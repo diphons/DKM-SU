@@ -293,9 +293,9 @@ pub fn uninstall(magiskboot_path: Option<PathBuf>) -> Result<()> {
     std::fs::remove_dir_all(defs::MODULE_UPDATE_TMP_DIR).ok();
     println!("- Restore boot image..");
     boot_patch::restore(None, magiskboot_path, true)?;
-    println!("- Uninstall KernelSU-Next manager..");
+    println!("- Uninstall DKM-SU manager..");
     Command::new("pm")
-        .args(["uninstall", "com.rifsxd.ksunext"])
+        .args(["uninstall", "com.diphons.dkmsu"])
         .spawn()?;
     println!("- Rebooting in 5 seconds..");
     std::thread::sleep(std::time::Duration::from_secs(5));

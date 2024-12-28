@@ -1,44 +1,45 @@
-**English** | [简体中文](/docs/README_CN.md) | [Türkçe](/docs/README_TR.md)
+[English](README_EN.md) | **Indonesia** | [简体中文](/docs/README_CN.md) | [Türkçe](/docs/README_TR.md)
 
-# KernelSU Next
+# DKM SU
 
-<img src="/assets/kernelsu_next.png" style="width: 96px;" alt="logo">
+<img src="/assets/dkm.png" style="width: 96px;" alt="logo">
 
-A Kernel-based root solution for Android devices.
+Solusi root berbasis Kernel untuk perangkat Android.
 
-[![Latest release](https://img.shields.io/github/v/release/rifsxd/KernelSU-Next?label=Release&logo=github)](https://github.com/rifsxd/KernelSU-Next/releases/latest)
-[![Nightly Release](https://img.shields.io/badge/Nightly%20release-gray?logo=hackthebox&logoColor=fff)](https://nightly.link/rifsxd/KernelSU-Next/workflows/build-manager/next/manager)
+[![Latest release](https://img.shields.io/github/v/release/diphons/DKM-SU?label=Release&logo=github)](https://github.com/diphons/DKM-SU/releases/latest)
+[![Nightly Release](https://img.shields.io/badge/Nightly%20release-gray?logo=hackthebox&logoColor=fff)](https://nightly.link/diphons/DKM-SU/workflows/build-manager/next/manager)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-orange.svg?logo=gnu)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![GitHub License](https://img.shields.io/github/license/rifsxd/KernelSU-Next?logo=gnu)](/LICENSE)
+[![GitHub License](https://img.shields.io/github/license/diphons/DKM-SU?logo=gnu)](/LICENSE)
 
-## Features
+## Fitur
 
-1. Kernel-based `su` and root access management.
-2. Module system based on [OverlayFS](https://en.wikipedia.org/wiki/OverlayFS).
-3. [App Profile](https://kernelsu.org/guide/app-profile.html): Lock up the root power in a cage.
+1. Manajemen akses root dan `su` berbasis kernel.
+2. Sistem modul berdasarkan [OverlayFS](https://en.wikipedia.org/wiki/OverlayFS).
+3. [Profil Aplikasi](https://kernelsu.org/guide/app-profile.html): Mengunci kekuatan root dalam sebuah kandang.
 
 ## Compatibility State
 
-KernelSU Next officially supports most Android kernels starting from 4.9 upto 6.6.
- - GKI 2.0 (5.10+) kernels can run pre-built images and LKM/KMI.
- - GKI 1.0 (4.19 - 5.4) kernels need to rebuilt with KernelSU driver.
- - EOL (<4.19) kernels also need to be rebuilt with KernelSU driver.
+DKM SU secara resmi mendukung sebagian besar kernel Android mulai dari 4.9 hingga 6.6.
+- Kernel GKI 2.0 (5.10+) dapat menjalankan citra yang telah dibuat sebelumnya dan LKM/KMI.
+- Kernel GKI 1.0 (4.19 - 5.4) perlu dibuat ulang dengan driver KernelSU.
+- Kernel EOL (<4.19) juga perlu dibuat ulang dengan driver KernelSU.
 
-Currently, only `arm64-v8a` is supported.
+Saat ini, hanya `arm64-v8a` yang didukung.
 
-## Security
+## Keamanan
 
-For information on reporting security vulnerabilities in KernelSU, see [SECURITY.md](/SECURITY.md).
+Untuk informasi tentang pelaporan kerentanan keamanan di KernelSU, lihat [SECURITY.md](/SECURITY.md).
 
-## License
+## Lisensi
 
-- Files under the `kernel` directory are [GPL-2.0-only](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
-- All other parts except the `kernel` directory are [GPL-3.0-or-later](https://www.gnu.org/licenses/gpl-3.0.html).
+- File di bawah direktori `kernel` adalah [hanya GPL-2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html).
+- Semua bagian lain kecuali direktori `kernel` adalah [GPL-3.0-atau-yang-lebih-baru](https://www.gnu.org/licenses/gpl-3.0.html).
 
-## Credits
+## Kredit
 
-- [kernel-assisted-superuser](https://git.zx2c4.com/kernel-assisted-superuser/about/): the KernelSU idea.
-- [Magisk](https://github.com/topjohnwu/Magisk): the powerful root tool.
-- [genuine](https://github.com/brevent/genuine/): apk v2 signature validation.
-- [Diamorphine](https://github.com/m0nad/Diamorphine): some rootkit skills.
-- [KernelSU](https://github.com/tiann/KernelSU): thanks to tiann or else KernelSU Next wouldn't even exist.
+- [kernel-assisted-superuser](https://git.zx2c4.com/kernel-assisted-superuser/about/): ide KernelSU.
+- [Magisk](https://github.com/topjohnwu/Magisk): alat root yang ampuh.
+- [genuine](https://github.com/brevent/genuine/): validasi tanda tangan apk v2.
+- [Diamorphine](https://github.com/m0nad/Diamorphine): beberapa keterampilan rootkit.
+- [KernelSU Next](https://github.com/rifsxd/KernelSU-Next): terima kasih kepada rifsxd atas basisnya.
+- [KernelSU](https://github.com/tiann/KernelSU): terima kasih kepada tiann atau kalau tidak DKM SU tidak akan ada.

@@ -1,15 +1,15 @@
-[English](README.md) | **简体中文** | [Türkçe](README_TR.md)
+[English](README_EN.md) | [Indonesia](README.md) | **简体中文** | [Türkçe](README_TR.md)
 
-# KernelSU Next
+# DKM SU
 
-<img src="/assets/kernelsu_next.png" style="width: 96px;" alt="logo">
+<img src="/assets/dkm.png" style="width: 96px;" alt="logo">
 
 安卓基于内核的 Root 方案
 
-[![Latest release](https://img.shields.io/github/v/release/rifsxd/KernelSU-Next?label=Release&logo=github)](https://github.com/rifsxd/KernelSU-Next/releases/latest)
-[![Nightly Release](https://img.shields.io/badge/Nightly%20release-gray?logo=hackthebox&logoColor=fff)](https://nightly.link/rifsxd/KernelSU-Next/workflows/build-manager/next/manager)
+[![Latest release](https://img.shields.io/github/v/release/diphons/DKM-SU?label=Release&logo=github)](https://github.com/diphons/DKM-SU/releases/latest)
+[![Nightly Release](https://img.shields.io/badge/Nightly%20release-gray?logo=hackthebox&logoColor=fff)](https://nightly.link/diphons/DKM-SU/workflows/build-manager/next/manager)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-orange.svg?logo=gnu)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![GitHub License](https://img.shields.io/github/license/rifsxd/KernelSU-Next?logo=gnu)](/LICENSE)
+[![GitHub License](https://img.shields.io/github/license/diphons/DKM-SU?logo=gnu)](/LICENSE)
 
 ## 特性
 
@@ -19,7 +19,7 @@
 
 ## 兼容状态
 
-KernelSU Next 支持从 4.9 到 6.6 的大多数安卓内核
+DKM SU 支持从 4.9 到 6.6 的大多数安卓内核
  - GKI 2.0（5.10+）内核可运行预置镜像和 LKM/KMI
  - GKI 1.0（4.19 - 5.4）内核需要使用 KernelSU 内核驱动重新编译
  - EOL (<4.19) 内核也需要使用 KernelSU 内核驱动重新编译
@@ -28,7 +28,7 @@ KernelSU Next 支持从 4.9 到 6.6 的大多数安卓内核
 
 ## 安全性
 
-有关报告 KernelSU Next 漏洞的信息，请参阅 [SECURITY.md](/SECURITY.md).
+有关报告 DKM SU 漏洞的信息，请参阅 [SECURITY.md](/SECURITY.md).
 
 ## 许可证
 
@@ -41,4 +41,5 @@ KernelSU Next 支持从 4.9 到 6.6 的大多数安卓内核
 - [Magisk](https://github.com/topjohnwu/Magisk): 强大的 Root 工具.
 - [genuine](https://github.com/brevent/genuine/): apk v2 签名验证。
 - [Diamorphine](https://github.com/m0nad/Diamorphine): 一些 Rootkit 技巧。
-- [KernelSU](https://github.com/tiann/KernelSU): 感谢 tiann，否则 KernelSU Next 根本不会存在。
+- [KernelSU Next](https://github.com/rifsxd/KernelSU-Next): 感谢 rifsxd 的基础.
+- [KernelSU](https://github.com/tiann/KernelSU): 感谢 tiann，否则 DKM SU 根本不会存在。

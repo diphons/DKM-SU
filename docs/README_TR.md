@@ -1,15 +1,15 @@
-[English](README.md) | [简体中文](/docs/README_CN.md) | **Türkçe**
+[English](README_EN.md) | [Indonesia](README.md) | [简体中文](/docs/README_CN.md) | **Türkçe**
 
-# KernelSU Next
+# DKM SU
 
-<img src="/assets/kernelsu_next.png" style="width: 96px;" alt="logo">
+<img src="/assets/dkm.png" style="width: 96px;" alt="logo">
 
 Android cihazlar için Kernel tabanlı bir root çözümü.
 
-[![Latest release](https://img.shields.io/github/v/release/rifsxd/KernelSU-Next?label=Release&logo=github)](https://github.com/rifsxd/KernelSU-Next/releases/latest)
-[![Nightly Release](https://img.shields.io/badge/Nightly%20release-gray?logo=hackthebox&logoColor=fff)](https://nightly.link/rifsxd/KernelSU-Next/workflows/build-manager/next/manager)
+[![Latest release](https://img.shields.io/github/v/release/diphons/DKM-SU?label=Release&logo=github)](https://github.com/diphons/DKM-SU/releases/latest)
+[![Nightly Release](https://img.shields.io/badge/Nightly%20release-gray?logo=hackthebox&logoColor=fff)](https://nightly.link/diphons/DKM-SU/workflows/build-manager/next/manager)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-orange.svg?logo=gnu)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![GitHub License](https://img.shields.io/github/license/rifsxd/KernelSU-Next?logo=gnu)](/LICENSE)
+[![GitHub License](https://img.shields.io/github/license/diphons/DKM-SU?logo=gnu)](/LICENSE)
 
 ## Özellikler
 
@@ -19,7 +19,7 @@ Android cihazlar için Kernel tabanlı bir root çözümü.
 
 ## Uyumluluk Durumu
 
-KernelSU Next, 4.9'dan başlayarak 6.6'ya kadar çoğu Android çekirdeğini resmi olarak desteklemektedir.
+DKM SU, 4.9'dan başlayarak 6.6'ya kadar çoğu Android çekirdeğini resmi olarak desteklemektedir.
  - GKI 2.0 (5.10+) çekirdekleri önceden oluşturulmuş görüntüleri ve LKM/KMI'yi çalıştırabilir.
  - GKI 1.0 (4.19 - 5.4) çekirdeklerinin KernelSU sürücüsü ile yeniden oluşturulması gerekir.
  - EOL (<4.19) çekirdeklerinin de KernelSU sürücüsü ile yeniden oluşturulması gerekir.
@@ -41,4 +41,5 @@ KernelSU'daki güvenlik açıklarını bildirme hakkında bilgi için [SECURITY.
 - [Magisk](https://github.com/topjohnwu/Magisk): güçlü kök aracı.
 - [genuine](https://github.com/brevent/genuine/): apk v2 imza doğrulama.
 - [Diamorphine](https://github.com/m0nad/Diamorphine): bazı rootkit becerileri.
-- [KernelSU](https://github.com/tiann/KernelSU): tiann'a teşekkürler, yoksa KernelSU Next var olamazdı bile.
+- [KernelSU Next](https://github.com/rifsxd/KernelSU-Next): temelli olduğu için diphons'ye teşekkürler..
+- [KernelSU](https://github.com/tiann/KernelSU): tiann'a teşekkürler, yoksa DKM SU var olamazdı bile.
