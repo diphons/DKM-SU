@@ -72,6 +72,15 @@ ccflags-y += -DEXPECTED_HASH=\"$(KSU_EXPECTED_HASH)\"
 
 ccflags-y += -DKSU_UMOUNT
 
+# This feature is introduced in linux 5.0-rc1
+ifeq ($(shell grep -q "get_cred_rcu" $(srctree)/include/linux/cred.h; echo $$?),0)
+ccflags-y += -DKSU_GET_CRED_RCU
+else
+$(info -- Your kernel does not have get_cred_rcu, please backport it.)
+$(info -- How to backport: https://github.com/tiann/KernelSU/pull/2320#issuecomment-2564232958)
+$(info -- Fallback to old changes.)
+endif
+
 ifneq ($(shell grep -Eq "^static int can_umount" $(srctree)/fs/namespace.c; echo $$?),0)
 $(info -- KSU_NEXT: adding function 'static int can_umount(const struct path *path, int flags);' to $(srctree)/fs/namespace.c)
 CAN_UMOUNT = static int can_umount(const struct path *path, int flags)\n\
