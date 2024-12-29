@@ -261,6 +261,21 @@ fn link_ksud_to_bin() -> Result<()> {
     Ok(())
 }
 
+pub fn susfs_to_bin(susfs: Option<PathBuf>) -> Result<()> {
+    ensure_dir_exists(defs::ADB_DIR)?;
+    std::fs::copy("/proc/self/exe", defs::DAEMON_PATH)?;
+    restorecon::lsetfilecon(defs::DAEMON_PATH, restorecon::ADB_CON)?;
+    // install binary assets
+    assets::ensure_binaries(false).with_context(|| "Failed to extract assets")?;
+
+    if let Some(susfs) = susfs {
+        ensure_dir_exists(defs::BINARY_DIR)?;
+        let _ = std::fs::copy(susfs, defs::SUSFS_PATH);
+    }
+
+    Ok(())
+}
+
 pub fn install(magiskboot: Option<PathBuf>) -> Result<()> {
     ensure_dir_exists(defs::ADB_DIR)?;
     std::fs::copy("/proc/self/exe", defs::DAEMON_PATH)?;

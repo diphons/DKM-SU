@@ -47,6 +47,12 @@ enum Commands {
         magiskboot: Option<PathBuf>,
     },
 
+    /// Install SUSFS userspace component to system
+    Susfs {
+        #[arg(long, default_value = None)]
+        susfs: Option<PathBuf>,
+    },
+
     /// SELinux policy Patch tool
     Sepolicy {
         #[command(subcommand)]
@@ -326,6 +332,7 @@ pub fn run() -> Result<()> {
         }
         Commands::Install { magiskboot } => utils::install(magiskboot),
         Commands::Uninstall { magiskboot } => utils::uninstall(magiskboot),
+        Commands::Susfs { susfs } => utils::susfs_to_bin(susfs),
         Commands::Sepolicy { command } => match command {
             Sepolicy::Patch { sepolicy } => crate::sepolicy::live_patch(&sepolicy),
             Sepolicy::Apply { file } => crate::sepolicy::apply_file(file),

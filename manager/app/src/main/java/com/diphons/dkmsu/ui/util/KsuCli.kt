@@ -97,11 +97,20 @@ fun execKsud(args: String, newShell: Boolean = false): Boolean {
     }
 }
 
+fun install_susfs() {
+    val start = SystemClock.elapsedRealtime()
+    val susfs = File(ksuApp.applicationInfo.nativeLibraryDir, "libsusfs.so").absolutePath
+    val result = execKsud("susfs --susfs $susfs", true)
+    Log.w(TAG, "install susfs result: $result, cost: ${SystemClock.elapsedRealtime() - start}ms")
+}
+
 fun install() {
     val start = SystemClock.elapsedRealtime()
     val magiskboot = File(ksuApp.applicationInfo.nativeLibraryDir, "libmagiskboot.so").absolutePath
     val result = execKsud("install --magiskboot $magiskboot", true)
     Log.w(TAG, "install result: $result, cost: ${SystemClock.elapsedRealtime() - start}ms")
+	// Install susfs
+	install_susfs()
 }
 
 fun listModules(): String {
