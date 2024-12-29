@@ -135,24 +135,24 @@ private fun getSuSFSPath(): String {
 
 fun getSuSFS(): String {
     val shell = getRootShell()
-    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} support")
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} show support")
     return result
 }
 
 fun getSuSFSVersion(): String {
     val shell = getRootShell()
-    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} version")
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} show version")
     return result
 }
 
 fun getSuSFSVariant(): String {
     val shell = getRootShell()
-    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} variant")
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} show variant")
     return result
 }
 fun getSuSFSFeatures(): String {
     val shell = getRootShell()
-    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} features")
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} show enabled_features")
     return result
 }
 
@@ -170,7 +170,7 @@ fun susfsSUS_SU_2(): String {
 
 fun susfsSUS_SU_Mode(): String {
     val shell = getRootShell()
-    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} sus_su mode")
+    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} sus_su show_working_mode")
     return result
 }
 
