@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.defaultMinSize
@@ -121,7 +122,9 @@ fun ExecuteModuleActionScreen(navigator: DestinationsNavigator, moduleId: String
                     icon = { Icon(Icons.Filled.Close, contentDescription = null) },
                     onClick = {
                         navigator.popBackStack()
-                    }
+                    },
+                    modifier = Modifier
+                        .navigationBarsPadding()
                 )
             }
         },

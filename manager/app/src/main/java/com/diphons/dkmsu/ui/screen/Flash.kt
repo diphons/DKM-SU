@@ -6,6 +6,7 @@ import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
@@ -190,6 +191,7 @@ fun FlashScreen(navigator: DestinationsNavigator, flashIt: FlashIt) {
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(16.dp)
+                        .navigationBarsPadding()
                 )
             }
 
@@ -204,6 +206,7 @@ fun FlashScreen(navigator: DestinationsNavigator, flashIt: FlashIt) {
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(16.dp)
+                        .navigationBarsPadding()
                 )
             }
         }
