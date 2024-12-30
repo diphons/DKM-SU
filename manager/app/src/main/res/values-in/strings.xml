@@ -60,9 +60,9 @@
     <string name="safe_mode">Mode aman</string>
     <string name="reboot_to_apply">Reboot agar berfungsi</string>
     <string name="module_magisk_conflict">Konflik dengan Magisk, fungsi modul ditiadakan!</string>
-    <string name="home_next_kernelsu">🔥 Pembangunan Next</string>
-    <string name="home_next_kernelsu_repo">https://github.com/rifsxd/KernelSU-Next</string>
-    <string name="home_next_kernelsu_body">Next cabang eksperimental. Lihat di GitHub!</string>
+    <string name="home_next_kernelsu">🔥 Pembangunan DKM</string>
+    <string name="home_next_kernelsu_repo">https://github.com/diphons/DKM-SU</string>
+    <string name="home_next_kernelsu_body">DKM cabang eksperimental. Lihat di GitHub!</string>
     <string name="home_experimental_kernelsu">⚠️ Peringatan Pengembangan Eksperimental!</string>
     <string name="home_experimental_kernelsu_repo">127.0.0.1</string>
     <string name="home_experimental_kernelsu_body">Next adalah versi non-resmi yang selalu dalam pengembangan eksperimental aktif. Versi ini disediakan apa adanya, tanpa jaminan stabilitas, performa, atau keandalan.</string>
@@ -84,7 +84,7 @@
     <string name="profile_selinux_context">SELinux</string>
     <string name="profile_umount_modules">Umount Modul</string>
     <string name="failed_to_update_app_profile">Gagal membarui Profil pada %s</string>
-    <string name="require_kernel_version">Versi KernelSU-Next %d terlalu rendah agar manajer berfungsi normal. Harap membarui ke versi %d atau di atasnya!</string>
+    <string name="require_kernel_version">Versi DKM-SU %d terlalu rendah agar manajer berfungsi normal. Harap membarui ke versi %d atau di atasnya!</string>
     <string name="settings_umount_modules_default">Melepas Modul secara bawaan</string>
     <string name="settings_umount_modules_default_summary">Menggunakan \"Umount Modul\" secara universal pada Profil Aplikasi. Jika diaktifkan, akan menghapus semua modifikasi sistem untuk aplikasi yang tidak memiliki set profil.</string>
     <string name="settings_susfs_toggle">Sembunyikan kait su yang mencurigakan</string>
@@ -145,7 +145,7 @@
     <string name="settings_uninstall_permanent">Hapus permanen</string>
     <string name="settings_restore_stock_image">Pulihkan image asal</string>
     <string name="settings_uninstall_temporary_message">Hapus temporer KernelSU Next, pulihkan ke kondisi asali setelah but berikutnya.</string>
-    <string name="settings_uninstall_permanent_message">Hapus permanen KernelSU-Next (root dan modul).</string>
+    <string name="settings_uninstall_permanent_message">Hapus permanen DKM-SU (root dan modul).</string>
     <string name="settings_restore_stock_image_message">Pulihkan image bawaan ROM (jika cadangan tersedia), umumnya dilakukan sebelum OTA; jika ingin menghapus KernelSU, gunakan fungsi "Hapus permanen".</string>
     <string name="flashing">Pasang</string>
     <string name="flash_success">Pemasangan Berhasil</string>
