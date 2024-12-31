@@ -10,10 +10,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.diphons.dkmsu.ui.util.HanziToPinyin
 import com.diphons.dkmsu.ui.util.listModules
 import com.diphons.dkmsu.ui.util.overlayFsAvailable
 import org.json.JSONArray
 import org.json.JSONObject
+import java.text.Collator
+import java.util.Locale
 
 class ModuleViewModel : ViewModel() {
 
@@ -49,6 +52,7 @@ class ModuleViewModel : ViewModel() {
 
     var isRefreshing by mutableStateOf(false)
         private set
+    var search by mutableStateOf("")
 
     var sortAToZ by mutableStateOf(false)
     var sortZToA by mutableStateOf(false)
@@ -56,10 +60,12 @@ class ModuleViewModel : ViewModel() {
     val moduleList by derivedStateOf {
         val comparator = when {
             sortAToZ -> compareBy<ModuleInfo> { it.name.lowercase() }
-            sortZToA -> compareByDescending<ModuleInfo> { it.name.lowercase() }
-            else -> compareBy<ModuleInfo> { it.id }
-        }
-        modules.sortedWith(comparator).also {
+            else -> compareByDescending<ModuleInfo> { it.name.lowercase() }
+        }.thenBy(Collator.getInstance(Locale.getDefault()), ModuleInfo::id)
+        modules.filter {
+            it.id.contains(search, true) || it.name.contains(search, true) || HanziToPinyin.getInstance()
+                .toPinyinString(it.name).contains(search, true)
+        }.sortedWith(comparator).also {
             isRefreshing = false
         }
     }
