@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Save
@@ -133,6 +134,9 @@ fun FlashScreen(navigator: DestinationsNavigator, flashIt: FlashIt) {
         topBar = {
             TopBar(
                 flashing,
+                onBack = {
+                    navigator.popBackStack()
+                },
                 onSave = {
                     scope.launch {
                         val format = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
@@ -148,8 +152,24 @@ fun FlashScreen(navigator: DestinationsNavigator, flashIt: FlashIt) {
                 scrollBehavior = scrollBehavior
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackBarHost) },
-        contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
+        floatingActionButton = {
+            if (showFloatAction) {
+                // Reboot button (bottom left)
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        scope.launch {
+                            withContext(Dispatchers.IO) {
+                                reboot()
+                            }
+                        }
+                    },
+                    icon = { Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.reboot)) },
+                    text = { Text(text = stringResource(R.string.reboot)) }
+                )
+            }
+        },
+        contentWindowInsets = WindowInsets.safeDrawing,
+        snackbarHost = { SnackbarHost(hostState = snackBarHost) }
     ) { innerPadding ->
         KeyEventBlocker {
             it.key == Key.VolumeDown || it.key == Key.VolumeUp
@@ -171,44 +191,6 @@ fun FlashScreen(navigator: DestinationsNavigator, flashIt: FlashIt) {
                 fontFamily = FontFamily.Monospace,
                 lineHeight = MaterialTheme.typography.bodySmall.lineHeight,
             )
-        }
-
-        // Floating Action Buttons
-        Box(modifier = Modifier.fillMaxSize()) {
-            // Reboot button (bottom left)
-            if (showFloatAction) {
-                val reboot = stringResource(id = R.string.reboot)
-                ExtendedFloatingActionButton(
-                    onClick = {
-                        scope.launch {
-                            withContext(Dispatchers.IO) {
-                                reboot()
-                            }
-                        }
-                    },
-                    icon = { Icon(Icons.Filled.Refresh, reboot) },
-                    text = { Text(text = reboot) },
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(16.dp)
-                        .navigationBarsPadding()
-                )
-            }
-
-            if (showFloatAction) {
-                // Back button (bottom right)
-                ExtendedFloatingActionButton(
-                    onClick = {
-                        navigator.popBackStack()
-                    },
-                    text = { Text(text = stringResource(R.string.close)) },
-                    icon = { Icon(Icons.Filled.Close, contentDescription = null) },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp)
-                        .navigationBarsPadding()
-                )
-            }
         }
     }
 }
@@ -252,6 +234,7 @@ fun flashIt(
 @Composable
 private fun TopBar(
     status: FlashingStatus,
+    onBack: () -> Unit = {},
     onSave: () -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
@@ -266,6 +249,12 @@ private fun TopBar(
                     }
                 )
             )
+        },
+        navigationIcon = {
+            IconButton(
+                onClick = { if (status != FlashingStatus.FLASHING) onBack() },
+                enabled = status != FlashingStatus.FLASHING
+            ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
         },
         actions = {
             IconButton(
