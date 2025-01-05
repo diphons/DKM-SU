@@ -168,20 +168,18 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                                     Checkbox(checked = viewModel.sortAToZ, onCheckedChange = null)
                                 },
                                 onClick = {
-                                    if (viewModel.sortAToZ) {
-                                        viewModel.sortAToZ = false
-                                    } else {
-                                        viewModel.sortAToZ = true
-                                        viewModel.sortZToA = false
-                                    }
+                                    viewModel.sortAToZ = !viewModel.sortAToZ
+                                    viewModel.sortZToA = false
                                     prefs.edit()
                                         .putBoolean("module_sort_a_to_z", viewModel.sortAToZ)
+                                        .putBoolean("module_sort_z_to_a", false)
                                         .apply()
                                     scope.launch {
                                         viewModel.fetchModuleList()
                                     }
                                 }
                             )
+
                             DropdownMenuItem(
                                 text = {
                                     Text(stringResource(R.string.module_sort_z_to_a))
@@ -190,14 +188,11 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                                     Checkbox(checked = viewModel.sortZToA, onCheckedChange = null)
                                 },
                                 onClick = {
-                                    if (viewModel.sortZToA) {
-                                        viewModel.sortZToA = false
-                                    } else {
-                                        viewModel.sortZToA = true
-                                        viewModel.sortAToZ = false
-                                    }
+                                    viewModel.sortZToA = !viewModel.sortZToA
+                                    viewModel.sortAToZ = false
                                     prefs.edit()
                                         .putBoolean("module_sort_z_to_a", viewModel.sortZToA)
+                                        .putBoolean("module_sort_a_to_z", false)
                                         .apply()
                                     scope.launch {
                                         viewModel.fetchModuleList()
