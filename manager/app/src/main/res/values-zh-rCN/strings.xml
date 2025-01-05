@@ -33,8 +33,8 @@
     <string name="module">模块</string>
     <string name="confirm_module_installation">确认安装</string>
     <string name="module_install_prompt_with_name">是否要继续安装模块 %1$s ？</string>
-    <string name="module_sort_action_first">可执行优先</string>
-    <string name="module_sort_enabled_first">已启用优先</string>
+    <string name="module_sort_a_to_z">种类 (A - Z)</string>
+    <string name="module_sort_z_to_a">种类 (Z - A)</string>
     <string name="uninstall">卸载</string>
     <string name="restore">重启</string>
     <string name="module_install">安装</string>

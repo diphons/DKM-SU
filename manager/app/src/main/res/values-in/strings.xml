@@ -33,6 +33,8 @@
     <string name="module">Modul</string>
     <string name="confirm_module_installation">Yakin instal</string>
     <string name="module_install_prompt_with_name">Anda ingin melanjutkan pemasangan modul %1$s?</string>
+    <string name="module_sort_a_to_z">Menyortir (A - Z)</string>
+    <string name="module_sort_z_to_a">Menyortir (Z - A)</string>
     <string name="uninstall">Hapus</string>
     <string name="restore">Pulihkan</string>
     <string name="module_install">Instal</string>

@@ -38,8 +38,8 @@
     <string name="module">Module</string>
     <string name="confirm_module_installation">Confirm Installation</string>
     <string name="module_install_prompt_with_name">Do you want to continue installing module %1$s?</string>
-    <string name="module_sort_action_first" translatable="false">Sort (Action First)</string>
-    <string name="module_sort_enabled_first" translatable="false">Sort (Enabled First)</string>
+    <string name="module_sort_a_to_z">Sort (A - Z)</string>
+    <string name="module_sort_z_to_a">Sort (Z - A)</string>
     <string name="uninstall">Uninstall</string>
     <string name="restore">Restore</string>
     <string name="module_install">Install</string>

@@ -122,8 +122,8 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
 
     LaunchedEffect(Unit) {
         if (viewModel.moduleList.isEmpty() || viewModel.isNeedRefresh) {
-            viewModel.sortEnabledFirst = prefs.getBoolean("module_sort_enabled_first", false)
-            viewModel.sortActionFirst = prefs.getBoolean("module_sort_action_first", false)
+            viewModel.sortAToZ = prefs.getBoolean("module_sort_a_to_z", true)
+            viewModel.sortZToA = prefs.getBoolean("module_sort_z_to_a", false)
             viewModel.fetchModuleList()
         }
     }
@@ -154,43 +154,56 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                             imageVector = Icons.Filled.MoreVert,
                             contentDescription = stringResource(id = R.string.settings)
                         )
-                        DropdownMenu(expanded = showDropdown, onDismissRequest = {
-                            showDropdown = false
-                        }) {
-                            DropdownMenuItem(text = {
-                                Text(stringResource(R.string.module_sort_action_first))
-                            }, trailingIcon = {
-                                Checkbox(viewModel.sortActionFirst, null)
-                            }, onClick = {
-                                viewModel.sortActionFirst =
-                                    !viewModel.sortActionFirst
-                                prefs.edit()
-                                    .putBoolean(
-                                        "module_sort_action_first",
-                                        viewModel.sortActionFirst
-                                    )
-                                    .apply()
-                                scope.launch {
-                                    viewModel.fetchModuleList()
+                        DropdownMenu(
+                            expanded = showDropdown,
+                            onDismissRequest = {
+                                showDropdown = false
+                            }
+                        ) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(stringResource(R.string.module_sort_a_to_z))
+                                },
+                                trailingIcon = {
+                                    Checkbox(checked = viewModel.sortAToZ, onCheckedChange = null)
+                                },
+                                onClick = {
+                                    if (viewModel.sortAToZ) {
+                                        viewModel.sortAToZ = false
+                                    } else {
+                                        viewModel.sortAToZ = true
+                                        viewModel.sortZToA = false
+                                    }
+                                    prefs.edit()
+                                        .putBoolean("module_sort_a_to_z", viewModel.sortAToZ)
+                                        .apply()
+                                    scope.launch {
+                                        viewModel.fetchModuleList()
+                                    }
                                 }
-                            })
-                            DropdownMenuItem(text = {
-                                Text(stringResource(R.string.module_sort_enabled_first))
-                            }, trailingIcon = {
-                                Checkbox(viewModel.sortEnabledFirst, null)
-                            }, onClick = {
-                                viewModel.sortEnabledFirst =
-                                    !viewModel.sortEnabledFirst
-                                prefs.edit()
-                                    .putBoolean(
-                                        "module_sort_enabled_first",
-                                        viewModel.sortEnabledFirst
-                                    )
-                                    .apply()
-                                scope.launch {
-                                    viewModel.fetchModuleList()
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(stringResource(R.string.module_sort_z_to_a))
+                                },
+                                trailingIcon = {
+                                    Checkbox(checked = viewModel.sortZToA, onCheckedChange = null)
+                                },
+                                onClick = {
+                                    if (viewModel.sortZToA) {
+                                        viewModel.sortZToA = false
+                                    } else {
+                                        viewModel.sortZToA = true
+                                        viewModel.sortAToZ = false
+                                    }
+                                    prefs.edit()
+                                        .putBoolean("module_sort_z_to_a", viewModel.sortZToA)
+                                        .apply()
+                                    scope.launch {
+                                        viewModel.fetchModuleList()
+                                    }
                                 }
-                            })
+                            )
                         }
                     }
                 },
@@ -584,7 +597,7 @@ private fun ModuleList(
                                 }
                             },
                             onClick = {
-                                onClickModule(it.id, it.name, it.hasWebUi)
+                                onClickModule(it.dirId, it.name, it.hasWebUi)
                             }
                         )
 

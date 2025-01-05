@@ -50,18 +50,20 @@ class ModuleViewModel : ViewModel() {
     var isRefreshing by mutableStateOf(false)
         private set
 
-    var sortEnabledFirst by mutableStateOf(false)
-    var sortActionFirst by mutableStateOf(false)
+    var sortAToZ by mutableStateOf(false)
+    var sortZToA by mutableStateOf(false)
+
     val moduleList by derivedStateOf {
-        val comparator =
-            compareBy<ModuleInfo>(
-                { if (sortEnabledFirst) !it.enabled else 0 },
-                { if (sortActionFirst) !it.hasWebUi && !it.hasActionScript else 0 },
-                { it.id })
+        val comparator = when {
+            sortAToZ -> compareBy<ModuleInfo> { it.name.lowercase() }
+            sortZToA -> compareByDescending<ModuleInfo> { it.name.lowercase() }
+            else -> compareBy<ModuleInfo> { it.dirId }
+        }
         modules.sortedWith(comparator).also {
             isRefreshing = false
         }
     }
+
 
     var isNeedRefresh by mutableStateOf(false)
         private set
