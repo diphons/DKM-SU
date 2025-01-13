@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.webkit.WebViewAssetLoader
+import com.diphons.dkmsu.ui.store.*
 import com.topjohnwu.superuser.Shell
 import com.diphons.dkmsu.ui.util.createRootShell
 import java.io.File
@@ -45,7 +46,7 @@ class WebUIActivity : ComponentActivity() {
             setTaskDescription(taskDescription)
         }
 
-        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
+        val prefs = getSharedPreferences(SpfConfig.SETTINGS, MODE_PRIVATE)
         WebView.setWebContentsDebuggingEnabled(prefs.getBoolean("enable_web_debugging", false))
 
         val moduleDir = "/data/adb/modules/${moduleId}"

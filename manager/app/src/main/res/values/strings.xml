@@ -14,14 +14,15 @@
     <string name="home_not_installed">Not installed</string>
     <string name="home_click_to_install">Click to install</string>
     <string name="home_working">Working</string>
-    <string name="home_working_version">Version: %d</string>
-    <string name="home_superuser_count">Superusers: %d</string>
-    <string name="home_module_count">Modules: %d</string>
+    <string name="home_working_version">Version</string>
+    <string name="home_superuser_count">Superusers</string>
+    <string name="home_module_count">Modules</string>
     <string name="home_failure">DKMSU v2 signature not found in kernel! [ !KSU_DKMSU || != size/hash ]</string>
     <string name="home_failure_tip">Ask your kernel developer to integrate DKMSU!</string>
+    <string name="home_device">Device</string>
     <string name="home_kernel">Kernel</string>
-    <string name="home_susfs">SuSFS: %s</string>
-    <string name="home_susfs_version">SuSFS</string>
+    <string name="home_kernel_tittle">Kernel Manager</string>
+    <string name="home_susfs">SuSFS</string>
     <string name="home_susfs_sus_su" translatable="false">SuS SU</string>
     <string name="home_android">Android</string>
     <string name="home_manager_version">Manager</string>
@@ -160,4 +161,115 @@
     <string name="selected_lkm">Selected LKM: %s</string>
     <string name="save_log">Save logs</string>
     <string name="log_saved">Logs saved</string>
+    <string name="performance_mode">Performance Mode</string>
+    <string name="performance_mode_disabled">Performance Mode is disabled</string>
+    <string name="balance">Balance</string>
+    <string name="battery">Battery</string>
+    <string name="game">Game</string>
+    <string name="performance">Performance</string>
+    <string name="game_ai" translatable="false">Game Ai</string>
+    <string name="game_ai_sum">Enable to use Game Ai</string>
+    <string name="game_ai_sum2">Disable to use Profile Mode</string>
+    <string name="game_ai_log">Game Ai Log</string>
+    <string name="game_ai_log_sum">Enable to show Game Ai running in kernel log</string>
+    <string name="profile_mode">Profile Mode</string>
+    <string name="touch">Touch</string>
+    <string name="touch_mode">Touch Mode</string>
+    <string name="touch_mode_sum">Set touchscreen mode to use</string>
+    <string name="dt2w">Double Tap to WakeUp</string>
+    <string name="dt2w_summary">Wake up your device by double tapping the screen.</string>
+    <string name="touch_sample">Improvement touch</string>
+    <string name="touch_sample_sum">Enable to use improvement touch bump resample</string>
+    <string name="seek_haptic">Haptic Level</string>
+    <string name="display_settings">Screen Settings</string>
+    <string name="display_settings_summary">Set additional features for screen settings</string>
+    <string name="sound_control">Sound Control</string>
+    <string name="sound_control_summary">Set sound gain to high or low on Mic, Ear or Headset</string>
+    <string name="headphone_gain">Headphone Gain</string>
+    <string name="headphone_gain_left">Headphone Gain - Left</string>
+    <string name="headphone_gain_right">Headphone Gain - Right</string>
+    <string name="speaker_gain">Speaker Gain></string>>
+    <string name="microphone_gain">Microphone Gain</string>
+    <string name="earpiece_gain">Earpiece Gain (Calls)</string>
+    <string name="per_channel_controls">Per-channel controls</string>
+    <string name="xt_game">Gesture Tracking</string>
+    <string name="xt_game_sum">Get batter real-time response throughout the whole gesture</string>
+    <string name="xt_active">Active Mode</string>
+    <string name="xt_up">Fast tap response</string>
+    <string name="xt_up_sum">Speed up tap response at the hardware level</string>
+    <string name="xt_tole">Tolerance</string>
+    <string name="xt_aim">Aim Sensitivity</string>
+    <string name="xt_tap">Stabilisation algorith</string>
+    <string name="xt_tap_sum">Make smaller gestures more responsive using the dedicated algorithm</string>
+    <string name="xt_exp">Expert Mode</string>
+    <string name="xt_edge">Edge Filter</string>
+    <string name="xt_grip">Grip Mode</string>
+    <string name="color_calibration">Color Calibration</string>
+    <string name="color_calibration_sum">Set Color Calibration, AMOLED or set it yourself</string>
+    <string name="reset">Reset</string>
+    <string name="rgb_adjustments">RGB Adjustments</string>
+    <string name="display_saturated">Saturation</string>
+    <string name="display_value">Value</string>
+    <string name="display_contrast">Contrast</string>
+    <string name="display_hue">Hue</string>
+    <string name="amoled_color">Amoled Color</string>
+    <string name="amoled_color_sum">Use amoled colors for a more premium appearance</string>
+    <string name="refresh_rate">Refresh Rate</string>
+    <string name="refresh_rate_summary">Set refresh rate for your display</string>
+    <string name="refresh_rate_label">A higher display refresh rate allows for smoother viewing but drains the battery faster.</string>
+    <string name="refresh_rate_label2">In some low-usage scenarios, your phone may optimize to a lower refresh rate in order to preserve battery life.</string>
+    <string name="reduce_green_tint">Reduce green tint</string>
+    <string name="reduce_green_tint_sum">some devices get green tint at 90hz refresh rate like alioth or munch, enable to reduce green tint on screen when using 90hz refresh rate</string>
+    <string name="power_settings">Power Settings</string>
+    <string name="current">Current</string>
+    <string name="status">Status</string>
+    <string name="enabled">Enabled</string>
+    <string name="power_profile">Profile</string>
+    <string name="charger_max">Charger Max</string>
+    <string name="charger_dynamic">Dynamic Charging</string>
+    <string name="charger_dynamic_sum_on">Disable to use select mode</string>
+    <string name="charger_dynamic_sum_off">Enable to use dynamic charging</string>
+    <string name="charger_profile_warning">If the charging does not match your device, set the power profile in the menu above.\n\nWarning.!!\nSet according to the maximum charging power of your device.</string>
+    <string name="skip_thermal">Skip Thermal</string>
+    <string name="skip_thermal_summary">Used to bypass maximum temperature when charging battery</string>
+    <string name="fast_charging">Force Fast Charging</string>
+    <string name="fast_charging_sum">Force adapter detected as USB to charge as AC</string>
+    <string name="night_charging">Night Charging</string>
+    <string name="step_charging">Stepped charging</string>
+    <string name="step_charging_sum">The system adjusts the upper limit of the charging speed in stages according to the power level to help protect the battery life\n\nIt is generally recommended to keep the default setting</string>
+    <string name="off">Off</string>
+    <string name="low">Low</string>
+    <string name="medium">Medium</string>
+    <string name="high">High</string>
+    <string name="not_set" translatable="false">Not Set</string>
+    <string name="evaluation" translatable="false">Dynamic (evaluation)</string>
+    <string name="class_0" translatable="false">Class 0</string>
+    <string name="ar_vr" translatable="false">AR &amp; VR</string>
+    <string name="in_calls" translatable="false">In-Calls</string>
+    <string name="game2" translatable="false">Game 2</string>
+    <string name="extreme" translatable="false">Extreme</string>
+    <string name="camera" translatable="false">Camera</string>
+    <string name="pubg" translatable="false">PUBG</string>
+    <string name="youtube" translatable="false">Youtube</string>
+    <string name="manual_settings">Manual Settings</string>
+    <string name="start">Start</string>
+    <string name="apply">Apply</string>
+    <string name="is_started">is started</string>
+    <string name="misc">Misc</string>
+    <string name="misc_sum">Another options you can use</string>
+    <string name="joyose">Block Joyose</string>
+    <string name="joyose_sum">Blocked joyose causes your device temperature to heat up quickly, make sure you use a device cooler when playing games.\n\nThis option only works for MIUI / HyperOS roms that have Joyose.</string>
+    <string name="jitter_rendering">Rendering Jitter</string>
+    <string name="jitter_rendering_sum">Test jitter redering - CPU - UI - RT duration on your device</string>
+    <string name="susfs_not_alowed">Spaces are not alowed in the input</string>
+    <string name="custom_susfs_settings">Custom SuSFS Settings</string>
+    <string name="custom_susfs_settings_sum">See more custom susfs settings for your use</string>
+    <string name="susfs_log" translatable="false">SuSFS Log</string>
+    <string name="susfs_hide_cusrom" translatable="false">Hide Custom ROM Path</string>
+    <string name="susfs_hide_gapps" translatable="false">Hide GAPPS</string>
+    <string name="susfs_hide_revanced" translatable="false">Hide Revanced (YT/YTM)</string>
+    <string name="susfs_hide_cmdline" translatable="false">Hide CMDLINE</string>
+    <string name="susfs_hide_loop" translatable="false">Hide KSU Loop</string>
+    <string name="susfs_hide_lsposed" translatable="false">Force Hide LSPosed Mounts</string>
+    <string name="dkm_service">DKM Service is not started, start it to use more feature</string>
 </resources>

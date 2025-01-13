@@ -145,6 +145,7 @@ fun InstallScreen(navigator: DestinationsNavigator) {
                 .padding(innerPadding)
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
+                .padding(bottom = 16.dp)
         ) {
             SelectInstallMethod { method ->
                 installMethod = method

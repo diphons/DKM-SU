@@ -53,6 +53,12 @@ enum Commands {
         susfs: Option<PathBuf>,
     },
 
+    /// Install DKM SVC userspace component to system
+    Dkmsvc {
+        #[arg(long, default_value = None)]
+        dkmsvc: Option<PathBuf>,
+    },
+
     /// SELinux policy Patch tool
     Sepolicy {
         #[command(subcommand)]
@@ -333,6 +339,7 @@ pub fn run() -> Result<()> {
         Commands::Install { magiskboot } => utils::install(magiskboot),
         Commands::Uninstall { magiskboot } => utils::uninstall(magiskboot),
         Commands::Susfs { susfs } => utils::susfs_to_bin(susfs),
+        Commands::Dkmsvc { dkmsvc } => utils::dkmsvc_to_bin(dkmsvc),
         Commands::Sepolicy { command } => match command {
             Sepolicy::Patch { sepolicy } => crate::sepolicy::live_patch(&sepolicy),
             Sepolicy::Apply { file } => crate::sepolicy::apply_file(file),

@@ -4,7 +4,6 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -29,6 +28,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Wysiwyg
 import androidx.compose.material.icons.filled.*
@@ -70,6 +70,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -98,6 +99,7 @@ import com.diphons.dkmsu.ui.component.rememberConfirmDialog
 import com.diphons.dkmsu.ui.component.rememberLoadingDialog
 import com.diphons.dkmsu.ui.util.DownloadListener
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
+import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.download
 import com.diphons.dkmsu.ui.util.hasMagisk
 import com.diphons.dkmsu.ui.util.reboot
@@ -116,7 +118,7 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
     val context = LocalContext.current
     val snackBarHost = LocalSnackbarHost.current
     val scope = rememberCoroutineScope()
-    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
 
     LaunchedEffect(Unit) {
         if (viewModel.moduleList.isEmpty() || viewModel.isNeedRefresh) {
@@ -194,7 +196,15 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                 },
                 scrollBehavior = scrollBehavior,
                 title = { Text(stringResource(R.string.module)) },
-                windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
+                windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                modifier = Modifier
+                    .graphicsLayer {
+                        shape = RoundedCornerShape(
+                        bottomStart = 20.dp,
+                        bottomEnd = 20.dp
+                    )
+                    clip = true
+                }
             )
         },
         floatingActionButton = {

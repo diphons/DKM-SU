@@ -22,7 +22,6 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -34,7 +33,6 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -79,6 +77,7 @@ import com.diphons.dkmsu.ui.component.rememberLoadingDialog
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.util.getBugreportFile
 import com.diphons.dkmsu.ui.util.*
+import com.diphons.dkmsu.ui.store.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -117,6 +116,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
 
             val context = LocalContext.current
             val scope = rememberCoroutineScope()
+            val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
 
             val exportBugreportLauncher = rememberLauncherForActivityResult(
                 ActivityResultContracts.CreateDocument("application/gzip")
@@ -155,34 +155,6 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             ) {
                 if (Natives.setDefaultUmountModules(it)) {
                     umountChecked = it
-                }
-            }
-
-            val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-
-            val isSUS_SU = getSuSFSFeatures()
-            if (isSUS_SU == "CONFIG_KSU_SUSFS_SUS_SU") {
-                var isEnabled by rememberSaveable {
-                    mutableStateOf(susfsSUS_SU_Mode() == "2")
-                }
-
-                LaunchedEffect(Unit) {
-                    isEnabled = susfsSUS_SU_Mode() == "2"
-                }
-
-                SwitchItem(
-                    icon = Icons.Filled.VisibilityOff,
-                    title = stringResource(id = R.string.settings_susfs_toggle),
-                    summary = stringResource(id = R.string.settings_susfs_toggle_summary),
-                    checked = isEnabled
-                ) {
-                    if (it) {
-                        susfsSUS_SU_2()
-                    } else {
-                        susfsSUS_SU_0()
-                    }
-                    prefs.edit().putBoolean("enable_sus_su", it).apply()
-                    isEnabled = it
                 }
             }
 

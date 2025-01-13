@@ -15,6 +15,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -58,49 +59,64 @@ fun SuperUserScreen(navigator: DestinationsNavigator) {
 
     Scaffold(
         topBar = {
-            SearchAppBar(
-                title = { Text(stringResource(R.string.superuser)) },
-                searchText = viewModel.search,
-                onSearchTextChange = { viewModel.search = it },
-                onClearClick = { viewModel.search = "" },
-                dropdownContent = {
-                    var showDropdown by remember { mutableStateOf(false) }
+            TopAppBar(
+                title = {},
+                actions = {
+                    SearchAppBar(
+                        title = { Text(stringResource(R.string.superuser)) },
+                        searchText = viewModel.search,
+                        onSearchTextChange = { viewModel.search = it },
+                        onClearClick = { viewModel.search = "" },
+                        dropdownContent = {
+                            var showDropdown by remember { mutableStateOf(false) }
 
-                    IconButton(
-                        onClick = { showDropdown = true },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.MoreVert,
-                            contentDescription = stringResource(id = R.string.settings)
-                        )
-
-                        DropdownMenu(expanded = showDropdown, onDismissRequest = {
-                            showDropdown = false
-                        }) {
-                            DropdownMenuItem(text = {
-                                Text(stringResource(R.string.refresh))
-                            }, onClick = {
-                                scope.launch {
-                                    viewModel.fetchAppList()
-                                }
-                                showDropdown = false
-                            })
-                            DropdownMenuItem(text = {
-                                Text(
-                                    if (viewModel.showSystemApps) {
-                                        stringResource(R.string.hide_system_apps)
-                                    } else {
-                                        stringResource(R.string.show_system_apps)
-                                    }
+                            IconButton(
+                                onClick = { showDropdown = true },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.MoreVert,
+                                    contentDescription = stringResource(id = R.string.settings)
                                 )
-                            }, onClick = {
-                                viewModel.showSystemApps = !viewModel.showSystemApps
-                                showDropdown = false
-                            })
-                        }
-                    }
+
+                                DropdownMenu(expanded = showDropdown, onDismissRequest = {
+                                    showDropdown = false
+                                }) {
+                                    DropdownMenuItem(text = {
+                                        Text(stringResource(R.string.refresh))
+                                    }, onClick = {
+                                        scope.launch {
+                                            viewModel.fetchAppList()
+                                        }
+                                        showDropdown = false
+                                    })
+                                    DropdownMenuItem(text = {
+                                        Text(
+                                            if (viewModel.showSystemApps) {
+                                                stringResource(R.string.hide_system_apps)
+                                            } else {
+                                                stringResource(R.string.show_system_apps)
+                                            }
+                                        )
+                                    }, onClick = {
+                                        viewModel.showSystemApps = !viewModel.showSystemApps
+                                        showDropdown = false
+                                    })
+                                }
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                    )
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                modifier = Modifier
+                    .graphicsLayer {
+                        shape = RoundedCornerShape(
+                            bottomStart = 20.dp,
+                            bottomEnd = 20.dp
+                        )
+                        clip = true
+                    }
             )
         },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
