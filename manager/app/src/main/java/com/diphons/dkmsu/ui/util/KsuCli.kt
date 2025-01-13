@@ -1360,6 +1360,53 @@ fun getFileName(context: Context, uri: Uri): String {
     return name
 }
 
+fun moduleBackupDir(): String? {
+    val shell = getRootShell()
+    val baseBackupDir = "/data/adb/modules_bak"
+    val resultBase = ShellUtils.fastCmd(shell, "mkdir -p $baseBackupDir").trim()
+    if (resultBase.isNotEmpty()) return null
+    val timestamp = ShellUtils.fastCmd(shell, "date +%Y%m%d_%H%M%S").trim()
+    if (timestamp.isEmpty()) return null
+    val newBackupDir = "$baseBackupDir/$timestamp"
+    val resultNewDir = ShellUtils.fastCmd(shell, "mkdir -p $newBackupDir").trim()
+    if (resultNewDir.isEmpty()) return newBackupDir
+    return null
+}
+
+fun moduleBackup(): Boolean {
+    val shell = getRootShell()
+    val checkEmptyCommand = "if [ -z \"$(ls -A /data/adb/modules)\" ]; then echo 'empty'; fi"
+    val resultCheckEmpty = ShellUtils.fastCmd(shell, checkEmptyCommand).trim()
+    if (resultCheckEmpty == "empty") {
+        return false
+    }
+    val backupDir = moduleBackupDir() ?: return false
+    val command = "cp -rp /data/adb/modules/* $backupDir"
+    val result = ShellUtils.fastCmd(shell, command).trim()
+    return result.isEmpty()
+}
+
+fun moduleMigration(): Boolean {
+    val shell = getRootShell()
+    val command = "cp -rp /data/adb/modules/* /data/adb/modules_update"
+    val result = ShellUtils.fastCmd(shell, command).trim()
+    return result.isEmpty()
+}
+
+fun moduleRestore(): Boolean {
+    val shell = getRootShell()
+    val command = "ls -t /data/adb/modules_bak | head -n 1"
+    val latestBackupDir = ShellUtils.fastCmd(shell, command).trim()
+    if (latestBackupDir.isEmpty()) return false
+    val sourceDir = "/data/adb/modules_bak/$latestBackupDir"
+    val destinationDir = "/data/adb/modules_update"
+    val createDestDirCommand = "mkdir -p $destinationDir"
+    ShellUtils.fastCmd(shell, createDestDirCommand)
+    val moveCommand = "cp -rp $sourceDir/* $destinationDir"
+    val result = ShellUtils.fastCmd(shell, moveCommand).trim()
+    return result.isEmpty()
+}
+
 fun setAppProfileTemplate(id: String, template: String): Boolean {
     val shell = getRootShell()
     val escapedTemplate = template.replace("\"", "\\\"")

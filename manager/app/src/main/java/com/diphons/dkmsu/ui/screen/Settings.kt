@@ -109,6 +109,8 @@ fun SettingScreen(navigator: DestinationsNavigator) {
         }
         val loadingDialog = rememberLoadingDialog()
         val shrinkDialog = rememberConfirmDialog()
+        val restoreDialog = rememberConfirmDialog()
+        val backupDialog = rememberConfirmDialog()
 
         Column(
             modifier = Modifier
@@ -191,6 +193,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 enableWebDebugging = it
             }
 
+            val show_warn = rememberSaveable { mutableStateOf(prefs.getBoolean(SpfConfig.KSUD_MODE_WARN, false)) }
             var useOverlayFs by rememberSaveable {
                 mutableStateOf(
                     prefs.getBoolean(SpfConfig.KSUD_MODE, false)
@@ -199,6 +202,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
 
             val isManager = Natives.becomeManager(ksuApp.packageName)
             var showRebootDialog by remember { mutableStateOf(false) }
+            var showWarningDialog by remember { mutableStateOf(false) }
 
             if (isManager) {
                 SwitchItem(
@@ -207,10 +211,38 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                     summary = stringResource(id = R.string.use_overlay_fs_summary),
                     checked = useOverlayFs
                 ) {
-                    prefs.edit().putBoolean(SpfConfig.KSUD_MODE, it).apply()
-                    useOverlayFs = it
-                    install()
-                    showRebootDialog = true
+                    if (!show_warn.value) {
+                        showWarningDialog = true
+                    }
+                }
+
+                if (showWarningDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showWarningDialog = false },
+                        title = { Text(stringResource(R.string.warning)) },
+                        text = { Text(stringResource(R.string.warning_message)) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                showWarningDialog = false
+                                prefs.edit().putBoolean(SpfConfig.KSUD_MODE, !useOverlayFs).apply()
+                                useOverlayFs = !useOverlayFs
+                                if (useOverlayFs) {
+                                    moduleBackup()
+                                } else {
+                                    moduleMigration()
+                                }
+                                install()
+                                showRebootDialog = true
+                            }) {
+                                Text(stringResource(R.string.proceed))
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showWarningDialog = false }) {
+                                Text(stringResource(R.string.cancel))
+                            }
+                        }
+                    )
                 }
 
                 if (showRebootDialog) {
@@ -233,6 +265,51 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         }
                     )
                 }
+
+                val moduleBackup = stringResource(id = R.string.module_backup)
+                val backupMessage = stringResource(id = R.string.module_backup_message)
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            Icons.Filled.Backup,
+                            moduleBackup
+                        )
+                    },
+                    headlineContent = { Text(moduleBackup) },
+                    modifier = Modifier.clickable {
+                        scope.launch {
+                            val result = backupDialog.awaitConfirm(title = moduleBackup, content = backupMessage)
+                            if (result == ConfirmResult.Confirmed) {
+                                loadingDialog.withLoading {
+                                    moduleBackup()
+                                }
+                            }
+                        }
+                    }
+                )
+
+                val moduleRestore = stringResource(id = R.string.module_restore)
+                val restoreMessage = stringResource(id = R.string.module_restore_message)
+                ListItem(
+                    leadingContent = {
+                        Icon(
+                            Icons.Filled.Restore,
+                            moduleRestore
+                        )
+                    },
+                    headlineContent = { Text(moduleRestore) },
+                    modifier = Modifier.clickable {
+                        scope.launch {
+                            val result = restoreDialog.awaitConfirm(title = moduleRestore, content = restoreMessage)
+                            if (result == ConfirmResult.Confirmed) {
+                                loadingDialog.withLoading {
+                                    moduleRestore()
+                                    showRebootDialog = true
+                                }
+                            }
+                        }
+                    }
+                )
             }
 
             var showBottomsheet by remember { mutableStateOf(false) }
