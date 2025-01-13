@@ -592,7 +592,7 @@ private fun ModuleList(
                                 }
                             },
                             onClick = {
-                                onClickModule(it.dirId, it.name, it.hasWebUi)
+                                onClickModule(it.id, it.name, it.hasWebUi)
                             }
                         )
 

@@ -43,6 +43,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.DefaultAlpha
@@ -462,6 +463,12 @@ private fun getDeviceInfo(): String {
 private fun InfoCard() {
     val context = LocalContext.current
 
+    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+
+    var useOverlayFs by rememberSaveable {
+        mutableStateOf(prefs.getBoolean(SpfConfig.KSUD_MODE, false))
+    }
+
     ElevatedCard {
         Column(
             modifier = Modifier
@@ -534,6 +541,15 @@ private fun InfoCard() {
             InfoCardItem(
                 label = stringResource(R.string.home_selinux_status),
                 content = getSELinuxStatus()
+            )
+            Spacer(Modifier.height(4.dp))
+            InfoCardItem(
+                label = stringResource(R.string.home_module_mount),
+                content = if (useOverlayFs) {
+                    stringResource(R.string.home_overlayfs_mount)
+                } else {
+                    stringResource(R.string.home_magic_mount)
+                },
             )
         }
     }

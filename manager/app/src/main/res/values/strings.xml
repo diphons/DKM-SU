@@ -61,6 +61,15 @@
     <string name="module_version">Version</string>
     <string name="module_author">Author</string>
     <string name="module_overlay_fs_not_available">Modules are unavailable as OverlayFS is disabled by the kernel.</string>
+    <string name="home_module_mount">System Module</string>
+    <string name="home_magic_mount">Magic Mount</string>
+    <string name="home_overlayfs_mount">OverlayFS</string>
+    <string name="use_overlay_fs">Use OverlayFS</string>
+    <string name="use_overlay_fs_summary">Toggle between using OverlayFS or Magic for KSU daemon</string>
+    <string name="restart_required">Restart Required</string>
+    <string name="restart_message">Changes will take effect after restarting the app. Would you like to restart now?</string>
+    <string name="restart_now">Restart Now</string>
+    <string name="later">Later</string>
     <string name="refresh">Refresh</string>
     <string name="show_system_apps">Show system apps</string>
     <string name="hide_system_apps">Hide system apps</string>

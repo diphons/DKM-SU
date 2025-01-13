@@ -56,6 +56,15 @@
     <string name="module_version">版本</string>
     <string name="module_author">作者</string>
     <string name="module_overlay_fs_not_available">OverlayFS被内核禁用，模块不可用。</string>
+    <string name="home_module_mount">系统模块</string>
+    <string name="home_magic_mount">Magic Mount</string>
+    <string name="home_overlayfs_mount">OverlayFS</string>
+    <string name="use_overlay_fs">使用 OverlayFS</string>
+    <string name="use_overlay_fs_summary">在使用 OverlayFS 或 Magic for KSU 守护进程之间切换</string>
+    <string name="restart_required">需要重新启动</string>
+    <string name="restart_message">更改将在重新启动应用程序后生效。您要立即重新启动吗？</string>
+    <string name="restart_now">立即重启</string>
+    <string name="later">之后</string>
     <string name="refresh">刷新</string>
     <string name="show_system_apps">显示系统应用</string>
     <string name="hide_system_apps">隐藏系统应用</string>

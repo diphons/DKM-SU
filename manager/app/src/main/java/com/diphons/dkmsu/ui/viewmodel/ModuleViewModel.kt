@@ -57,7 +57,7 @@ class ModuleViewModel : ViewModel() {
         val comparator = when {
             sortAToZ -> compareBy<ModuleInfo> { it.name.lowercase() }
             sortZToA -> compareByDescending<ModuleInfo> { it.name.lowercase() }
-            else -> compareBy<ModuleInfo> { it.dirId }
+            else -> compareBy<ModuleInfo> { it.id }
         }
         modules.sortedWith(comparator).also {
             isRefreshing = false

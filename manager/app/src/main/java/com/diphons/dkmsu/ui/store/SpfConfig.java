@@ -2,6 +2,7 @@ package com.diphons.dkmsu.ui.store;
 
 public class SpfConfig {
     public static String SETTINGS = "settings";
+    public static String KSUD_MODE = "ksud_mode";
     public static String DEVICE_BOARD = "device_board";
     public static String DYNAMIC_FPS = "dynamic_fps";
     public static String PERF_MODE = "perf_mode";
@@ -10,7 +11,6 @@ public class SpfConfig {
     public static String DT2W = "dt2w";
     public static String TOUCH_SAMPLE = "touch_dev";
     public static String HAPTIC_LEVEL = "haptic_level";
-
     public static String SC_MICROFON = "sc_microfon";
     public static String SC_EARFON = "sc_earfon";
     public static String SC_SWITCH_HEADFON = "sc_switch_headfon";

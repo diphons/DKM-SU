@@ -3,6 +3,7 @@ package com.diphons.dkmsu.ui.util
 import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.database.Cursor
 import android.net.ConnectivityManager
@@ -44,8 +45,24 @@ import java.io.File
  */
 private const val TAG = "KsuCli"
 
-private fun getKsuDaemonPath(): String {
-    return ksuApp.applicationInfo.nativeLibraryDir + File.separator + "libksud.so"
+private fun ksuDaemonMagicPath(): String {
+    return ksuApp.applicationInfo.nativeLibraryDir + File.separator + "libksud_magic.so"
+}
+
+private fun ksuDaemonOverlayfsPath(): String {
+    return ksuApp.applicationInfo.nativeLibraryDir + File.separator + "libksud_overlayfs.so"
+}
+
+// Get the path based on the user's choice
+fun getKsuDaemonPath(): String {
+    val prefs = ksuApp.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    val useOverlayFs = prefs.getBoolean(SpfConfig.KSUD_MODE, false)
+
+    return if (useOverlayFs) {
+        ksuDaemonOverlayfsPath()
+    } else {
+        ksuDaemonMagicPath()
+    }
 }
 
 object KsuCli {
@@ -1361,4 +1378,11 @@ fun launchApp(packageName: String) {
 fun restartApp(packageName: String) {
     forceStopApp(packageName)
     launchApp(packageName)
+}
+
+fun restartDKMSU(context: Context) {
+    val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+    intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+    context.startActivity(intent)
+    Runtime.getRuntime().exit(0)
 }

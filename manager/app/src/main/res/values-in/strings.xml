@@ -56,6 +56,15 @@
     <string name="module_version">Versi</string>
     <string name="module_author">Oleh</string>
     <string name="module_overlay_fs_not_available">OverlayFS dinonaktifkan oleh kernel, modul tidak tersedia.</string>
+    <string name="home_module_mount">Modul Sistem</string>
+    <string name="home_magic_mount">Magic Mount</string>
+    <string name="home_overlayfs_mount">OverlayFS</string>
+    <string name="use_overlay_fs">Gunakan OverlayFS</string>
+    <string name="use_overlay_fs_summary">Beralih antara menggunakan OverlayFS atau Magic untuk daemon KSU</string>
+    <string name="restart_required">Diperlukan Restart</string>
+    <string name="restart_message">Perubahan akan berlaku setelah aplikasi dimulai ulang. Apakah Anda ingin memulai ulang sekarang?</string>
+    <string name="restart_now">Restart Sekarang</string>
+    <string name="later">Nanti</string>
     <string name="refresh">Muat ulang</string>
     <string name="show_system_apps">Tampilkan aplikasi sistem</string>
     <string name="hide_system_apps">Sembunyikan aplikasi sistem</string>
