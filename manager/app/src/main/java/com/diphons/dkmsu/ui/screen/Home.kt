@@ -468,6 +468,8 @@ private fun InfoCard() {
 
     val useOverlayFs = MutableLiveData<Boolean>(prefs.getBoolean(SpfConfig.KSUD_MODE, false))
 
+    val isManager = Natives.becomeManager(ksuApp.packageName)
+
     ElevatedCard {
         Column(
             modifier = Modifier
@@ -540,15 +542,17 @@ private fun InfoCard() {
                 label = stringResource(R.string.home_selinux_status),
                 content = getSELinuxStatus()
             )
-            Spacer(Modifier.height(4.dp))
-            InfoCardItem(
-                label = stringResource(R.string.home_module_mount),
-                content = if (useOverlayFs.value!!) {
-                    stringResource(R.string.home_overlayfs_mount)
-                } else {
-                    stringResource(R.string.home_magic_mount)
-                },
-            )
+            if (isManager) {
+                Spacer(Modifier.height(4.dp))
+                InfoCardItem(
+                    label = stringResource(R.string.home_module_mount),
+                    content = if (useOverlayFs.value!!) {
+                        stringResource(R.string.home_overlayfs_mount)
+                    } else {
+                        stringResource(R.string.home_magic_mount)
+                    },
+                )
+            }
         }
     }
 }

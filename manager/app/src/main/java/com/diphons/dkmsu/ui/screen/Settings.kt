@@ -200,37 +200,39 @@ fun SettingScreen(navigator: DestinationsNavigator) {
             val isManager = Natives.becomeManager(ksuApp.packageName)
             var showRebootDialog by remember { mutableStateOf(false) }
 
-            SwitchItem(
-                icon = Icons.Filled.UnfoldMore,
-                title = stringResource(id = R.string.use_overlay_fs),
-                summary = stringResource(id = R.string.use_overlay_fs_summary),
-                checked = useOverlayFs
-            ) {
-                prefs.edit().putBoolean(SpfConfig.KSUD_MODE, it).apply()
-                useOverlayFs = it
-                if (isManager) install()
-                showRebootDialog = true
-            }
+            if (isManager) {
+                SwitchItem(
+                    icon = Icons.Filled.UnfoldMore,
+                    title = stringResource(id = R.string.use_overlay_fs),
+                    summary = stringResource(id = R.string.use_overlay_fs_summary),
+                    checked = useOverlayFs
+                ) {
+                    prefs.edit().putBoolean(SpfConfig.KSUD_MODE, it).apply()
+                    useOverlayFs = it
+                    install()
+                    showRebootDialog = true
+                }
 
-            if (showRebootDialog) {
-                AlertDialog(
-                    onDismissRequest = { showRebootDialog = false },
-                    title = { Text(stringResource(R.string.reboot_required)) },
-                    text = { Text(stringResource(R.string.reboot_message)) },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            showRebootDialog = false
-                            reboot()
-                        }) {
-                            Text(stringResource(R.string.reboot))
+                if (showRebootDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showRebootDialog = false },
+                        title = { Text(stringResource(R.string.reboot_required)) },
+                        text = { Text(stringResource(R.string.reboot_message)) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                showRebootDialog = false
+                                reboot()
+                            }) {
+                                Text(stringResource(R.string.reboot))
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showRebootDialog = false }) {
+                                Text(stringResource(R.string.later))
+                            }
                         }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showRebootDialog = false }) {
-                            Text(stringResource(R.string.later))
-                        }
-                    }
-                )
+                    )
+                }
             }
 
             var showBottomsheet by remember { mutableStateOf(false) }
