@@ -544,12 +544,12 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                 onSwitch = {
                     perf_mode = globalConfig.getBoolean(SpfConfig.PERF_MODE,false)
                     if (perf_mode) {
+                        profile = globalConfig.getInt(SpfConfig.PROFILE_MODE_LAST, 0)
+                        globalConfig.edit().putInt(SpfConfig.PROFILE_MODE, profile).apply()
                         if (gameai)
                             setKernel("1", GAME_AI)
                         else {
                             setKernel("0", GAME_AI)
-                            profile = globalConfig.getInt(SpfConfig.PROFILE_MODE_LAST, 0)
-                            globalConfig.edit().putInt(SpfConfig.PROFILE_MODE, profile).apply()
                             setProfile(context, globalConfig.getInt(SpfConfig.PROFILE_MODE, 0))
                         }
                     } else {
