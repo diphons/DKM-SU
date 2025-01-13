@@ -17,6 +17,10 @@ parcelablelist = "2.0.1"
 libsu = "6.0.0"
 apksign = "1.4"
 cmaker = "1.2"
+accompanist= "0.36.0"
+live-data= "1.7.6"
+work= "2.10.0"
+appcompat-resources = "1.7.0"
 
 [plugins]
 agp-app = { id = "com.android.application", version.ref = "agp" }
@@ -72,3 +76,7 @@ sheet-compose-dialogs-input = { group = "com.maxkeppeler.sheets-compose-dialogs"
 markdown = { group = "io.noties.markwon", name = "core", version.ref = "markdown" }
 
 lsposed-cxx = { module = "org.lsposed.libcxx:libcxx", version = "27.0.12077973" }
+accompanist = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist"}
+livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "live-data"}
+worker = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
+androidx-appcompat-resources = { group = "androidx.appcompat", name = "appcompat-resources", version.ref = "appcompat-resources" }

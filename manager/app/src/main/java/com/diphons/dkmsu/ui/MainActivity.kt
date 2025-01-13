@@ -11,14 +11,22 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -29,6 +37,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
@@ -50,6 +59,7 @@ import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.util.rootAvailable
 import com.diphons.dkmsu.ui.util.install
 import com.diphons.dkmsu.ui.util.*
+import com.diphons.dkmsu.ui.store.*
 
 class MainActivity : ComponentActivity() {
 
@@ -66,7 +76,7 @@ class MainActivity : ComponentActivity() {
         val isManager = Natives.becomeManager(ksuApp.packageName)
 	    if (isManager) install()
 
-        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
+        val prefs = getSharedPreferences(SpfConfig.SETTINGS, MODE_PRIVATE)
 
         val isSUS_SU = getSuSFSFeatures()
         if (isSUS_SU == "CONFIG_KSU_SUSFS_SUS_SU") {
@@ -77,6 +87,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        //Extract Assets
+        if (isManager && rootAvailable())
+            extractXTAssets(this)
         setContent {
             KernelSUTheme {
                 val navController = rememberNavController()
@@ -92,7 +105,21 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     bottomBar = {
                         if (showBottomBar) {
-                            BottomBar(navController)
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                            ){
+                                Row (modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(20.dp)
+                                    .border(
+                                        BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)),
+                                        RoundedCornerShape(
+                                            topStart = 19.dp,
+                                            topEnd = 19.dp
+                                        ),
+                                    )){ }
+                                BottomBar(navController)
+                            }
                         }
                     },
                     contentWindowInsets = WindowInsets(0, 0, 0, 0)
@@ -127,7 +154,16 @@ private fun BottomBar(navController: NavHostController) {
         tonalElevation = 8.dp,
         windowInsets = WindowInsets.systemBars.union(WindowInsets.displayCutout).only(
             WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom
-        )
+        ),
+        modifier = Modifier
+            .padding(top = 1.dp)
+            .graphicsLayer {
+                shape = RoundedCornerShape(
+                    topStart = 20.dp,
+                    topEnd = 20.dp
+                )
+                clip = true
+            }
     ) {
         BottomBarDestination.entries.forEach { destination ->
             if (!fullFeatured && destination.rootRequired) return@forEach
@@ -148,9 +184,9 @@ private fun BottomBar(navController: NavHostController) {
                 },
                 icon = {
                     if (isCurrentDestOnBackStack) {
-                        Icon(destination.iconSelected, stringResource(destination.label))
+                        Icon(destination.iconSelected.asPainterResource(), stringResource(destination.label))
                     } else {
-                        Icon(destination.iconNotSelected, stringResource(destination.label))
+                        Icon(destination.iconNotSelected.asPainterResource(), stringResource(destination.label))
                     }
                 },
                 label = { Text(stringResource(destination.label)) },

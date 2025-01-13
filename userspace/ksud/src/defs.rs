@@ -14,6 +14,7 @@ pub const KSU_OVERLAY_SOURCE: &str = "KSU";
 pub const DAEMON_PATH: &str = concatcp!(ADB_DIR, "ksud");
 pub const MAGISKBOOT_PATH: &str = concatcp!(BINARY_DIR, "magiskboot");
 pub const SUSFS_PATH: &str = concatcp!(BINARY_DIR, "susfs");
+pub const DKM_SVC_PATH: &str = concatcp!(BINARY_DIR, "dkmsvc");
 
 #[cfg(target_os = "android")]
 pub const DAEMON_LINK_PATH: &str = concatcp!(BINARY_DIR, "ksud");

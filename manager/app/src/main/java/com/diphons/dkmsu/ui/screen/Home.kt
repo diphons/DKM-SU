@@ -3,20 +3,16 @@ package com.diphons.dkmsu.ui.screen
 import android.content.Context
 import android.os.Build
 import android.os.PowerManager
-import android.os.Handler
-import android.os.Looper
 import android.system.Os
-import android.text.Layout
 import androidx.annotation.StringRes
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -44,6 +40,16 @@ import com.diphons.dkmsu.ui.util.*
 import com.diphons.dkmsu.ui.util.module.LatestVersionInfo
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.DefaultAlpha
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.sp
+import com.diphons.dkmsu.ui.store.*
+import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>(start = true)
@@ -56,6 +62,9 @@ fun HomeScreen(navigator: DestinationsNavigator) {
         topBar = {
             TopBar(
                 kernelVersion,
+                onSettingsClick = {
+                    navigator.navigate(SettingScreenDestination)
+                },
                 onInstallClick = {
                     navigator.navigate(InstallScreenDestination)
                 },
@@ -78,9 +87,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                 if (it >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && kernelVersion.isGKI()) Natives.isLkmMode else null
             }
 
-            StatusCard(kernelVersion, ksuVersion, lkmMode) {
-                navigator.navigate(InstallScreenDestination)
-            }
+            StatusCard(kernelVersion, ksuVersion, lkmMode)
             if (isManager && Natives.requireNewKernel()) {
                 WarningCard(
                     stringResource(id = R.string.require_kernel_version).format(
@@ -94,7 +101,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                 )
             }
             val checkUpdate =
-                LocalContext.current.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                LocalContext.current.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
                     .getBoolean("check_update", true)
             if (checkUpdate) {
                 UpdateCard()
@@ -165,6 +172,7 @@ fun RebootDropdownItem(@StringRes id: Int, reason: String = "") {
 private fun TopBar(
     kernelVersion: KernelVersion,
     onInstallClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
@@ -182,10 +190,20 @@ private fun TopBar(
             }
         },
         actions = {
-            if (kernelVersion.isGKI()) {
+            /*
+             * Hide GKI Feature on Spoofed Kernel when SuSFS available
+             */
+            val realGKI: Boolean = if (getSuSFS() == "Supported")
+                if (getSuSFSVariant() == "GKI")
+                    true
+                else
+                    false
+            else
+                true
+            if (kernelVersion.isGKI() && realGKI) {
                 IconButton(onClick = onInstallClick) {
                     Icon(
-                        imageVector = Icons.Filled.Archive,
+                        imageVector = Icons.Filled.InstallMobile,
                         contentDescription = stringResource(id = R.string.install)
                     )
                 }
@@ -217,9 +235,23 @@ private fun TopBar(
                     RebootDropdownItem(id = R.string.reboot_edl, reason = "edl")
                 }
             }
+            IconButton(onClick = onSettingsClick) {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = stringResource(id = R.string.settings)
+                )
+            }
         },
         windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior
+        scrollBehavior = scrollBehavior,
+        modifier = Modifier
+            .graphicsLayer {
+                shape = RoundedCornerShape(
+                    bottomStart = 20.dp,
+                    bottomEnd = 20.dp
+                )
+                clip = true
+            }
     )
 }
 
@@ -227,8 +259,7 @@ private fun TopBar(
 private fun StatusCard(
     kernelVersion: KernelVersion,
     ksuVersion: Int?,
-    lkmMode: Boolean?,
-    onClickInstall: () -> Unit = {}
+    lkmMode: Boolean?
 ) {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(containerColor = run {
@@ -238,11 +269,6 @@ private fun StatusCard(
     ) {
         Row(modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                if (kernelVersion.isGKI()) {
-                    onClickInstall()
-                }
-            }
             .padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
             when {
                 ksuVersion != null -> {
@@ -259,38 +285,109 @@ private fun StatusCard(
 
                     val workingText =
                         "${stringResource(id = R.string.home_working)}$workingMode$safeMode"
+                    val painter = painterResource(id = R.drawable.wall_multi)
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .height(130.dp)
+                            .width(59.dp)
+                            .border(BorderStroke(1.dp, MaterialTheme.colorScheme.primary), RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
 
-                    Icon(Icons.Filled.LocalFireDepartment, stringResource(R.string.home_working))
+                            },
+                        alignment = Alignment.Center,
+                        contentScale = ContentScale.Crop,
+                        alpha = DefaultAlpha,
+                    )
                     Column(Modifier.padding(start = 20.dp)) {
                         Text(
                             text = workingText,
+                            fontSize = 18.sp,
                             style = MaterialTheme.typography.titleMedium
                         )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.home_working_version, ksuVersion),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(
-                                R.string.home_superuser_count, getSuperuserCount()
-                            ), style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.home_module_count, getModuleCount()),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        val isSUS_SU = getSuSFSFeatures() == "CONFIG_KSU_SUSFS_SUS_SU"
-                        val susSUMode = if (isSUS_SU) "| SuS SU mode: ${susfsSUS_SU_Mode()}" else ""
-                        val suSFS = getSuSFS()
-                        if (suSFS == "Supported") {
-                            Text(
-                                text = stringResource(R.string.home_susfs, "${getSuSFSVersion()} (${getSuSFSVariant()}) $susSUMode"),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
+                        Spacer(Modifier.height(1.dp))
+                        Row (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ){
+                            val isSUS_SU = getSuSFSFeatures() == "CONFIG_KSU_SUSFS_SUS_SU"
+                            val susSUMode = if (isSUS_SU) "| SuS SU mode: ${susfsSUS_SU_Mode()}" else ""
+                            val suSFS = getSuSFS()
+                            val dkmsvc = getSVCVersion()
+                            Column {
+                                Text(
+                                    text = stringResource(R.string.home_working_version),
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(Modifier.height(1.dp))
+                                Text(
+                                    text = stringResource(R.string.home_superuser_count), fontSize = 12.sp, style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(Modifier.height(1.dp))
+                                Text(
+                                    text = stringResource(R.string.home_module_count),
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(Modifier.height(1.dp))
+                                Text(
+                                    text = stringResource(R.string.home_susfs),
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                if (dkmsvc.isNotEmpty()) {
+                                    Spacer(Modifier.height(1.dp))
+                                    Text(
+                                        text = "DkmSvc",
+                                        fontSize = 13.sp,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                            Spacer(Modifier.width(4.dp))
+                            Column {
+                                Text(
+                                    text = ": $ksuVersion",
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(Modifier.height(1.dp))
+                                Text(
+                                    text = ": ${getSuperuserCount()}",
+                                    fontSize = 13.sp, style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(Modifier.height(1.dp))
+                                Text(
+                                    text = ": ${getModuleCount()}",
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Spacer(Modifier.height(1.dp))
+                                if (suSFS == "Supported") {
+                                    Text(
+                                        text = ": ${getSuSFSVersion()} (${if (workingMode.contains("GKI")) "GKI" else getSuSFSVariant()}) $susSUMode",
+                                        fontSize = 13.sp,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                } else {
+                                    Text(
+                                        text = suSFS,
+                                        fontSize = 13.sp,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                                if (dkmsvc.isNotEmpty()) {
+                                    Spacer(Modifier.height(1.dp))
+                                    Text(
+                                        text = ": $dkmsvc",
+                                        fontSize = 13.sp,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -351,6 +448,16 @@ fun WarningCard(
     }
 }
 
+private fun getDeviceInfo(): String {
+    var manufacturer =
+        Build.MANUFACTURER[0].uppercaseChar().toString() + Build.MANUFACTURER.substring(1)
+    if (Build.BRAND != Build.MANUFACTURER) {
+        manufacturer += " " + Build.BRAND[0].uppercaseChar() + Build.BRAND.substring(1)
+    }
+    manufacturer += " " + Build.MODEL + " "
+    return manufacturer
+}
+
 @Composable
 private fun InfoCard() {
     val context = LocalContext.current
@@ -384,120 +491,50 @@ private fun InfoCard() {
                     Column {
                         Text(
                             text = label,
-                            style = MaterialTheme.typography.bodyLarge
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.titleSmall
                         )
                         Text(
                             text = content,
+                            fontSize = 13.sp,
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(top = 4.dp)
+                            modifier = Modifier.padding(top = 2.dp)
                         )
                     }
                 }
                 
             }
 
+            InfoCardItem(
+                label = stringResource(R.string.home_device),
+                content = getDeviceInfo()
+            )
 
+            Spacer(Modifier.height(4.dp))
             InfoCardItem(
                 label = stringResource(R.string.home_kernel),
-                content = uname.release,
-                icon = painterResource(R.drawable.ic_linux),
+                content = uname.release
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(4.dp))
             InfoCardItem(
                 label = stringResource(R.string.home_android),
-                content = "${Build.VERSION.RELEASE} (${Build.VERSION.SDK_INT})",
-                icon = Icons.Filled.Android,
+                content = "${Build.VERSION.RELEASE} (${Build.VERSION.SDK_INT})"
 
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(4.dp))
             val managerVersion = getManagerVersion(context)
             InfoCardItem(
                 label = stringResource(R.string.home_manager_version),
-                content = "${managerVersion.first}-su (${managerVersion.second})",
-                icon = painterResource(R.drawable.ic_dkm_su),
+                content = "${managerVersion.first}-su (${managerVersion.second})"
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(4.dp))
             InfoCardItem(
                 label = stringResource(R.string.home_selinux_status),
-                content = getSELinuxStatus(),
-                icon = Icons.Filled.Security,
+                content = getSELinuxStatus()
             )
-        }
-    }
-}
-
-@Composable
-fun NextCard() {
-    val uriHandler = LocalUriHandler.current
-    val url = stringResource(R.string.home_next_kernelsu_repo)
-
-    ElevatedCard {
-
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                uriHandler.openUri(url)
-            }
-            .padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Text(
-                    text = stringResource(R.string.home_next_kernelsu),
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.home_next_kernelsu_body),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun EXperimentalCard() {
-    /*val uriHandler = LocalUriHandler.current
-    val url = stringResource(R.string.home_experimental_kernelsu_repo)
-    */
-
-    ElevatedCard {
-
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            /*.clickable {
-                uriHandler.openUri(url)
-            }
-            */
-            .padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu),
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body_point_1),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body_point_2),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = stringResource(R.string.home_experimental_kernelsu_body_point_3),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
         }
     }
 }
@@ -518,16 +555,19 @@ fun IssueReportCard() {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(R.string.issue_report_title),
+                    fontSize = 15.sp,
                     style = MaterialTheme.typography.titleSmall
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.issue_report_body),
+                    fontSize = 13.sp,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.issue_report_body_2),
+                    fontSize = 13.sp,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
