@@ -31,7 +31,6 @@
     <string name="module_failed_to_disable">Gagal menonaktifkan modul: %s</string>
     <string name="module_empty">Tidak ada modul</string>
     <string name="module">Modul</string>
-    <string name="confirm_module_installation">Yakin instal</string>
     <string name="module_install_prompt_with_name">Anda ingin melanjutkan pemasangan modul %1$s?</string>
     <string name="module_sort_a_to_z">Menyortir (A - Z)</string>
     <string name="module_sort_z_to_a">Menyortir (Z - A)</string>
@@ -61,9 +60,8 @@
     <string name="home_overlayfs_mount">OverlayFS</string>
     <string name="use_overlay_fs">Gunakan OverlayFS</string>
     <string name="use_overlay_fs_summary">Beralih antara menggunakan OverlayFS atau Magic untuk daemon KSU</string>
-    <string name="restart_required">Diperlukan Restart</string>
-    <string name="restart_message">Perubahan akan berlaku setelah aplikasi dimulai ulang. Apakah Anda ingin memulai ulang sekarang?</string>
-    <string name="restart_now">Restart Sekarang</string>
+    <string name="reboot_required">Diperlukan Reboot</string>
+    <string name="reboot_message">Perubahan akan berlaku setelah sistem di-boot ulang. Apakah Anda ingin melakukan boot ulang sekarang?</string>
     <string name="later">Nanti</string>
     <string name="refresh">Muat ulang</string>
     <string name="show_system_apps">Tampilkan aplikasi sistem</string>

@@ -49,6 +49,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.MutableLiveData
 import com.diphons.dkmsu.ui.store.*
 import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
 
@@ -465,9 +466,7 @@ private fun InfoCard() {
 
     val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
 
-    var useOverlayFs by rememberSaveable {
-        mutableStateOf(prefs.getBoolean(SpfConfig.KSUD_MODE, false))
-    }
+    val useOverlayFs = MutableLiveData<Boolean>(prefs.getBoolean(SpfConfig.KSUD_MODE, false))
 
     ElevatedCard {
         Column(
@@ -475,7 +474,6 @@ private fun InfoCard() {
                 .fillMaxWidth()
                 .padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 16.dp)
         ) {
-            val contents = StringBuilder()
             val uname = Os.uname()
 
             @Composable
@@ -545,7 +543,7 @@ private fun InfoCard() {
             Spacer(Modifier.height(4.dp))
             InfoCardItem(
                 label = stringResource(R.string.home_module_mount),
-                content = if (useOverlayFs) {
+                content = if (useOverlayFs.value!!) {
                     stringResource(R.string.home_overlayfs_mount)
                 } else {
                     stringResource(R.string.home_magic_mount)

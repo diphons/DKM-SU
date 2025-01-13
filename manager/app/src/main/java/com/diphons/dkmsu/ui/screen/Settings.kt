@@ -69,6 +69,7 @@ import kotlinx.coroutines.withContext
 import com.diphons.dkmsu.BuildConfig
 import com.diphons.dkmsu.Natives
 import com.diphons.dkmsu.R
+import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.component.AboutDialog
 import com.diphons.dkmsu.ui.component.ConfirmResult
 import com.diphons.dkmsu.ui.component.DialogHandle
@@ -192,38 +193,40 @@ fun SettingScreen(navigator: DestinationsNavigator) {
 
             var useOverlayFs by rememberSaveable {
                 mutableStateOf(
-                    prefs.getBoolean("use_overlay_fs", false)
+                    prefs.getBoolean(SpfConfig.KSUD_MODE, false)
                 )
             }
 
-            var showRestartDialog by remember { mutableStateOf(false) }
+            val isManager = Natives.becomeManager(ksuApp.packageName)
+            var showRebootDialog by remember { mutableStateOf(false) }
 
             SwitchItem(
-                icon = Icons.Filled.Build,
+                icon = Icons.Filled.UnfoldMore,
                 title = stringResource(id = R.string.use_overlay_fs),
                 summary = stringResource(id = R.string.use_overlay_fs_summary),
                 checked = useOverlayFs
             ) {
-                prefs.edit().putBoolean("use_overlay_fs", it).apply()
+                prefs.edit().putBoolean(SpfConfig.KSUD_MODE, it).apply()
                 useOverlayFs = it
-                showRestartDialog = true
+                if (isManager) install()
+                showRebootDialog = true
             }
 
-            if (showRestartDialog) {
+            if (showRebootDialog) {
                 AlertDialog(
-                    onDismissRequest = { showRestartDialog = false },
-                    title = { Text(stringResource(R.string.restart_required)) },
-                    text = { Text(stringResource(R.string.restart_message)) },
+                    onDismissRequest = { showRebootDialog = false },
+                    title = { Text(stringResource(R.string.reboot_required)) },
+                    text = { Text(stringResource(R.string.reboot_message)) },
                     confirmButton = {
                         TextButton(onClick = {
-                            showRestartDialog = false
-                            restartDKMSU(context)
+                            showRebootDialog = false
+                            reboot()
                         }) {
-                            Text(stringResource(R.string.restart_now))
+                            Text(stringResource(R.string.reboot))
                         }
                     },
                     dismissButton = {
-                        TextButton(onClick = { showRestartDialog = false }) {
+                        TextButton(onClick = { showRebootDialog = false }) {
                             Text(stringResource(R.string.later))
                         }
                     }

@@ -101,6 +101,7 @@ import com.diphons.dkmsu.ui.util.DownloadListener
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.download
+import com.diphons.dkmsu.ui.util.getFileName
 import com.diphons.dkmsu.ui.util.hasMagisk
 import com.diphons.dkmsu.ui.util.reboot
 import com.diphons.dkmsu.ui.util.toggleModule
@@ -250,8 +251,7 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
     ) { innerPadding ->
         // confirmation dialog
         if (showConfirmDialog && zipUri != null) {
-            // extract the module name from the zipUri
-            val moduleName = zipUri?.lastPathSegment?.substringAfterLast('/') ?: "Unknown Module"
+            val moduleName = getFileName(context, zipUri!!)
 
             AlertDialog(
                 onDismissRequest = { showConfirmDialog = false },
@@ -261,7 +261,6 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                         navigator.navigate(FlashScreenDestination(FlashIt.FlashModule(zipUri!!)))
 
                         viewModel.markNeedRefresh()
-
                     }) {
                         Text(stringResource(R.string.confirm))
                     }
@@ -271,11 +270,11 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                         Text(stringResource(android.R.string.cancel))
                     }
                 },
-                title = { Text(stringResource(R.string.confirm_module_installation)) },
-                text = { 
+                title = { Text(stringResource(R.string.module)) },
+                text = {
                     Text(
                         stringResource(R.string.module_install_prompt_with_name, moduleName)
-                    ) 
+                    )
                 }
             )
         }

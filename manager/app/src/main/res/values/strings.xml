@@ -36,7 +36,6 @@
     <string name="module_failed_to_disable">Failed to disable module: %s</string>
     <string name="module_empty">No module installed</string>
     <string name="module">Module</string>
-    <string name="confirm_module_installation">Confirm Installation</string>
     <string name="module_install_prompt_with_name">Do you want to continue installing module %1$s?</string>
     <string name="module_sort_a_to_z">Sort (A - Z)</string>
     <string name="module_sort_z_to_a">Sort (Z - A)</string>
@@ -66,9 +65,8 @@
     <string name="home_overlayfs_mount">OverlayFS</string>
     <string name="use_overlay_fs">Use OverlayFS</string>
     <string name="use_overlay_fs_summary">Toggle between using OverlayFS or Magic for KSU daemon</string>
-    <string name="restart_required">Restart Required</string>
-    <string name="restart_message">Changes will take effect after restarting the app. Would you like to restart now?</string>
-    <string name="restart_now">Restart Now</string>
+    <string name="reboot_required">Reboot Required</string>
+    <string name="reboot_message">Changes will take effect after rebooting the system. Would you like to reboot now?</string>
     <string name="later">Later</string>
     <string name="refresh">Refresh</string>
     <string name="show_system_apps">Show system apps</string>

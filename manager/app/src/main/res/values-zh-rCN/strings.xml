@@ -31,7 +31,6 @@
     <string name="module_failed_to_disable">无法禁用模块: %s</string>
     <string name="module_empty">没有安装模块</string>
     <string name="module">模块</string>
-    <string name="confirm_module_installation">确认安装</string>
     <string name="module_install_prompt_with_name">是否要继续安装模块 %1$s ？</string>
     <string name="module_sort_a_to_z">种类 (A - Z)</string>
     <string name="module_sort_z_to_a">种类 (Z - A)</string>
@@ -61,9 +60,8 @@
     <string name="home_overlayfs_mount">OverlayFS</string>
     <string name="use_overlay_fs">使用 OverlayFS</string>
     <string name="use_overlay_fs_summary">在使用 OverlayFS 或 Magic for KSU 守护进程之间切换</string>
-    <string name="restart_required">需要重新启动</string>
-    <string name="restart_message">更改将在重新启动应用程序后生效。您要立即重新启动吗？</string>
-    <string name="restart_now">立即重启</string>
+    <string name="reboot_required">需要重新启动</string>
+    <string name="reboot_message">更改将在重新启动系统后生效。您要立即重新启动吗？</string>
     <string name="later">之后</string>
     <string name="refresh">刷新</string>
     <string name="show_system_apps">显示系统应用</string>

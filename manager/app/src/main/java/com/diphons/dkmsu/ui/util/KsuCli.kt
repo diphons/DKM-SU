@@ -1345,6 +1345,21 @@ fun getAppProfileTemplate(id: String): String {
         .to(ArrayList(), null).exec().out.joinToString("\n")
 }
 
+fun getFileName(context: Context, uri: Uri): String {
+    var name = "Unknown Module"
+    if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+        val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                name = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+            }
+        }
+    } else if (uri.scheme == "file") {
+        name = uri.lastPathSegment ?: "Unknown Module"
+    }
+    return name
+}
+
 fun setAppProfileTemplate(id: String, template: String): Boolean {
     val shell = getRootShell()
     val escapedTemplate = template.replace("\"", "\\\"")
@@ -1378,11 +1393,4 @@ fun launchApp(packageName: String) {
 fun restartApp(packageName: String) {
     forceStopApp(packageName)
     launchApp(packageName)
-}
-
-fun restartDKMSU(context: Context) {
-    val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-    intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
-    context.startActivity(intent)
-    Runtime.getRuntime().exit(0)
 }
