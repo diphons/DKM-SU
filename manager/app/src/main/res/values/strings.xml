@@ -300,7 +300,7 @@
     <string name="susfs_not_alowed">Spaces are not alowed in the input</string>
     <string name="custom_susfs_settings">Custom SuSFS Settings</string>
     <string name="custom_susfs_settings_sum">See more custom susfs settings for your use</string>
-    <string name="susfs_features">SuSFS 功能</string>
+    <string name="susfs_features">SuSFS Features</string>
     <string name="susfs_enabled_features">SuSFS Enabled Features</string>
     <string name="susfs_log" translatable="false">SuSFS Log</string>
     <string name="susfs_hide_cusrom" translatable="false">Hide Custom ROM Path</string>
