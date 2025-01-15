@@ -62,14 +62,17 @@ private fun DialogCardContent() {
     LaunchedEffect(Unit) {
         for (i in 1..200) {
             delay(1000) // update once a second
-            if (CMD_MSG.isNotEmpty())
-                pif_update = CMD_MSG
-            if (pif_update.contains("Checking internet")) {
-                if (AV_INTERNET) {
-                    pif_update = "Checking internet connection...${replacDoubleToEmpty(CMD_MSG, "Checking internet connection...")}"
-                } else
-                    pif_update = "Update PIF Failed\nCheck your internet connection"
-            }
+            if (AV_INTERNET) {
+                if (CMD_MSG.isNotEmpty())
+                    pif_update = CMD_MSG
+                if (pif_update.contains("Checking internet")) {
+                    if (!pif_update.contains("Your PIF") && pif_update.contains("failed"))
+                        pif_update = "Update PIF Failed\nCheck your internet connection"
+                    else
+                        pif_update = "Checking internet connection...${replacDoubleToEmpty(CMD_MSG, "Checking internet connection...")}"
+                }
+            } else
+                pif_update = "Update PIF Failed\nCheck your internet connection"
         }
     }
     Column(

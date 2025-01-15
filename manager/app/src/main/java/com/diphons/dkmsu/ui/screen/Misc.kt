@@ -148,16 +148,6 @@ fun MiscScreen(navigator: DestinationsNavigator) {
             }
             if (hasModule(PIF_UPDATER)) {
                 var pif_finish by rememberSaveable { mutableStateOf(false) }
-                if (pif_finish) {
-                    LaunchedEffect(Unit) {
-                        for (i in 1..200) {
-                            delay(1000) // update once a second
-                            if (CMD_MSG.contains("PIF.apk")) {
-                                pif_finish = false
-                            }
-                        }
-                    }
-                }
                 ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -186,9 +176,10 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                                     DIALOG_MODE = 0
                                     pif_finish = true
                                     runDialog.show()
-                                    if (isInternetAvailable(context)) {
+                                    if (isInternetAvailable(context))
                                         startPIFWorker(context)
-                                    }
+                                    else
+                                        AV_INTERNET = false
                                 },
                         ) {
                             Row(
