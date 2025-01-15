@@ -297,6 +297,10 @@ fun getKnVersion(): String{
     return result
 }
 
+fun susfsEnableFeatures(): String{
+    return  RootUtils.runAndGetOutput("getef=$(susfs show enabled_features); echo \"\$getef\" | sed 's/CONFIG_KSU_SUSFS_//g' | sed 's/_/ /g' | awk '{print \"·\", \$0}'")
+}
+
 fun hasModule(path: String): Boolean {
     val shell = getRootShell()
     val result = ShellUtils.fastCmd(shell, "if [[ -f $path ]] || [[ -d $path ]]; then echo 1;else echo 0;fi;")

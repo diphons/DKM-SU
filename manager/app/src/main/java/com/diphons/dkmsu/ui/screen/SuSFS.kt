@@ -49,14 +49,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.SwitchItem
-import com.diphons.dkmsu.ui.component.rememberCustomDialog
-import com.diphons.dkmsu.ui.component.runDialog
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.applySUSList
 import com.diphons.dkmsu.ui.util.getSUSList
 import com.diphons.dkmsu.ui.util.getSUSListReset
 import com.diphons.dkmsu.ui.util.runSVCWorker
+import com.diphons.dkmsu.ui.util.susfsEnableFeatures
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -86,9 +85,6 @@ fun SuSFSScreen(navigator: DestinationsNavigator) {
         snackbarHost = { SnackbarHost(snackBarHost) },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     ) { innerPadding ->
-        val runDialog = rememberCustomDialog {
-            runDialog(it)
-        }
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -98,6 +94,31 @@ fun SuSFSScreen(navigator: DestinationsNavigator) {
                 .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            ElevatedCard (
+                modifier = Modifier
+                    .fillMaxWidth()
+            ){
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(23.dp),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
+                ){
+                    Text(
+                        modifier = Modifier,
+                        text = stringResource(R.string.susfs_enabled_features),
+                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+
+                    Text(
+                        modifier = Modifier,
+                        text = susfsEnableFeatures().lowercase(),
+                        fontSize = 13.sp,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
             ElevatedCard (
                 modifier = Modifier
                     .fillMaxWidth()

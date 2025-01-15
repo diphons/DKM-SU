@@ -283,5 +283,6 @@
     <string name="susfs_not_alowed">Spasi tidak diperbolehkan dalam input</string>
     <string name="custom_susfs_settings">Pengaturan SuSFS Khusus</string>
     <string name="custom_susfs_settings_sum">Lihat lebih banyak pengaturan susfs khusus untuk penggunaan Anda</string>
+    <string name="susfs_enabled_features">Fitur yang Diaktifkan SuSFS</string>
     <string name="dkm_service">Layanan DKM belum dimulai, mulai untuk menggunakan lebih banyak fitur</string>
 </resources>
