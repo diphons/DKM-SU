@@ -97,7 +97,7 @@ class PerfTile : TileService() {
         if (hasModule(GAME_AI)) {
             if (prefs.getBoolean(SpfConfig.GAME_AI, true)) {
                 newState = Tile.STATE_UNAVAILABLE
-                newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_perf_ai)
+                newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_perf_game)
                 newLabel = getString(R.string.performance_mode)
             } else {
                 perfMode()
