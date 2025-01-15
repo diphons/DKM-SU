@@ -47,6 +47,7 @@ object Natives {
 
     external fun uidShouldUmount(uid: Int): Boolean
 
+    external fun getKernelPropLong(path: String): Long
     /**
      * Get the profile of the given package.
      * @param key usually the package name

@@ -60,5 +60,15 @@ public class SpfConfig {
     public static String SUSFS_HIDE_CMDLINE = "susfs_hide_cmdline";
     public static String SUSFS_HIDE_LOOP = "susfs_hide_loop";
     public static String SUSFS_HIDE_LSPOSED = "susfs_hide_lsposed";
-
+    public static String MONITOR_MINI = "monitor_mini";
+    public static String MONITOR_MINI_MODE = "monitor_mini_mode";
+    public static String MONITOR_MINI_CURRENT_NOW_UNIT = "monitor_mini_current_unit_now";
+    public static int MONITOR_MINI_CURRENT_NOW_UNIT_DEFAULT = -1000;
+    public static String MONITOR_MINI_EXPAND = "monitor_mini_expend";
+    public static String MONITOR_MINI_BATT = "monitor_mini_batt_percent";
+    public static String MONITOR_MINI_TEMP = "monitor_mini_batt_temp";
+    public static String MONITOR_MINI_SMALL = "monitor_mini_small_view";
+    public static String MONITOR_MINI_RAM = "monitor_mini_ram_percent";
+    public static String MONITOR_MINI_INITIAL_X = "initial_x";
+    public static String MONITOR_MINI_INITIAL_Y = "initial_y";
 }

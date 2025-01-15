@@ -1441,3 +1441,7 @@ fun restartApp(packageName: String) {
     forceStopApp(packageName)
     launchApp(packageName)
 }
+
+fun getKernelPropLong(path: String): Long {
+    return Natives.getKernelPropLong(path)
+}

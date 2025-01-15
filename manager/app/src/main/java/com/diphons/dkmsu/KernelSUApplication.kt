@@ -32,5 +32,8 @@ class KernelSUApplication : Application() {
         }
     }
 
+    companion object {
+        lateinit var context: Application
+    }
 
 }

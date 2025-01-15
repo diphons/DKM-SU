@@ -478,7 +478,7 @@ private fun InfoCard() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 24.dp, top = 24.dp, end = 24.dp, bottom = 16.dp)
+                .padding(24.dp)
         ) {
             val uname = Os.uname()
 

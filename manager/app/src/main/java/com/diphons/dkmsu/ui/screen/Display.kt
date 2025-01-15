@@ -51,6 +51,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.diphons.dkmsu.R
+import com.diphons.dkmsu.ui.component.SwitchItem
+import com.diphons.dkmsu.ui.popup.FPSMonitor
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.RootUtils
@@ -65,6 +67,8 @@ import com.diphons.dkmsu.ui.util.getBoard
 import com.diphons.dkmsu.ui.util.getFPSCount
 import com.diphons.dkmsu.ui.util.getfpsbyid
 import com.diphons.dkmsu.ui.util.hasModule
+import com.diphons.dkmsu.ui.util.setKernel
+import com.diphons.dkmsu.ui.util.setProfile
 import com.diphons.dkmsu.ui.util.setRefreshRate
 import com.ramcosta.composedestinations.generated.destinations.DisplayColorScreenDestination
 
@@ -265,6 +269,188 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
                             imageVector = Icons.Filled.KeyboardDoubleArrowRight,
                             contentDescription = null
                         )
+                    }
+                }
+            }
+
+            var fps_monitor by rememberSaveable {
+                mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI, false))
+            }
+            var fps_monitor_mode by rememberSaveable {
+                mutableStateOf(prefs.getInt(SpfConfig.MONITOR_MINI_MODE, 0))
+            }
+            var showFPSDropdown by remember { mutableStateOf(false) }
+            @Composable
+            fun FPSMonitorDropdownItem(title: String, reason: Int) {
+                DropdownMenuItem(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            text = title,
+                            textAlign = TextAlign.Center
+                        )
+                    }, onClick = {
+                        fps_monitor_mode = reason
+                        prefs.edit().putInt(SpfConfig.MONITOR_MINI_MODE, reason).apply()
+                        showFPSDropdown = false
+                        if (prefs.getBoolean(SpfConfig.MONITOR_MINI, false)) {
+                            FPSMonitor(context).hidePopupWindow()
+                            FPSMonitor(context).showPopupWindow()
+                        }
+                    })
+            }
+
+            ElevatedCard {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 18.dp, end = 18.dp, top = 18.dp, bottom = 5.dp),
+                    ){
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart),
+                            text = stringResource(R.string.fps_monitor),
+                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+
+                        ElevatedCard(
+                            colors = CardDefaults.elevatedCardColors(containerColor = run {
+                                MaterialTheme.colorScheme.primary
+                            }),
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .clickable {
+                                        showFPSDropdown = true
+                                    }
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                ) {
+                                    Text(
+                                        modifier = Modifier
+                                            .padding(top = 9.dp, bottom = 9.dp, start = 15.dp, end = 32.dp),
+                                        text = if (fps_monitor_mode == 0) stringResource(R.string.fps_only)
+                                        else if (fps_monitor_mode == 1)
+                                            stringResource(R.string.fps_scene)
+                                        else
+                                            stringResource(R.string.fps_oplus),
+                                        fontSize = 16.sp,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        textAlign = TextAlign.Center
+                                    )
+
+                                    Row (
+                                        modifier = Modifier
+                                            .align(Alignment.CenterEnd)
+                                            .padding(end = 6.dp)
+                                    ){
+                                        Icon(
+                                            Icons.Filled.KeyboardArrowDown, "",
+                                        )
+                                    }
+                                }
+                                DropdownMenu(
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    expanded = showFPSDropdown, onDismissRequest = {
+                                        showFPSDropdown = false
+                                    }) {
+                                    FPSMonitorDropdownItem(stringResource(R.string.fps_only), reason = 0)
+                                    FPSMonitorDropdownItem(stringResource(R.string.fps_scene), reason = 1)
+                                    FPSMonitorDropdownItem(stringResource(R.string.fps_oplus), reason = 2)
+                                }
+                            }
+                        }
+                    }
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 18.dp, end = 18.dp, top = 5.dp, bottom = 5.dp),
+                        text = if (fps_monitor_mode == 0)
+                            stringResource(R.string.fps_only_info)
+                        else if (fps_monitor_mode == 1)
+                            stringResource(R.string.fps_scene_info)
+                        else
+                            stringResource(R.string.fps_oplus_info),
+                        fontSize = 14.sp,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    SwitchItem(
+                        title = stringResource(R.string.fps_monitor_show),
+                        checked = fps_monitor,
+                        summary = if (fps_monitor)
+                            stringResource(R.string.fps_monitor_show_disable)
+                        else
+                            stringResource(R.string.fps_monitor_show_enable)
+                    ) {
+                        if (it)
+                            FPSMonitor(context).showPopupWindow()
+                        else
+                            FPSMonitor(context).hidePopupWindow()
+                        prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, it).apply()
+                        fps_monitor = it
+                    }
+                    if (fps_monitor_mode == 2) {
+                        var fps_monitor_small by rememberSaveable {
+                            mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI_SMALL, false))
+                        }
+                        SwitchItem(
+                            title = stringResource(R.string.fps_small_view),
+                            checked = fps_monitor_small,
+                            summary = if (fps_monitor_small)
+                                stringResource(R.string.fps_small_view_disable)
+                            else
+                                stringResource(R.string.fps_small_view_enable)
+                        ) {
+                            prefs.edit().putBoolean(SpfConfig.MONITOR_MINI_SMALL, it).apply()
+                            fps_monitor_small = it
+                        }
+                        if (fps_monitor_small) {
+                            var fps_monitor_ram by rememberSaveable {
+                                mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI_RAM, true))
+                            }
+                            var fps_monitor_bat by rememberSaveable {
+                                mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI_BATT, true))
+                            }
+                            var fps_monitor_temp by rememberSaveable {
+                                mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI_TEMP, true))
+                            }
+                            SwitchItem(
+                                title = stringResource(R.string.fps_battery_view),
+                                checked = fps_monitor_bat,
+                                summary = stringResource(R.string.fps_battery_view_sum)
+                            ) {
+                                prefs.edit().putBoolean(SpfConfig.MONITOR_MINI_BATT, it).apply()
+                                fps_monitor_bat = it
+                            }
+                            SwitchItem(
+                                title = stringResource(R.string.fps_temp_view),
+                                checked = fps_monitor_temp,
+                                summary = stringResource(R.string.fps_temp_view_sum)
+                            ) {
+                                prefs.edit().putBoolean(SpfConfig.MONITOR_MINI_TEMP, it).apply()
+                                fps_monitor_temp = it
+                            }
+                            SwitchItem(
+                                title = stringResource(R.string.fps_ram_view),
+                                checked = fps_monitor_ram,
+                                summary = stringResource(R.string.fps_ram_view_sum)
+                            ) {
+                                prefs.edit().putBoolean(SpfConfig.MONITOR_MINI_RAM, it).apply()
+                                fps_monitor_ram = it
+                            }
+                        }
                     }
                 }
             }

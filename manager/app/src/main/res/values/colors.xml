@@ -7,4 +7,10 @@
     <color name="color_balance">#00B78A</color>
     <color name="color_performance">#6ECB00</color>
     <color name="color_fast">#FF7E00</color>
+    <color name="wallbgdark">#2e2e2e</color>
+    <color name="wallbgwhite">#c9cacc</color>
+    <color name="color_ht">#00f0ff</color>
+    <color name="color_ht_bg">#f6ff04</color>
+    <color name="color_ht1">#2eeb0f</color>
+    <color name="white">#ffffff</color>
 </resources>

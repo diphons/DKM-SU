@@ -4,11 +4,29 @@
 
 #include <android/log.h>
 #include <cstring>
+#include <string>
 
 #include "ksu.h"
 
 #define LOG_TAG "DKM-SU"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+
+char* jstringToChar(JNIEnv* env, jstring jstr) {
+    char* rtn = NULL;
+    jclass clsstring = env->FindClass("java/lang/String");
+    jstring strencode = env->NewStringUTF("GB2312");
+    jmethodID mid = env->GetMethodID(clsstring, "getBytes", "(Ljava/lang/String;)[B");
+    jbyteArray barr = (jbyteArray) env->CallObjectMethod(jstr, mid, strencode);
+    jsize alen = env->GetArrayLength(barr);
+    jbyte* ba = env->GetByteArrayElements(barr, JNI_FALSE);
+    if (alen > 0) {
+        rtn = (char*) malloc(alen + 1);
+        memcpy(rtn, ba, alen);
+        rtn[alen] = 0;
+    }
+    env->ReleaseByteArrayElements(barr, ba, 0);
+    return rtn;
+}
 
 extern "C"
 JNIEXPORT jboolean JNICALL
@@ -295,4 +313,21 @@ extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_diphons_dkmsu_Natives_uidShouldUmount(JNIEnv *env, jobject thiz, jint uid) {
     return uid_should_umount(uid);
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_diphons_dkmsu_ui_KsuJNI_getKernelPropLong(
+        JNIEnv *env,
+        jobject,
+        jstring path) {
+    char* charData = jstringToChar(env, path);
+
+    FILE *kernelProp = fopen(charData, "r");
+    if (kernelProp == nullptr)
+        return -1;
+    long freq;
+    fscanf(kernelProp,"%ld",&freq);
+    fclose(kernelProp);
+    return freq;
 }
