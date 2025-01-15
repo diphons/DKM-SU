@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +36,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -94,39 +96,71 @@ fun SuSFSScreen(navigator: DestinationsNavigator) {
                 .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            ElevatedCard (
-                modifier = Modifier
-                    .fillMaxWidth()
-            ){
-                Column (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(23.dp),
-                    verticalArrangement = Arrangement.spacedBy(5.dp)
-                ){
-                    Text(
-                        modifier = Modifier,
-                        text = stringResource(R.string.susfs_enabled_features),
-                        fontSize = 15.sp,
-                        style = MaterialTheme.typography.titleSmall
-                    )
-
-                    Text(
-                        modifier = Modifier,
-                        text = susfsEnableFeatures().lowercase(),
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
+            var showDialog by remember { mutableStateOf(false) }
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = {
+                        Text(
+                            text = stringResource(R.string.susfs_enabled_features),
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = susfsEnableFeatures().lowercase(),
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    },
+                    confirmButton = {}
+                )
             }
             ElevatedCard (
                 modifier = Modifier
                     .fillMaxWidth()
             ){
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 21.dp)
+                        .padding(top = 23.dp, bottom = 5.dp)
+                ){
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterStart),
+                        text = stringResource(R.string.susfs_features),
+                        fontSize = 15.sp
+                    )
+                    ElevatedCard(
+                        colors = CardDefaults.elevatedCardColors(containerColor = run {
+                            MaterialTheme.colorScheme.primary
+                        }),
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .clickable {
+                                showDialog = true
+                            },
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(vertical = 6.dp, horizontal = 15.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.show),
+                                style = MaterialTheme.typography.titleSmall,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
                 Column (
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                        .padding(start = 5.dp, end = 5.dp, top = 5.dp, bottom = 10.dp)
                 ){
                     var susfsLog by rememberSaveable { mutableStateOf(globalConfig.getBoolean(SpfConfig.SUSFS_LOG, true)) }
                     SwitchItem(

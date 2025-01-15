@@ -71,6 +71,7 @@
     <string name="proceed">继续</string>
     <string name="cancel">取消</string>
     <string name="later">之后</string>
+    <string name="show">展示</string>
     <string name="refresh">刷新</string>
     <string name="show_system_apps">显示系统应用</string>
     <string name="hide_system_apps">隐藏系统应用</string>
@@ -283,6 +284,7 @@
     <string name="susfs_not_alowed">输入中不允许有空格</string>
     <string name="custom_susfs_settings">自定义 SuSFS 设置</string>
     <string name="custom_susfs_settings_sum">查看更多可供您使用的自定义 susfs 设置</string>
+    <string name="susfs_features">SuSFS 功能</string>
     <string name="susfs_enabled_features">SuSFS 支持的功能</string>
     <string name="dkm_service">DKM 服务未启动，请启动它以使用更多功能</string>
 </resources>
