@@ -142,7 +142,7 @@
             android:name=".ui.tiles.FPSTile"
             android:foregroundServiceType="shortService"
             android:exported="true"
-            android:icon="@drawable/ic_perf_none"
+            android:icon="@drawable/ic_fps_monitor"
             android:label="FPS"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>

@@ -33,7 +33,7 @@ class FPSTile : TileService() {
             FPSMonitor(applicationContext).showPopupWindow()
         }
 
-        val newIcon: Icon = Icon.createWithResource(applicationContext, R.drawable.ic_perf_none)
+        val newIcon: Icon = Icon.createWithResource(applicationContext, R.drawable.ic_fps_monitor)
         // Change the UI of the tile.
         tile.label = "FPS Meter"
         tile.icon = newIcon
@@ -58,7 +58,7 @@ class FPSTile : TileService() {
             newState = Tile.STATE_INACTIVE
             FPSMonitor(applicationContext).hidePopupWindow()
         }
-        val newIcon: Icon = Icon.createWithResource(applicationContext, R.drawable.ic_perf_none)
+        val newIcon: Icon = Icon.createWithResource(applicationContext, R.drawable.ic_fps_monitor)
         // Change the UI of the tile.
         tile.label = "FPS Meter"
         tile.icon = newIcon
