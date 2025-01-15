@@ -87,7 +87,7 @@ class ChgTile : TileService() {
         newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_charge)
         newLabel = "${cur_chg0 * 5.5 / 1000000} Watt"
 
-        fun perfMode(){
+        fun Mode(){
             if (prefs.getBoolean(SpfConfig.PERF_MODE, true)) {
                 newState = Tile.STATE_ACTIVE
                 if (id == 1) {
@@ -101,20 +101,18 @@ class ChgTile : TileService() {
                 }
             } else {
                 newState = Tile.STATE_UNAVAILABLE
-                newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_perf_none)
                 newLabel = getString(R.string.performance_mode)
             }
         }
         if (hasModule(DYNAMIC_CHARGING)) {
             if (prefs.getBoolean(SpfConfig.DYNAMIC_CHARGING, true)) {
                 newState = Tile.STATE_UNAVAILABLE
-                newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_perf_ai)
                 newLabel = getString(R.string.charger_max)
             } else {
-                perfMode()
+                Mode()
             }
         } else {
-            perfMode()
+            Mode()
         }
 
         // Change the UI of the tile.
