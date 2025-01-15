@@ -317,7 +317,7 @@ Java_com_diphons_dkmsu_Natives_uidShouldUmount(JNIEnv *env, jobject thiz, jint u
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_diphons_dkmsu_ui_KsuJNI_getKernelPropLong(
+Java_com_diphons_dkmsu_Natives_getKernelPropLong(
         JNIEnv *env,
         jobject,
         jstring path) {
