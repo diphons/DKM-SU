@@ -2,6 +2,8 @@ import com.android.build.api.dsl.ApplicationDefaultConfig
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.api.AndroidBasePlugin
 import java.io.ByteArrayOutputStream
+import java.util.Date
+import java.text.SimpleDateFormat
 
 plugins {
     alias(libs.plugins.agp.app) apply false
@@ -35,6 +37,7 @@ val androidSourceCompatibility = JavaVersion.VERSION_21
 val androidTargetCompatibility = JavaVersion.VERSION_21
 val managerVersionCode by extra(getVersionCode())
 val managerVersionName by extra(getVersionName())
+val buildDate by extra(getDate())
 
 fun getGitCommitCount(): Int {
     val out = ByteArrayOutputStream()
@@ -45,15 +48,6 @@ fun getGitCommitCount(): Int {
     return out.toString().trim().toInt()
 }
 
-fun getGitDescribe(): String {
-    val out = ByteArrayOutputStream()
-    exec {
-        commandLine("git", "describe", "--tags", "--always")
-        standardOutput = out
-    }
-    return out.toString().trim()
-}
-
 fun getVersionCode(): Int {
     val commitCount = getGitCommitCount()
     val major = 1
@@ -61,7 +55,13 @@ fun getVersionCode(): Int {
 }
 
 fun getVersionName(): String {
-    return getGitDescribe()
+    return "v2.1.5"
+}
+
+fun getDate(): String {
+    val date = SimpleDateFormat("yyyyMMdd").format(Date())
+    val hours = SimpleDateFormat("hhmmss").format(Date())
+    return "$date$hours"
 }
 
 subprojects {

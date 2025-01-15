@@ -14,6 +14,7 @@ plugins {
 
 val managerVersionCode: Int by rootProject.extra
 val managerVersionName: String by rootProject.extra
+val buildDate: String by rootProject.extra
 
 apksign {
     storeFileProperty = "KEYSTORE_FILE"
@@ -68,7 +69,7 @@ android {
     applicationVariants.all {
         outputs.forEach {
             val output = it as BaseVariantOutputImpl
-            output.outputFileName = "DKM_SU_${managerVersionName}_${managerVersionCode}-$name.apk"
+            output.outputFileName = "DKM_SU_${managerVersionName}_${managerVersionCode}_${buildDate}-$name.apk"
         }
         kotlin.sourceSets {
             getByName(name) {

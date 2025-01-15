@@ -538,7 +538,7 @@ private fun InfoCard() {
             val managerVersion = getManagerVersion(context)
             InfoCardItem(
                 label = stringResource(R.string.home_manager_version),
-                content = "${managerVersion.first}-su (${managerVersion.second})"
+                content = "${managerVersion.first} (${managerVersion.second})"
             )
 
             Spacer(Modifier.height(4.dp))
