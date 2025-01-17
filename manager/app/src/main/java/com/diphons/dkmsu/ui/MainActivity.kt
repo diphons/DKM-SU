@@ -91,8 +91,9 @@ class MainActivity : ComponentActivity() {
         }
 
         //Extract Assets
-        if (isManager && rootAvailable())
+        if (isManager && rootAvailable()) {
             extractXTAssets(this)
+        }
         setContent {
             KernelSUTheme {
                 val navController = rememberNavController()

@@ -52,10 +52,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import com.diphons.dkmsu.ui.component.rememberCustomDialog
 import com.diphons.dkmsu.ui.component.runDialog
-import com.diphons.dkmsu.ui.popup.PowerMenu
 import com.diphons.dkmsu.ui.store.*
+import com.diphons.dkmsu.ui.util.Utils.CMD_MSG
 import com.diphons.dkmsu.ui.util.Utils.DIALOG_MODE
 import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>(start = true)
@@ -64,6 +65,8 @@ fun HomeScreen(navigator: DestinationsNavigator) {
     val kernelVersion = getKernelVersion()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
     Scaffold(
         topBar = {
             TopBar(
@@ -79,6 +82,32 @@ fun HomeScreen(navigator: DestinationsNavigator) {
         },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     ) { innerPadding ->
+        val runDialog = rememberCustomDialog {
+            runDialog(it)
+        }
+        var runGrant by rememberSaveable { mutableStateOf(false) }
+        var count_finish by rememberSaveable { mutableStateOf(false) }
+        if (!prefs.getBoolean(SpfConfig.PERMISSIONS, false)) {
+            DIALOG_MODE = 3
+            if (!runGrant) {
+                runDialog.show()
+                runGrant = true
+                setPermissions(context)
+                count_finish = true
+            }
+        }
+        if (count_finish) {
+            LaunchedEffect(Unit) {
+                for (i in 1..200) {
+                    delay(1000) // update once a second
+                    if (CMD_MSG.contains("Finish")) {
+                        runDialog.hide()
+                        CMD_MSG = ""
+                        count_finish = false
+                    }
+                }
+            }
+        }
         Column(
             modifier = Modifier
                 .padding(innerPadding)

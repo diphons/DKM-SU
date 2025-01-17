@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.diphons.dkmsu.ui.component.KeepShellPublic
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.Utils.CHG_CUR_MAX
 import com.diphons.dkmsu.ui.util.Utils.DISPLAY_BLUE
@@ -43,6 +44,8 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
 
     override fun doWork(): Result {
         globalConfig = applicationContext.getSharedPreferences("settings", Context.MODE_PRIVATE)
+
+        KeepShellPublic.doCmdSync("dumpsys deviceidle whitelist +${applicationContext.packageName}")
 
         if (globalConfig.getBoolean(SpfConfig.PERF_MODE, true)) {
             if (hasModule(GAME_AI)) {

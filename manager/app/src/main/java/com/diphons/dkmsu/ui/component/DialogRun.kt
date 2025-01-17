@@ -26,6 +26,7 @@ import androidx.compose.ui.window.Dialog
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.util.Utils.*
 import kotlinx.coroutines.delay
+import java.util.Locale
 
 @Preview
 @Composable
@@ -43,6 +44,8 @@ fun DialogCard() {
                 DialogSVCContent()
             else if (DIALOG_MODE == 2)
                 DialogUFSContent()
+            else if (DIALOG_MODE == 3)
+                DialogPermContent()
             else
                 DialogCardContent()
         }
@@ -148,6 +151,38 @@ private fun DialogUFSContent() {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.ufs_health_info_die),
+                    style = TextStyle(
+                        fontSize = 14.sp
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DialogPermContent() {
+    DIALOG_MODE = 0
+    var apply_perm by rememberSaveable { mutableStateOf(CMD_MSG) }
+    LaunchedEffect(Unit) {
+        for (i in 1..200) {
+            delay(1000) // update once a second
+            apply_perm = CMD_MSG
+        }
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row {
+            Column {
+                Text(
+                    stringResource(id = R.string.app_name),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontSize = 18.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = if (apply_perm.isEmpty()) "Trying to set permissions.." else "Set Permissions ${apply_perm.replace("_", " ").lowercase(Locale.getDefault())}",
                     style = TextStyle(
                         fontSize = 14.sp
                     )

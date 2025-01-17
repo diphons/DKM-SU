@@ -3,7 +3,6 @@ package com.diphons.dkmsu.ui.util
 import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.database.Cursor
 import android.net.ConnectivityManager
@@ -23,8 +22,10 @@ import com.diphons.dkmsu.Natives
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.getKernelVersion
 import com.diphons.dkmsu.ksuApp
+import com.diphons.dkmsu.ui.component.KeepShellPublic
 import com.diphons.dkmsu.ui.services.ExtractAssetsWorker
 import com.diphons.dkmsu.ui.services.PIFWorker
+import com.diphons.dkmsu.ui.services.PermWorker
 import com.diphons.dkmsu.ui.services.ProfileWorker
 import com.diphons.dkmsu.ui.services.SVCWorker
 import com.diphons.dkmsu.ui.util.Utils.*
@@ -1481,4 +1482,58 @@ fun restartApp(packageName: String) {
 
 fun getKernelPropLong(path: String): Long {
     return Natives.getKernelPropLong(path)
+}
+
+fun setPermissions(context: Context){
+    val result = OneTimeWorkRequest.Builder(PermWorker::class.java)
+        .build()
+    val workManager = WorkManager.getInstance(context)
+    workManager.enqueue(result)
+}
+
+fun checkPermission(context: Context): Boolean {
+    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    return prefs.getBoolean(SpfConfig.PERMISSIONS, false)
+}
+
+fun grantPermissions(context: Context) {
+    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    val requiredPermission = arrayOf(
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "CHANGE_CONFIGURATION",
+        "WRITE_SECURE_SETTINGS",
+        "SYSTEM_ALERT_WINDOW",
+        "WRITE_SETTINGS",
+        "WRITE_SYNC_SETTINGS",
+        "RECEIVE_BOOT_COMPLETED",
+        "BATTERY_STATS",
+        "SET_WALLPAPER",
+        "INTERNET",
+        "READ_SYNC_SETTINGS",
+        "VIBRATE",
+        "WAKE_LOCK",
+        "BIND_NOTIFICATION_LISTENER_SERVICE",
+        "POST_NOTIFICATIONS",
+        "QUERY_ALL_PACKAGES",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_SPECIAL_USE",
+        "START_FOREGROUND_SERVICES_FROM_BACKGROUND",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_DATA_SYNC",
+        "FOREGROUND_SERVICE_HEALTH",
+        "RUN_USER_INITIATED_JOBS",
+        "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+    )
+    requiredPermission.forEach {
+        CMD_MSG = it
+        KeepShellPublic.doCmdSync("appops set ${context.packageName} $it allow")
+        KeepShellPublic.doCmdSync("pm grant ${context.packageName} $it")
+        if (CMD_MSG.contains("REQUEST_IGNORE_BATTERY_OPTIMIZATIONS")) {
+            KeepShellPublic.doCmdSync("dumpsys deviceidle whitelist +${context.packageName}")
+            prefs.edit().putBoolean(SpfConfig.PERMISSIONS, true).apply()
+        }
+    }
+    if (prefs.getBoolean(SpfConfig.PERMISSIONS, true))
+        CMD_MSG = "Finished"
 }
