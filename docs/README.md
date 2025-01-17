@@ -14,7 +14,7 @@ Solusi root berbasis Kernel untuk perangkat Android.
 ## Fitur
 
 1. Manajemen akses root dan `su` berbasis kernel.
-2. Sistem modul berdasarkan [OverlayFS](https://en.wikipedia.org/wiki/OverlayFS).
+2. Sistem modul berdasarkan sistem pemasangan dinamis [Magic Mount ](https://topjohnwu.github.io/Magisk/details.html#magic-mount) / [OverlayFS](https://en.wikipedia.org/wiki/OverlayFS).
 3. [Profil Aplikasi](https://kernelsu.org/guide/app-profile.html): Mengunci kekuatan root dalam sebuah kandang.
 
 ## Compatibility State

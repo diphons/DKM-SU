@@ -14,7 +14,7 @@ Android cihazlar için Kernel tabanlı bir root çözümü.
 ## Özellikler
 
 1. Çekirdek tabanlı `su` ve kök erişim yönetimi.
-2. [OverlayFS](https://en.wikipedia.org/wiki/OverlayFS) tabanlı modül sistemi.
+2. Dinamik montaj sistemine dayalı modül sistemi [Magic Mount](https://topjohnwu.github.io/Magisk/details.html#magic-mount) / [OverlayFS](https://en.wikipedia.org/wiki/OverlayFS).
 3. [App Profile](https://kernelsu.org/guide/app-profile.html): Kök gücünü bir kafese kilitleyin.
 
 ## Uyumluluk Durumu

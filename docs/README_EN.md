@@ -14,7 +14,7 @@ A Kernel-based root solution for Android devices.
 ## Features
 
 1. Kernel-based `su` and root access management.
-2. Module system based on [OverlayFS](https://en.wikipedia.org/wiki/OverlayFS).
+2. Module system based on dynamic mount system [Magic Mount ](https://topjohnwu.github.io/Magisk/details.html#magic-mount) / [OverlayFS](https://en.wikipedia.org/wiki/OverlayFS).
 3. [App Profile](https://kernelsu.org/guide/app-profile.html): Lock up the root power in a cage.
 
 ## Compatibility State
