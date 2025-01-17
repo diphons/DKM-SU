@@ -3,6 +3,7 @@ package com.diphons.dkmsu.ui.screen
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -38,13 +41,20 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
@@ -53,6 +63,8 @@ import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.diphons.dkmsu.R
+import com.diphons.dkmsu.ui.component.rememberCustomDialog
+import com.diphons.dkmsu.ui.component.runDialog
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.util.*
 import com.diphons.dkmsu.ui.store.*
@@ -94,6 +106,8 @@ fun KernelScreen(navigator: DestinationsNavigator) {
     val chg_profile_name = MutableLiveData<String>(prefs.getString(SpfConfig.CHG_MAX_NAME, "Default"))
     val chg_profile = MutableLiveData<String>("")
     val chg_current = MutableLiveData<String>("")
+    val ufs_healt_info = MutableLiveData<Float>(1f)
+    var ufs_popup by rememberSaveable { mutableStateOf(false) }
 
     fun getCurChg() {
         val check_profile_name = "$chg_profile_name"
@@ -165,6 +179,9 @@ fun KernelScreen(navigator: DestinationsNavigator) {
         snackbarHost = { SnackbarHost(snackBarHost) },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     ) { innerPadding ->
+        val runDialog = rememberCustomDialog {
+            runDialog(it)
+        }
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -280,6 +297,70 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
+                        }
+                    }
+                }
+            }
+            if (hasModule(UFS_HEALTH)) {
+                ufs_healt_info.value = (getUFSHelat().toFloat() / 100)
+                if (getUFSHelat() < 10 && !ufs_popup) {
+                    ufs_popup = true
+                    DIALOG_MODE = 2
+                    runDialog.show()
+                }
+                ElevatedCard {
+                    Column (modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(start = 18.dp, top = 13.dp),
+                            text = stringResource(R.string.storage),
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(start = 7.dp, end = 18.dp),
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(start = 11.dp),
+                                text = stringResource(R.string.ufs_health_info),
+                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Slider(
+                                modifier = Modifier
+                                    .padding(top = 10.dp, end = 40.dp),
+                                value = ufs_healt_info.value!!,
+                                onValueChange = {},
+                                colors = SliderDefaults.colors(
+                                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                                    inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
+                                        alpha = 0.4f
+                                    )
+                                ),
+                                thumb = {
+                                    SliderDefaults.Thumb(
+                                        interactionSource = remember {
+                                            MutableInteractionSource()
+                                        },
+                                        thumbSize = DpSize(20.dp, 20.dp),
+                                        colors = SliderDefaults.colors(
+                                            thumbColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    )
+                                }
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .padding(top = 10.dp, bottom = 1.dp),
+                                text = "${getUFSHelat()}%"
+                            )
                         }
                     }
                 }

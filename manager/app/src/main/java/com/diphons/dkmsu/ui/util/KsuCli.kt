@@ -1054,6 +1054,33 @@ fun getDefDT2W(): Boolean{
     return result.contains("1")
 }
 
+fun getUFSHelat(): Int{
+    var result = RootUtils.runAndGetOutput("cat $UFS_HEALTH")
+    if (result.contains("1"))
+        result = "100"
+    else if (result.contains("2"))
+        result = "90"
+    else if (result.contains("3"))
+        result = "80"
+    else if (result.contains("4"))
+        result = "70"
+    else if (result.contains("5"))
+        result = "60"
+    else if (result.contains("6"))
+        result = "50"
+    else if (result.contains("7"))
+        result = "40"
+    else if (result.contains("8"))
+        result = "30"
+    else if (result.contains("9"))
+        result = "20"
+    else if (result.contains("A") || result.contains("a"))
+        result = "10"
+    else
+        result = "0"
+    return strToInt(result)
+}
+
 fun getLastDirListIO(): String{
     return RootUtils.runAndGetOutput("dirIO=$(ls $IO_PATH | grep 'sd');parse0=$(echo \$dirIO);parse1=\${parse0##* }; echo \$parse1 | sed 's/sd//g'")
 }

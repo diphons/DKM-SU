@@ -312,4 +312,7 @@
     <string name="susfs_hide_loop" translatable="false">Hide KSU Loop</string>
     <string name="susfs_hide_lsposed" translatable="false">Force Hide LSPosed Mounts</string>
     <string name="dkm_service">DKM Service is not started, start it to use more feature</string>
+    <string name="storage">Storage</string>
+    <string name="ufs_health_info">UFS Health Info</string>
+    <string name="ufs_health_info_die">Your UFS storage will die soon</string>
 </resources>

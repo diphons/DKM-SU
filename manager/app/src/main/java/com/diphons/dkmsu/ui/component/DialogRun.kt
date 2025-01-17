@@ -41,6 +41,8 @@ fun DialogCard() {
         ) {
             if (DIALOG_MODE == 1)
                 DialogSVCContent()
+            else if (DIALOG_MODE == 2)
+                DialogUFSContent()
             else
                 DialogCardContent()
         }
@@ -121,6 +123,31 @@ private fun DialogSVCContent() {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = dkm_service,
+                    style = TextStyle(
+                        fontSize = 14.sp
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DialogUFSContent() {
+    DIALOG_MODE = 0
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row {
+            Column {
+                Text(
+                    stringResource(id = R.string.app_name),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontSize = 18.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.ufs_health_info_die),
                     style = TextStyle(
                         fontSize = 14.sp
                     )

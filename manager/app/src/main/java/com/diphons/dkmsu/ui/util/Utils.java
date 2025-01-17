@@ -103,6 +103,8 @@ public class Utils {
     public static String DATA_DATA = "/data/data";
     public static Boolean AV_INTERNET = false;
 
+    public static String UFS_HEALTH = "/sys/devices/platform/soc/1d84000.ufshc/health_descriptor/life_time_estimation_a";
+
     public static Integer DIALOG_MODE = 0;
     public static String SUS_MOUNT() {
         return "# example\n# /system\n# /system_ext\n/data/adb/modules\n/debug_ramdisk\n" ;

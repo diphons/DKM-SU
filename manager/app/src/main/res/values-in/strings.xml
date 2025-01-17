@@ -289,4 +289,7 @@
     <string name="susfs_features">SuSFS Features</string>
     <string name="susfs_enabled_features">Fitur yang Diaktifkan SuSFS</string>
     <string name="dkm_service">Layanan DKM belum dimulai, mulai untuk menggunakan lebih banyak fitur</string>
+    <string name="storage">Penyimpanan</string>
+    <string name="ufs_health_info">Info Kesehatan UFS</string>
+    <string name="ufs_health_info_die">Penyimpanan UFS Anda akan segera mati</string>
 </resources>

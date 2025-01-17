@@ -289,4 +289,7 @@
     <string name="susfs_features">SuSFS 功能</string>
     <string name="susfs_enabled_features">SuSFS 支持的功能</string>
     <string name="dkm_service">DKM 服务未启动，请启动它以使用更多功能</string>
+    <string name="storage">贮存</string>
+    <string name="ufs_health_info">UFS 健康信息</string>
+    <string name="ufs_health_info_die">你的 UFS 存储很快就会死掉</string>
 </resources>
