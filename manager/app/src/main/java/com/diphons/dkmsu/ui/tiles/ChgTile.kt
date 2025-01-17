@@ -5,7 +5,9 @@ import android.content.SharedPreferences
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import com.diphons.dkmsu.Natives
 import com.diphons.dkmsu.R
+import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.Utils.DYNAMIC_CHARGING
 import com.diphons.dkmsu.ui.util.hasModule
@@ -19,10 +21,12 @@ class ChgTile : TileService() {
     private var cur_chg2 = 0
     private var cur_chg3 = 0
     lateinit var prefs: SharedPreferences
+    val isManager = Natives.becomeManager(ksuApp.packageName)
 
     override fun onClick() {
         super.onClick()
-        updateTile()
+        if (isManager)
+            updateTile()
     }
 
     private fun updateTile() {
@@ -83,10 +87,6 @@ class ChgTile : TileService() {
         cur_chg2 = cur_chg / 2
         cur_chg1 = cur_chg3 + cur_chg2
 
-        newState = Tile.STATE_ACTIVE
-        newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_charge)
-        newLabel = "${cur_chg0 * 5.5 / 1000000} Watt"
-
         fun Mode(){
             if (prefs.getBoolean(SpfConfig.PERF_MODE, true)) {
                 newState = Tile.STATE_ACTIVE
@@ -101,18 +101,28 @@ class ChgTile : TileService() {
                 }
             } else {
                 newState = Tile.STATE_UNAVAILABLE
-                newLabel = getString(R.string.performance_mode)
+                newLabel = getString(R.string.charger_max)
             }
         }
-        if (hasModule(DYNAMIC_CHARGING)) {
-            if (prefs.getBoolean(SpfConfig.DYNAMIC_CHARGING, true)) {
-                newState = Tile.STATE_UNAVAILABLE
-                newLabel = getString(R.string.charger_max)
+
+        newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_charge)
+        if (isManager) {
+            newState = Tile.STATE_ACTIVE
+            newLabel = "${cur_chg0 * 5.5 / 1000000} Watt"
+
+            if (hasModule(DYNAMIC_CHARGING)) {
+                if (prefs.getBoolean(SpfConfig.DYNAMIC_CHARGING, true)) {
+                    newState = Tile.STATE_UNAVAILABLE
+                    newLabel = getString(R.string.charger_max)
+                } else {
+                    Mode()
+                }
             } else {
                 Mode()
             }
         } else {
-            Mode()
+            newState = Tile.STATE_UNAVAILABLE
+            newLabel = getString(R.string.charger_max)
         }
 
         // Change the UI of the tile.

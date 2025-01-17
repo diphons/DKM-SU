@@ -40,11 +40,13 @@
     <string name="install">Instal</string>
     <string name="reboot">Reboot</string>
     <string name="settings">Pengaturan</string>
+    <string name="power_menu">Menu Power</string>
+    <string name="shutdown">Matikan</string>
     <string name="reboot_userspace">Soft Reboot</string>
-    <string name="reboot_recovery">Reboot ke Recovery</string>
-    <string name="reboot_bootloader">Reboot ke Bootloader</string>
-    <string name="reboot_download">Reboot ke Download</string>
-    <string name="reboot_edl">Reboot ke EDL</string>
+    <string name="reboot_recovery">Recovery</string>
+    <string name="reboot_bootloader">Bootloader</string>
+    <string name="reboot_download">Download</string>
+    <string name="reboot_edl">EDL</string>
     <string name="about">Tentang</string>
     <string name="module_uninstall_confirm">Yakin menghapus modul %s?</string>
     <string name="module_uninstall_success">%s berhasil dihapus</string>

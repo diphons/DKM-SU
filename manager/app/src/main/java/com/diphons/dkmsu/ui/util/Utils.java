@@ -3,6 +3,7 @@ package com.diphons.dkmsu.ui.util;
 import static android.content.ContentValues.TAG;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -15,6 +16,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.VectorDrawable;
+import android.net.Uri;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.DrawableRes;
@@ -239,6 +242,14 @@ public class Utils {
                 "\t$susfs add_sus_path /proc/fs/jbd2/${device}-8\n" +
                 "\tsusfs add_sus_path /proc/fs/ext4/${device}\n" +
                 "done\n");
+    }
+
+    public static void checkDrawOverlayPermission(Context context) {
+        if (!Settings.canDrawOverlays(context)) { // WHAT IF THIS EVALUATES TO FALSE.
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + context.getPackageName()));
+            context.startActivity(intent);
+        }
     }
 
     public static int color_start = Color.parseColor("#FFFFFF");

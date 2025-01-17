@@ -5,7 +5,9 @@ import android.content.SharedPreferences
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import com.diphons.dkmsu.Natives
 import com.diphons.dkmsu.R
+import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.store.SpfConfig
 import com.diphons.dkmsu.ui.util.Utils.*
 import com.diphons.dkmsu.ui.util.checkFPS
@@ -21,11 +23,14 @@ class RefreshRateTile : TileService() {
     lateinit var infinity_display: String
     lateinit var getFPSdata: String
     private var id = 1
+    val isManager = Natives.becomeManager(ksuApp.packageName)
 
     override fun onClick() {
         super.onClick()
-        if (getFPSCount() > 1)
-            updateTile()
+        if (isManager) {
+            if (getFPSCount() > 1)
+                updateTile()
+        }
     }
 
     private fun updateTile() {
@@ -54,23 +59,27 @@ class RefreshRateTile : TileService() {
         prefs = applicationContext.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
         refreshrete = "${prefs.getString(SpfConfig.REFRESH_RATE, "60")}"
         infinity_display = "${prefs.getString(SpfConfig.DYNAMIC_FPS, "")}"
-        getFPSdata = checkFPS()
-        refreshrete = checkRefresRate()
-        id = getCurFPSID(refreshrete)
+        if (isManager) {
+            getFPSdata = checkFPS()
+            refreshrete = checkRefresRate()
+            id = getCurFPSID(refreshrete)
+        }
         resetTile()
     }
 
     fun resetTile() {
         val tile = this.qsTile
-        if (getFPSCount() > 1) {
-            if (!checkRefresRate().contains(refreshrete))
-                refreshrete = checkRefresRate()
-            if (infinity_display.isEmpty() && refreshrete.contains("finity")) {
-                prefs.edit().putString(SpfConfig.DYNAMIC_FPS, refreshrete).apply()
-                infinity_display = "infinity"
-            }
-        } else
-            refreshrete = getfpsbyid(1)
+        if (isManager) {
+            if (getFPSCount() > 1) {
+                if (!checkRefresRate().contains(refreshrete))
+                    refreshrete = checkRefresRate()
+                if (infinity_display.isEmpty() && refreshrete.contains("finity")) {
+                    prefs.edit().putString(SpfConfig.DYNAMIC_FPS, refreshrete).apply()
+                    infinity_display = "infinity"
+                }
+            } else
+                refreshrete = getfpsbyid(1)
+        }
 
         val newLabel = "$refreshrete Hz"
         val newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_refreshrate)

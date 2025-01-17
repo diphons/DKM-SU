@@ -50,7 +50,11 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
+import com.diphons.dkmsu.ui.component.rememberCustomDialog
+import com.diphons.dkmsu.ui.component.runDialog
+import com.diphons.dkmsu.ui.popup.PowerMenu
 import com.diphons.dkmsu.ui.store.*
+import com.diphons.dkmsu.ui.util.Utils.DIALOG_MODE
 import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -226,6 +230,7 @@ private fun TopBar(
                         showDropdown = false
                     }) {
 
+                        RebootDropdownItem(id = R.string.shutdown, reason = "shutdown")
                         RebootDropdownItem(id = R.string.reboot)
 
                         val pm =

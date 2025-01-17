@@ -5,22 +5,25 @@ import android.content.SharedPreferences
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import com.diphons.dkmsu.Natives
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.R
+import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.popup.FPSMonitor
 
 class FPSTile : TileService() {
     lateinit var prefs: SharedPreferences
     var state: Boolean = false
+    val isManager = Natives.becomeManager(ksuApp.packageName)
 
     override fun onClick() {
         super.onClick()
-        updateTile()
+        if (isManager)
+            updateTile()
     }
 
     private fun updateTile() {
         val tile = this.qsTile
-        val newLabel: String
         val newState: Int
 
         state = prefs.getBoolean(SpfConfig.MONITOR_MINI, false)
@@ -50,13 +53,17 @@ class FPSTile : TileService() {
 
     fun resetTile() {
         val tile = this.qsTile
-        var newState: Int
-        if (state) {
-            newState = Tile.STATE_ACTIVE
-            FPSMonitor(applicationContext).showPopupWindow()
+        val newState: Int
+        if (isManager) {
+            if (state) {
+                newState = Tile.STATE_ACTIVE
+                FPSMonitor(applicationContext).showPopupWindow()
+            } else {
+                newState = Tile.STATE_INACTIVE
+                FPSMonitor(applicationContext).hidePopupWindow()
+            }
         } else {
-            newState = Tile.STATE_INACTIVE
-            FPSMonitor(applicationContext).hidePopupWindow()
+            newState = Tile.STATE_UNAVAILABLE
         }
         val newIcon: Icon = Icon.createWithResource(applicationContext, R.drawable.ic_fps_monitor)
         // Change the UI of the tile.

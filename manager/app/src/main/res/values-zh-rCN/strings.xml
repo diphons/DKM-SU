@@ -40,11 +40,13 @@
     <string name="install">安装</string>
     <string name="reboot">重启</string>
     <string name="settings">设置</string>
+    <string name="power_menu">电源菜单</string>
+    <string name="shutdown">关闭</string>
     <string name="reboot_userspace">软重启</string>
-    <string name="reboot_recovery">重启到 Recovery</string>
-    <string name="reboot_bootloader">重启到 Bootloader</string>
-    <string name="reboot_download">重启到 Download</string>
-    <string name="reboot_edl">重启到 EDL</string>
+    <string name="reboot_recovery">Recovery</string>
+    <string name="reboot_bootloader">Bootloader</string>
+    <string name="reboot_download">Download</string>
+    <string name="reboot_edl">EDL</string>
     <string name="about">关于</string>
     <string name="module_uninstall_confirm">确定要卸载模块 %s 吗？</string>
     <string name="module_uninstall_success">%s 已卸载</string>

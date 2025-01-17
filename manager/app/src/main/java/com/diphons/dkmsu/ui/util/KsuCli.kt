@@ -1262,11 +1262,17 @@ fun installBoot(
 
 fun reboot(reason: String = "") {
     val shell = getRootShell()
-    if (reason == "recovery") {
-        // KEYCODE_POWER = 26, hide incorrect "Factory data reset" message
-        ShellUtils.fastCmd(shell, "/system/bin/input keyevent 26")
+    if (reason == "shutdown") {
+        ShellUtils.fastCmd(shell, "setprop sys.powerctl \"reboot,shutdown\"")
+    } else {
+        if (reason == "recovery") {
+            ShellUtils.fastCmd(shell, "/system/bin/input keyevent 26")
+        }
+        ShellUtils.fastCmd(
+            shell,
+            "/system/bin/svc power reboot $reason || /system/bin/reboot $reason"
+        )
     }
-    ShellUtils.fastCmd(shell, "/system/bin/svc power reboot $reason || /system/bin/reboot $reason")
 }
 
 fun rootAvailable(): Boolean {

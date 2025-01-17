@@ -13,4 +13,22 @@
     <color name="color_ht_bg">#f6ff04</color>
     <color name="color_ht1">#2eeb0f</color>
     <color name="white">#ffffff</color>
+
+    <!-- GM2 colors -->
+    <color name="GM2_grey_100">#F1F3F4</color>
+    <color name="GM2_grey_200">#E8EAED</color>
+    <color name="GM2_grey_300">#DADCE0</color>
+    <color name="GM2_grey_500">#9AA0A6</color>
+    <color name="GM2_grey_600">#80868B</color>
+    <color name="GM2_grey_700">#5F6368</color>
+    <color name="GM2_grey_800">#3C4043</color>
+    <color name="GM2_grey_900">#202124</color>
+
+    <!-- Colors for Power Menu Lite -->
+    <color name="global_actions_lite_background">#191C18</color>
+    <color name="global_actions_lite_button_background">#303030</color>
+    <color name="global_actions_lite_text">#F0F0F0</color>
+    <color name="global_actions_lite_emergency_background">#F85D4D</color>
+    <color name="global_actions_lite_emergency_icon">@color/GM2_grey_900</color>
+
 </resources>
