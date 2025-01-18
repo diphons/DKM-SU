@@ -1,4 +1,4 @@
-**English** | [Indonesia](README.md) | [简体中文](/docs/README_CN.md) | [Türkçe](/docs/README_TR.md)
+**English** | [Indonesia](/docs/README.md) | [简体中文](/docs/README_CN.md) | [Türkçe](/docs/README_TR.md) | [Rusia](/docs/README_RU.md)
 
 # DKM SU
 
