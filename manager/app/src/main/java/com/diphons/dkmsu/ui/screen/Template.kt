@@ -1,19 +1,26 @@
 package com.diphons.dkmsu.ui.screen
 
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -42,7 +49,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -90,6 +102,18 @@ fun AppProfileTemplateScreen(
         }
     }
 
+    var scrollPos by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = scrollPos - delta
+                scrollPos = newOffset
+                return Offset.Zero
+            }
+        }
+    }
     Scaffold(
         topBar = {
             val clipboardManager = LocalClipboardManager.current
@@ -132,7 +156,8 @@ fun AppProfileTemplateScreen(
                         }
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                borderVisible = if (scrollPos > 0.1f) true else false
             )
         },
         floatingActionButton = {
@@ -161,7 +186,7 @@ fun AppProfileTemplateScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    .nestedScroll(nestedScrollConnection),
                 contentPadding = remember {
                     PaddingValues(bottom = 16.dp + 56.dp + 16.dp /* Scaffold Fab Spacing + Fab container height */)
                 }
@@ -216,53 +241,86 @@ private fun TopBar(
     onSync: () -> Unit = {},
     onImport: () -> Unit = {},
     onExport: () -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    borderVisible: Boolean
 ) {
-    TopAppBar(
-        title = {
-            Text(stringResource(R.string.settings_profile_template))
-        },
-        navigationIcon = {
-            IconButton(
-                onClick = onBack
-            ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
-        },
-        actions = {
-            IconButton(onClick = onSync) {
-                Icon(
-                    Icons.Filled.Sync,
-                    contentDescription = stringResource(id = R.string.app_profile_template_sync)
-                )
-            }
-
-            var showDropdown by remember { mutableStateOf(false) }
-            IconButton(onClick = {
-                showDropdown = true
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.ImportExport,
-                    contentDescription = stringResource(id = R.string.app_profile_import_export)
-                )
-
-                DropdownMenu(expanded = showDropdown, onDismissRequest = {
-                    showDropdown = false
-                }) {
-                    DropdownMenuItem(text = {
-                        Text(stringResource(id = R.string.app_profile_import_from_clipboard))
-                    }, onClick = {
-                        onImport()
-                        showDropdown = false
-                    })
-                    DropdownMenuItem(text = {
-                        Text(stringResource(id = R.string.app_profile_export_to_clipboard))
-                    }, onClick = {
-                        onExport()
-                        showDropdown = false
-                    })
+    Box(modifier = Modifier
+        .fillMaxWidth()
+    ) {
+        if (borderVisible) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .height(20.dp)
+                    .border(
+                        BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        ),
+                        RoundedCornerShape(
+                            bottomStart = 19.dp,
+                            bottomEnd = 19.dp
+                        ),
+                    )
+            ) { }
+        }
+        TopAppBar(
+            title = {
+                Text(stringResource(R.string.settings_profile_template))
+            },
+            navigationIcon = {
+                IconButton(
+                    onClick = onBack
+                ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+            },
+            actions = {
+                IconButton(onClick = onSync) {
+                    Icon(
+                        Icons.Filled.Sync,
+                        contentDescription = stringResource(id = R.string.app_profile_template_sync)
+                    )
                 }
-            }
-        },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior
-    )
+
+                var showDropdown by remember { mutableStateOf(false) }
+                IconButton(onClick = {
+                    showDropdown = true
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.ImportExport,
+                        contentDescription = stringResource(id = R.string.app_profile_import_export)
+                    )
+
+                    DropdownMenu(expanded = showDropdown, onDismissRequest = {
+                        showDropdown = false
+                    }) {
+                        DropdownMenuItem(text = {
+                            Text(stringResource(id = R.string.app_profile_import_from_clipboard))
+                        }, onClick = {
+                            onImport()
+                            showDropdown = false
+                        })
+                        DropdownMenuItem(text = {
+                            Text(stringResource(id = R.string.app_profile_export_to_clipboard))
+                        }, onClick = {
+                            onExport()
+                            showDropdown = false
+                        })
+                    }
+                }
+            },
+            windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+            scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(if (borderVisible) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
+            modifier = Modifier
+                .padding(bottom = 1.dp)
+                .graphicsLayer {
+                    shape = RoundedCornerShape(
+                        bottomStart = 20.dp,
+                        bottomEnd = 20.dp
+                    )
+                    clip = true
+                }
+        )
+    }
 }
