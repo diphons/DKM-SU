@@ -292,4 +292,5 @@
     <string name="storage">Penyimpanan</string>
     <string name="ufs_health_info">Info Kesehatan UFS</string>
     <string name="ufs_health_info_die">Penyimpanan UFS Anda akan segera mati</string>
+    <string name="health">Kesehatan</string>
 </resources>

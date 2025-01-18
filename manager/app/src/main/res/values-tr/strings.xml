@@ -292,4 +292,5 @@
     <string name="storage">Depolamak</string>
     <string name="ufs_health_info">UFS Sağlık Bilgileri</string>
     <string name="ufs_health_info_die">UFS depolama alanınız ölmek üzere</string>
+    <string name="health">Sağlık</string>
 </resources>

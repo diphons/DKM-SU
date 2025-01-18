@@ -1537,3 +1537,17 @@ fun grantPermissions(context: Context) {
     if (prefs.getBoolean(SpfConfig.PERMISSIONS, true))
         CMD_MSG = "Finished"
 }
+
+var batt_health = ""
+fun getBattHealth(): Int{
+    if (batt_health.isEmpty()) {
+        var result =
+            RootUtils.runAndGetOutput("bat_health=$(awk -v capacity_now=$(cat /sys/class/power_supply/battery/charge_full) -v capacity_original=$(cat /sys/class/power_supply/battery/charge_full_design) 'BEGIN { print  ( capacity_now / capacity_original * 100 ) }'); echo \$bat_health")
+        if (result.isEmpty())
+            return 0
+        else if (result.contains("."))
+            result = result.substring(0, result.indexOf("."))
+        batt_health = result
+    }
+    return strToInt(batt_health)
+}

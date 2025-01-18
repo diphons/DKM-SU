@@ -118,8 +118,8 @@ fun KernelScreen(navigator: DestinationsNavigator) {
     val chg_prof_3 = MutableLiveData<Int>(prefs.getInt(SpfConfig.CHG_MAX_PROF_3, 0))
     val chg_profile_name = MutableLiveData<String>(prefs.getString(SpfConfig.CHG_MAX_NAME, "Default"))
     val chg_profile = MutableLiveData<String>("")
-    val chg_current = MutableLiveData<String>("")
     val ufs_healt_info = MutableLiveData<Float>(1f)
+    val batt_healt_info = MutableLiveData<Int>(getBattHealth())
     var ufs_popup by rememberSaveable { mutableStateOf(false) }
 
     fun getCurChg() {
@@ -169,16 +169,20 @@ fun KernelScreen(navigator: DestinationsNavigator) {
         chg_profile.value = if (chg_dynamic.value!!) {
             stringResource(R.string.charger_dynamic)
         } else {
-            "${stringResource(R.string.power_profile)} : ${chg_profile_name.value}"
+            "${stringResource(R.string.power_profile)} : ${
+                if (chg_potition.value == 0)
+                "${chg_prof_0.value!! * 5.5 / 1000000} Watt"
+                else if (chg_potition.value == 3)
+                    "${chg_prof_3.value!! * 5.5 / 1000000} Watt"
+                else if (chg_potition.value == 2)
+                    "${chg_prof_2.value!! * 5.5 / 1000000} Watt"
+                else
+                    "${chg_prof_1.value!! * 5.5 / 1000000} Watt"
+            }"
         }
-        chg_current.value = if (chg_potition.value == 0)
-            "${chg_prof_0.value!! * 5.5 / 1000000} Watt"
-        else if (chg_potition.value == 3)
-            "${chg_prof_3.value!! * 5.5 / 1000000} Watt"
-        else if (chg_potition.value == 2)
-            "${chg_prof_2.value!! * 5.5 / 1000000} Watt"
-        else
-            "${chg_prof_1.value!! * 5.5 / 1000000} Watt"
+        batt_healt_info.value = getBattHealth()
+        if (batt_healt_info.value!! > 100)
+            batt_healt_info.value = 100
     }
     loadData()
 
@@ -303,14 +307,12 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                                 fontSize = 13.sp,
                                 style = MaterialTheme.typography.bodySmall
                             )
-                            if (!chg_dynamic.value!!) {
-                                Text(
-                                    modifier = Modifier,
-                                    text = "${stringResource(R.string.current)} : ${chg_current.value}",
-                                    fontSize = 13.sp,
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
+                            Text(
+                                modifier = Modifier,
+                                text = "${stringResource(R.string.health)} : ${batt_healt_info.value}%",
+                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
                     }
                 }

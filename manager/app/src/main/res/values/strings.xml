@@ -315,4 +315,5 @@
     <string name="storage">Storage</string>
     <string name="ufs_health_info">UFS Health Info</string>
     <string name="ufs_health_info_die">Your UFS storage will die soon</string>
+    <string name="health">Health</string>
 </resources>

@@ -292,4 +292,5 @@
     <string name="storage">Хранилище</string>
     <string name="ufs_health_info">Информация о здоровье UFS</string>
     <string name="ufs_health_info_die">Ваше хранилище UFS скоро умрет</string>
+    <string name="health">Здоровье</string>
 </resources>
