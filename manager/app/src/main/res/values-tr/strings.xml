@@ -91,7 +91,7 @@
     <string name="home_experimental_kernelsu_body_point_2"> • Garanti yok: Geliştirici, kullanımından kaynaklanan herhangi bir veri kaybından, sistem hasarından veya diğer sonuçlardan sorumlu değildir.</string>
     <string name="home_experimental_kernelsu_body_point_3"> • Yalnızca test amaçlıdır: Bu uygulama, riskleri anlayan ve sorun giderme konusunda rahat olan kullanıcılar için tasarlanmıştır.</string>
     <string name="about_source_code"><![CDATA[Kaynak kodunu %1$s adresinde görüntüle]]></string>
-    <string name="profile" translatable="false">Uygulama Profili</string>
+    <string name="profile">Uygulama Profili</string>
     <string name="profile_default">Varsayılan</string>
     <string name="profile_template">Şablon</string>
     <string name="profile_custom">Özel</string>

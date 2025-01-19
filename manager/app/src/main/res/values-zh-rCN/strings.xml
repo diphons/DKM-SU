@@ -91,7 +91,7 @@
     <string name="home_experimental_kernelsu_body_point_2"> • 无担保：开发人员不对因使用而产生的任何数据丢失、系统损坏或其他后果负责。</string>
     <string name="home_experimental_kernelsu_body_point_3"> • 仅用于测试目的：它适用于了解风险并能轻松解决问题的用户。</string>
     <string name="about_source_code"><![CDATA[在 %1$s 查看源码]]></string>
-    <string name="profile" translatable="false">App Profile</string>
+    <string name="profile">应用程序配置文件</string>
     <string name="profile_default">默认</string>
     <string name="profile_template">模板</string>
     <string name="profile_custom">自定义</string>

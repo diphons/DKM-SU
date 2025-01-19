@@ -91,7 +91,7 @@
     <string name="home_experimental_kernelsu_body_point_2"> • Tidak ada garansi: Pengembang tidak bertanggung jawab atas kehilangan data, kerusakan sistem, atau konsekuensi lain yang timbul dari penggunaannya.</string>
     <string name="home_experimental_kernelsu_body_point_3"> • Hanya untuk tujuan pengujian: Aplikasi ini ditujukan untuk pengguna yang memahami risiko dan nyaman dalam memecahkan masalah.</string>
     <string name="about_source_code"><![CDATA[Lihat kode sumber di %1$s]]></string>
-    <string name="profile" translatable="false">Profil Apl</string>
+    <string name="profile">Profil Apl</string>
     <string name="profile_default">Bawaan</string>
     <string name="profile_template">Templat</string>
     <string name="profile_custom">Khusus</string>
@@ -217,7 +217,7 @@
     <string name="xt_edge">Filter Tepi</string>
     <string name="xt_grip">Mode Genggaman</string>
     <string name="color_calibration">Kalibrasi Warna</string>
-    <string name="color_calibration_sum">Atur Kalibrasi Warna, AMOLED atau atur sendiri</string>
+    <string name="color_calibration_sum" >Atur Kalibrasi Warna, AMOLED atau atur sendiri</string>
     <string name="reset">Atur ulang</string>
     <string name="rgb_adjustments">Penyesuaian RGB</string>
     <string name="display_saturated">Saturasi</string>

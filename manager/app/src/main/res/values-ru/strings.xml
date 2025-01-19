@@ -91,7 +91,7 @@
     <string name="home_experimental_kernelsu_body_point_2"> • Отсутствие гарантии: Разработчик не несет ответственности за потерю данных, повреждение системы или другие последствия, возникшие в результате его использования.</string>
     <string name="home_experimental_kernelsu_body_point_3"> • Только для целей тестирования: это приложение предназначено для пользователей, которые понимают риски и умеют устранять неполадки.</string>
     <string name="about_source_code"><![CDATA[Просмотреть исходный код на %1$s]]></string>
-    <string name="profile" translatable="false">Профиль приложения</string>
+    <string name="profile">Профиль приложения</string>
     <string name="profile_default">По умолчанию</string>
     <string name="profile_template">Шаблон</string>
     <string name="profile_custom">Особенный</string>

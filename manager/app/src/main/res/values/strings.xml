@@ -96,7 +96,7 @@
     <string name="home_experimental_kernelsu_body_point_2"> • No Warranty: The developers are not responsible for any data loss, system damage, or other consequences arising from its use.</string>
     <string name="home_experimental_kernelsu_body_point_3"> • For Testing Purposes Only: It is intended for users who understand the risks and are comfortable troubleshooting issues.</string>
     <string name="about_source_code"><![CDATA[View source code at %1$s]]></string>
-    <string name="profile" translatable="false">App Profile</string>
+    <string name="profile">App Profile</string>
     <string name="profile_default">Default</string>
     <string name="profile_template">Template</string>
     <string name="profile_custom">Custom</string>
