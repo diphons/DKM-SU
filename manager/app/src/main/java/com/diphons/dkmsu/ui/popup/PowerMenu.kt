@@ -40,7 +40,6 @@ class PowerMenu(context: Context) {
         }
 
         val flags = LayoutParams.FLAG_ALT_FOCUSABLE_IM
-        flags.and(LayoutParams.FLAG_FULLSCREEN)
         flags.and(LayoutParams.FLAG_LAYOUT_IN_SCREEN)
         flags.and(LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         params.flags = flags

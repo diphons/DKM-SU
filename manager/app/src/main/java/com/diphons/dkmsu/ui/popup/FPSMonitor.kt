@@ -90,7 +90,7 @@ public class FPSMonitor(private val mContext: Context) {
         params.y = 0
 
         if (bola || getMode == 1) {
-            params.flags = LayoutParams.FLAG_NOT_TOUCH_MODAL or LayoutParams.FLAG_NOT_FOCUSABLE or LayoutParams.FLAG_NOT_TOUCHABLE or LayoutParams.FLAG_FULLSCREEN
+            params.flags = LayoutParams.FLAG_NOT_TOUCH_MODAL or LayoutParams.FLAG_NOT_FOCUSABLE or LayoutParams.FLAG_NOT_TOUCHABLE
         } else {
             params.flags = LayoutParams.FLAG_NOT_FOCUSABLE
             val gestureDetector = GestureDetector(view.context, simpleOnGestureListener)
