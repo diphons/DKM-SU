@@ -29,6 +29,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.view.FrameMetrics;
@@ -64,7 +65,7 @@ public class RenderingJitter extends Activity {
     public static final int code6 = R.id.graph;
 
     @SuppressLint("HandlerLeak")
-    private Handler mUpdateHandler = new Handler() {
+    private Handler mUpdateHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == code1) {
