@@ -461,7 +461,7 @@ private fun StatusCard(
                                     )
                                 } else {
                                     Text(
-                                        text = suSFS,
+                                        text = ": $suSFS",
                                         fontSize = 13.sp,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
