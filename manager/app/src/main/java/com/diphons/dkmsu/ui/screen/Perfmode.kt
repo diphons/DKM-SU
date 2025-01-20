@@ -154,6 +154,10 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
         mutableStateOf(0)
     }
 
+    val hasAdrenoBoost by rememberSaveable {
+        mutableStateOf(hasModule("${getGPUPath(context)}/$ADRENO_BOOST"))
+    }
+
     //Live Data
     val profile_load = context.getSharedPreferences(getSpfProfileName(perf_mode, profile), Context.MODE_PRIVATE)
     val profile_balance = context.getSharedPreferences(SpfProfile.BALANCE, Context.MODE_PRIVATE)
@@ -211,7 +215,8 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
         gpu_min_freq.value = pref_profile.getInt("gpu_min_freq", getGPUMinFreq(context))
         gpu_gov.value = pref_profile.getString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV))
         gpu_def_power.value = pref_profile.getInt("gpu_def_power", gpuMaxPwrLevel(context))
-        gpu_adreno_boost.value = parseAdrenoBoost(context, pref_profile.getInt("gpu_adreno_boost", getDefAdrenoBoost(profile)))
+        if (hasAdrenoBoost)
+            gpu_adreno_boost.value = parseAdrenoBoost(context, pref_profile.getInt("gpu_adreno_boost", getDefAdrenoBoost(profile)))
         thermal_profile.value = getThermalString(context, pref_profile.getInt("thermal", getDefThermalProfile(profile)))
         io_sched.value = pref_profile.getString("io_sched", getIOSelect())
     }
@@ -256,7 +261,8 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
         profile_none.edit().putInt("gpu_min_freq", getGPUMinFreq(context)).apply()
         profile_none.edit().putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)).apply()
         profile_none.edit().putInt("gpu_def_power", gpuMaxPwrLevel(context)).apply()
-        profile_none.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
+        if (hasAdrenoBoost)
+            profile_none.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
         profile_none.edit().putInt("thermal", getDefThermalProfile(profile)).apply()
         profile_none.edit().putString("io_sched", getDefIOSched()).apply()
 
@@ -264,7 +270,8 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
         gpu_min_freq.value = getGPUMinFreq(context)
         gpu_gov.value = readKernel(getGPUPath(context), GPU_GOV)
         gpu_def_power.value = gpuMaxPwrLevel(context)
-        gpu_adreno_boost.value = parseAdrenoBoost(context, getDefAdrenoBoost(profile))
+        if (hasAdrenoBoost)
+            gpu_adreno_boost.value = parseAdrenoBoost(context, getDefAdrenoBoost(profile))
         thermal_profile.value = getThermalString(context, getDefThermalProfile(profile))
         io_sched.value = getDefIOSched()
 
@@ -1373,28 +1380,29 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                 }
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 5.dp)
-                                ) {
-                                    Text(
+                                if (hasAdrenoBoost) {
+                                    Box(
                                         modifier = Modifier
-                                            .align(Alignment.CenterStart),
-                                        text = "Adreno Boost",
-                                        fontSize = 10.sp,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                    Text(
-                                        modifier = Modifier
-                                            .align(Alignment.CenterEnd),
-                                        text = "${gpu_adreno_boost.value}",
-                                        textAlign = TextAlign.Center,
-                                        fontSize = 10.sp,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
+                                            .fillMaxWidth()
+                                            .padding(vertical = 5.dp)
+                                    ) {
+                                        Text(
+                                            modifier = Modifier
+                                                .align(Alignment.CenterStart),
+                                            text = "Adreno Boost",
+                                            fontSize = 10.sp,
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                        Text(
+                                            modifier = Modifier
+                                                .align(Alignment.CenterEnd),
+                                            text = "${gpu_adreno_boost.value}",
+                                            textAlign = TextAlign.Center,
+                                            fontSize = 10.sp,
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
                                 }
-
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Text(
                                     modifier = Modifier
@@ -2038,30 +2046,32 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    getModeSelect = 4
-                                    setGpu("Choose Adreno Boost Level", getModeSelect)
-                                }
-                                .padding(vertical = 10.dp, horizontal = 22.dp)
-                        ) {
-                            Text(
+                        if (hasAdrenoBoost) {
+                            Box(
                                 modifier = Modifier
-                                    .align(Alignment.CenterStart),
-                                text = "Adreno Boost",
-                                fontSize = 13.sp,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .align(Alignment.CenterEnd),
-                                text = "${gpu_adreno_boost.value}",
-                                textAlign = TextAlign.Center,
-                                fontSize = 13.sp,
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        getModeSelect = 4
+                                        setGpu("Choose Adreno Boost Level", getModeSelect)
+                                    }
+                                    .padding(vertical = 10.dp, horizontal = 22.dp)
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterStart),
+                                    text = "Adreno Boost",
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd),
+                                    text = "${gpu_adreno_boost.value}",
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
                         }
                     }
                     ElevatedCard(

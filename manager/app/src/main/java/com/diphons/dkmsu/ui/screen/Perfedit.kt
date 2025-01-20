@@ -81,6 +81,7 @@ import com.diphons.dkmsu.ui.util.readKernel
 import com.diphons.dkmsu.ui.util.setCPU
 import com.diphons.dkmsu.ui.util.setGPU
 import com.diphons.dkmsu.ui.util.getThermalString
+import com.diphons.dkmsu.ui.util.hasModule
 import com.diphons.dkmsu.ui.util.parseAdrenoBoost
 import com.diphons.dkmsu.ui.util.setIOSched
 import com.diphons.dkmsu.ui.util.setKernel
@@ -191,6 +192,10 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
         mutableStateOf(prefs.getString("io_sched", getDefIOSched()))
     }
 
+    val hasAdrenoBoost by rememberSaveable {
+        mutableStateOf(hasModule("${getGPUPath(context)}/$ADRENO_BOOST"))
+    }
+
     fun resetProfile(){
         prefs.edit().putInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1)).apply()
         prefs.edit().putInt("cpu1_min_freq", getMinFreq(context, 1)).apply()
@@ -231,7 +236,8 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
         prefs.edit().putInt("gpu_min_freq", getGPUMinFreq(context)).apply()
         prefs.edit().putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)).apply()
         prefs.edit().putInt("gpu_def_power", gpuMaxPwrLevel(context)).apply()
-        prefs.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
+        if (hasAdrenoBoost)
+            prefs.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
         prefs.edit().putInt("thermal", getDefThermalProfile(profile)).apply()
         prefs.edit().putString("io_sched", getDefIOSched()).apply()
 
@@ -239,7 +245,8 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
         gpu_min_freq = getGPUMinFreq(context)
         gpu_gov = readKernel(getGPUPath(context), GPU_GOV)
         gpu_def_power = gpuMaxPwrLevel(context)
-        gpu_adreno_boost = parseAdrenoBoost(context, getDefAdrenoBoost(profile))
+        if (hasAdrenoBoost)
+            gpu_adreno_boost = parseAdrenoBoost(context, getDefAdrenoBoost(profile))
         thermal_profile = getThermalString(context, getDefThermalProfile(profile))
         io_sched = getDefIOSched()
 
@@ -1068,30 +1075,32 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                getModeSelect = 4
-                                setGpu("Choose Adreno Boost Level", getModeSelect)
-                            }
-                            .padding(vertical = 10.dp, horizontal = 22.dp)
-                    ) {
-                        Text(
+                    if (hasAdrenoBoost) {
+                        Box(
                             modifier = Modifier
-                                .align(Alignment.CenterStart),
-                            text = "Adreno Boost",
-                            fontSize = 13.sp,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                        Text(
-                            modifier = Modifier
-                                .align(Alignment.CenterEnd),
-                            text = gpu_adreno_boost,
-                            textAlign = TextAlign.Center,
-                            fontSize = 13.sp,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                                .fillMaxWidth()
+                                .clickable {
+                                    getModeSelect = 4
+                                    setGpu("Choose Adreno Boost Level", getModeSelect)
+                                }
+                                .padding(vertical = 10.dp, horizontal = 22.dp)
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart),
+                                text = "Adreno Boost",
+                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd),
+                                text = gpu_adreno_boost,
+                                textAlign = TextAlign.Center,
+                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
                 }
                 ElevatedCard(
