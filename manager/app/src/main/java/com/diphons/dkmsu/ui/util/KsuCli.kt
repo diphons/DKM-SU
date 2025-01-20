@@ -500,7 +500,7 @@ fun getMaxCluster(context: Context): Int {
         var getCluster = prefs.getInt("cpu_cluster", 0)
         if (getCluster == 0) {
             getCluster =
-                strToInt(RootUtils.runAndGetOutput("cpu=\$(ls $CPUFREQ); echo \"\$cpu\" | wc -l"))
+                strToInt(RootUtils.runAndGetOutput("cpu=\$(ls $CPUFREQ | grep 'policy'); echo \"\$cpu\" | wc -l"))
             prefs.edit().putInt("cpu_cluster", getCluster).apply()
         }
         maxCluster = getCluster
@@ -532,14 +532,14 @@ fun readKernel(path: String): String {
 fun readKernel(context: Context, cpu: Int, name: String): String {
     if (getMaxCluster(context) < cpu)
         return ""
-    val result = RootUtils.runAndGetOutput("cpu=\$(ls $CPUFREQ); echo \$cpu | awk '{print $$cpu}'")
+    val result = RootUtils.runAndGetOutput("cpu=\$(ls $CPUFREQ | grep 'policy'); echo \$cpu | awk '{print $$cpu}'")
     return readKernel("$CPUFREQ/$result/$name")
 }
 
 fun readKernelInt(context: Context, cpu: Int, name: String): Int {
     if (getMaxCluster(context) < cpu)
         return 0
-    val result = RootUtils.runAndGetOutput("cpu=\$(ls $CPUFREQ); echo \$cpu | awk '{print $$cpu}'")
+    val result = RootUtils.runAndGetOutput("cpu=\$(ls $CPUFREQ | grep 'policy'); echo \$cpu | awk '{print $$cpu}'")
     return strToInt(readKernel("$CPUFREQ/$result/$name"))
 }
 
@@ -553,7 +553,7 @@ fun setKernel(value: String, path: String) {
 
 fun setKernel(value: String, cpu: Int, name: String) {
     //val result = "$path/policy$cpu/$name"
-    val result = RootUtils.runAndGetOutput("cpu=\$(ls $CPUFREQ); echo \$cpu | awk '{print $$cpu}'")
+    val result = RootUtils.runAndGetOutput("cpu=\$(ls $CPUFREQ | grep 'policy'); echo \$cpu | awk '{print $$cpu}'")
     setKernel(value, "$CPUFREQ/$result/$name", false)
 }
 
@@ -589,7 +589,7 @@ fun hasModule(path: String, name: String): Boolean {
 }
 
 fun hasModule(cpu: Int, name: String): Boolean {
-    val result = RootUtils.runAndGetOutput("cpu=$(ls $CPUFREQ); echo \$cpu | awk '{print $$cpu}'")
+    val result = RootUtils.runAndGetOutput("cpu=$(ls $CPUFREQ | grep 'policy'); echo \$cpu | awk '{print $$cpu}'")
     return hasModule("$CPUFREQ/$result/$name")
 }
 
@@ -597,7 +597,7 @@ fun get_cpu_av_freq(context: Context, cpu: Int): String{
     if (getMaxCluster(context) < cpu)
         return ""
     val result: String
-    val getCluster = RootUtils.runAndGetOutput("cpu=$(ls $CPUFREQ); echo \$cpu | awk '{print $$cpu}'")
+    val getCluster = RootUtils.runAndGetOutput("cpu=$(ls $CPUFREQ | grep 'policy'); echo \$cpu | awk '{print $$cpu}'")
     if (hasModule("$CPUFREQ/$getCluster/$CPUFREQ_FULL_TABLE"))
         result = RootUtils.runAndGetOutput("cpuavfreq=$(cat $CPUFREQ/$getCluster/$CPUFREQ_FULL_TABLE);parse0=$(echo \$cpuavfreq | sed 's/From : To : //g');parse1=\${parse0%%:*};parse2=\${parse1% *};echo \$parse2")
     else if (hasModule("$CPUFREQ/$getCluster/$CPU_AV_FREQ"))
