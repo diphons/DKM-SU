@@ -105,7 +105,7 @@
     <string name="profile_selinux_context">SELinux</string>
     <string name="profile_umount_modules">Размонтировать модуль</string>
     <string name="failed_to_update_app_profile">Не удалось обновить профиль на %s</string>
-    <string name="require_kernel_version">Версия DKM-SU %d слишком низкая для нормальной работы менеджера. Пожалуйста, обновите до версии %d или выше!</string>
+    <string name="require_kernel_version">Версия DKM-SU %1$d слишком низкая для нормальной работы менеджера. Пожалуйста, обновите до версии %2$d или выше!</string>
     <string name="settings_umount_modules_default">Удаление модулей по умолчанию</string>
     <string name="settings_umount_modules_default_summary">Используйте функцию «Umount Module» повсеместно в профиле приложения. Если этот параметр включен, будут удалены все системные изменения для приложений, для которых не установлен профиль.</string>
     <string name="settings_susfs_toggle">Скрыть подозрительные su-хуки</string>

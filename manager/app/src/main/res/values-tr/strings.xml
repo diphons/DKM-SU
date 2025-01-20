@@ -105,7 +105,7 @@
     <string name="profile_selinux_context">SELinux</string>
     <string name="profile_umount_modules">Umount Modülü</string>
     <string name="failed_to_update_app_profile">%s üzerinde Profil güncellenemedi</string>
-    <string name="require_kernel_version">DKM-SU sürüm %d, yöneticinin normal şekilde çalışması için çok düşük. Lütfen %d veya üzeri sürüme güncelleyin!</string>
+    <string name="require_kernel_version">DKM-SU sürüm %1$d, yöneticinin normal şekilde çalışması için çok düşük. Lütfen %2$d veya üzeri sürüme güncelleyin!</string>
     <string name="settings_umount_modules_default">Modülleri varsayılan olarak kaldırma</string>
     <string name="settings_umount_modules_default_summary">Uygulama Profilinde \"Umount Module\"ü evrensel olarak kullanın. Etkinleştirildiğinde, profili ayarlanmamış uygulamalar için tüm sistem değişiklikleri kaldırılır.</string>
     <string name="settings_susfs_toggle">Şüpheli su kancalarını gizle</string>
