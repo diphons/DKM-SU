@@ -593,17 +593,28 @@ fun hasModule(cpu: Int, name: String): Boolean {
     return hasModule("$CPUFREQ/$result/$name")
 }
 
+fun get_cpu_av_freq2(cluster: String): String{
+    var result: String
+    val getMaxFreq = RootUtils.runAndGetOutput("cat $CPUFREQ/$cluster/$CPU_INFO_MAX")
+    result = RootUtils.runAndGetOutput("cat $CPUFREQ/$cluster/$CPU_AV_FREQ")
+    if (!result.contains(getMaxFreq))
+        result = "$result $getMaxFreq"
+    return result
+}
+
 fun get_cpu_av_freq(context: Context, cpu: Int): String{
     if (getMaxCluster(context) < cpu)
         return ""
-    val result: String
+    var result: String
     val getCluster = RootUtils.runAndGetOutput("cpu=$(ls $CPUFREQ | grep 'policy'); echo \$cpu | awk '{print $$cpu}'")
-    if (hasModule("$CPUFREQ/$getCluster/$CPUFREQ_FULL_TABLE"))
-        result = RootUtils.runAndGetOutput("cpuavfreq=$(cat $CPUFREQ/$getCluster/$CPUFREQ_FULL_TABLE);parse0=$(echo \$cpuavfreq | sed 's/From : To : //g');parse1=\${parse0%%:*};parse2=\${parse1% *};echo \$parse2")
-    else if (hasModule("$CPUFREQ/$getCluster/$CPU_AV_FREQ"))
-        result = RootUtils.runAndGetOutput("cat $CPUFREQ/$getCluster/$CPU_AV_FREQ")
-    else
-        result = ""
+    if (hasModule("$CPUFREQ/$getCluster/$CPUFREQ_FULL_TABLE")) {
+        result =
+            RootUtils.runAndGetOutput("cpuavfreq=$(cat $CPUFREQ/$getCluster/$CPUFREQ_FULL_TABLE);parse0=$(echo \$cpuavfreq | sed 's/From : To : //g');parse1=\${parse0%%:*};parse2=\${parse1% *};echo \$parse2")
+        if (result.isEmpty() || result.contains("too large"))
+            result = get_cpu_av_freq2(getCluster)
+    } else {
+        result = get_cpu_av_freq2(getCluster)
+    }
     return result
 }
 

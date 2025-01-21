@@ -66,7 +66,7 @@ public class Utils {
     public static final String CEK_OP3 = "/system/product/priv-app/OPSystemUI/OPSystemUI.apk";
 
     public static final String CPUFREQ = "/sys/devices/system/cpu/cpufreq";
-    public static final String CPUFREQ_FULL_TABLE = "/stats/trans_table";
+    public static final String CPUFREQ_FULL_TABLE = "stats/trans_table";
     public static final String CPU_GOV = "scaling_governor";
     public static final String CPU_INFO_MAX = "cpuinfo_max_freq";
     public static final String CPU_INFO_MIN = "cpuinfo_min_freq";
