@@ -2,6 +2,8 @@ package com.diphons.dkmsu.ui.screen
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -39,7 +42,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -100,6 +106,18 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
 
     val context = LocalContext.current
     val globalConfig = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    var scrollPos by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = scrollPos - delta
+                scrollPos = newOffset
+                return Offset.Zero
+            }
+        }
+    }
 
     var perf_mode by rememberSaveable {
         mutableStateOf(globalConfig.getBoolean(SpfConfig.PERF_MODE, true))
@@ -517,7 +535,8 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                 onResetClick = {
                     resetProfile()
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                borderVisible = if (scrollPos > 0.1f) true else false
             )
         },
         snackbarHost = { SnackbarHost(snackBarHost) },
@@ -526,7 +545,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .nestedScroll(nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 16.dp),
@@ -1171,59 +1190,88 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun TopBar(
     onResetClick: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    borderVisible: Boolean
 ) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
     val get_profile_position by rememberSaveable {
         mutableStateOf(prefs.getInt(SpfConfig.PROFILE_MODE, 0))
     }
-    TopAppBar(
-        title = { Text("${stringResource(R.string.power_profile)} : ${
-            if (get_profile_position == 1)
-                stringResource(R.string.performance)
-            else if (get_profile_position == 2)
-                stringResource(R.string.game)
-            else if (get_profile_position == 4)
-                stringResource(R.string.battery)
-            else
-                stringResource(R.string.balance)
-        }") },
-        actions = {
-            ElevatedCard(
-                colors = CardDefaults.elevatedCardColors(containerColor = run {
-                    MaterialTheme.colorScheme.primary
-                }),
+    Box(modifier = Modifier
+        .fillMaxWidth()
+    ) {
+        if (borderVisible) {
+            Row(
                 modifier = Modifier
-                    .padding(end = 14.dp)
-                    .clickable {
-                        onResetClick()
-                    },
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(vertical = 6.dp, horizontal = 15.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.reset),
-                        style = MaterialTheme.typography.titleSmall,
-                        textAlign = TextAlign.Center
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .height(20.dp)
+                    .border(
+                        BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        ),
+                        RoundedCornerShape(
+                            bottomStart = 19.dp,
+                            bottomEnd = 19.dp
+                        ),
                     )
-                }
-            }
-        },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior,
-        modifier = Modifier
-            .graphicsLayer {
-                shape = RoundedCornerShape(
-                    bottomStart = 20.dp,
-                    bottomEnd = 20.dp
+            ) { }
+        }
+        TopAppBar(
+            title = {
+                Text(
+                    "${stringResource(R.string.power_profile)} : ${
+                        if (get_profile_position == 1)
+                            stringResource(R.string.performance)
+                        else if (get_profile_position == 2)
+                            stringResource(R.string.game)
+                        else if (get_profile_position == 4)
+                            stringResource(R.string.battery)
+                        else
+                            stringResource(R.string.balance)
+                    }"
                 )
-                clip = true
-            }
-    )
+            },
+            actions = {
+                ElevatedCard(
+                    colors = CardDefaults.elevatedCardColors(containerColor = run {
+                        MaterialTheme.colorScheme.primary
+                    }),
+                    modifier = Modifier
+                        .padding(end = 14.dp)
+                        .clickable {
+                            onResetClick()
+                        },
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 6.dp, horizontal = 15.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.reset),
+                            style = MaterialTheme.typography.titleSmall,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            },
+            windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+            scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(if (borderVisible) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
+            modifier = Modifier
+                .padding(bottom = 1.dp)
+                .graphicsLayer {
+                    shape = RoundedCornerShape(
+                        bottomStart = 20.dp,
+                        bottomEnd = 20.dp
+                    )
+                    clip = true
+                }
+        )
+    }
 }
 
 data class DialogEvent(

@@ -6,16 +6,21 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
@@ -28,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -42,7 +48,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -95,10 +105,23 @@ fun SettingScreen(navigator: DestinationsNavigator) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val snackBarHost = LocalSnackbarHost.current
 
+    var scrollPos by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = scrollPos - delta
+                scrollPos = newOffset
+                return Offset.Zero
+            }
+        }
+    }
     Scaffold(
         topBar = {
             TopBar(
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                borderVisible = if (scrollPos > 0.1f) true else false
             )
         },
         snackbarHost = { SnackbarHost(snackBarHost) },
@@ -115,7 +138,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .nestedScroll(nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
         ) {
 
@@ -574,13 +597,46 @@ fun rememberUninstallDialog(onSelected: (UninstallType) -> Unit): DialogHandle {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    borderVisible: Boolean
 ) {
-    TopAppBar(
-        title = { Text(stringResource(R.string.settings)) },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior
-    )
+    Box(modifier = Modifier
+        .fillMaxWidth()
+    ) {
+        if (borderVisible) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .height(20.dp)
+                    .border(
+                        BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        ),
+                        RoundedCornerShape(
+                            bottomStart = 19.dp,
+                            bottomEnd = 19.dp
+                        ),
+                    )
+            ) { }
+        }
+        TopAppBar(
+            title = { Text(stringResource(R.string.settings)) },
+            windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+            scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(if (borderVisible) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
+            modifier = Modifier
+                .padding(bottom = 1.dp)
+                .graphicsLayer {
+                    shape = RoundedCornerShape(
+                        bottomStart = 20.dp,
+                        bottomEnd = 20.dp
+                    )
+                    clip = true
+                }
+        )
+    }
 }
 
 @Preview

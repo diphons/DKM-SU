@@ -4,16 +4,22 @@ import android.net.Uri
 import android.os.Environment
 import android.os.Parcelable
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -36,13 +42,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -168,6 +179,18 @@ fun FlashScreen(navigator: DestinationsNavigator, flashIt: FlashIt) {
         }
     }
 
+    var scrollPos by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = scrollPos - delta
+                scrollPos = newOffset
+                return Offset.Zero
+            }
+        }
+    }
     Scaffold(
         topBar = {
             TopBar(
@@ -187,7 +210,8 @@ fun FlashScreen(navigator: DestinationsNavigator, flashIt: FlashIt) {
                         snackBarHost.showSnackbar("Log saved to ${file.absolutePath}")
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                borderVisible = if (scrollPos > 0.1f) true else false
             )
         },
         floatingActionButton = {
@@ -216,7 +240,7 @@ fun FlashScreen(navigator: DestinationsNavigator, flashIt: FlashIt) {
             modifier = Modifier
                 .fillMaxSize(1f)
                 .padding(innerPadding)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .nestedScroll(nestedScrollConnection)
                 .verticalScroll(scrollState),
         ) {
             LaunchedEffect(text) {
@@ -280,40 +304,73 @@ private fun TopBar(
     status: FlashingStatus,
     onBack: () -> Unit = {},
     onSave: () -> Unit = {},
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    borderVisible: Boolean
 ) {
-    TopAppBar(
-        title = {
-            Text(
-                stringResource(
-                    when (status) {
-                        FlashingStatus.FLASHING -> R.string.flashing
-                        FlashingStatus.SUCCESS -> R.string.flash_success
-                        FlashingStatus.FAILED -> R.string.flash_failed
-                    }
+    Box(modifier = Modifier
+        .fillMaxWidth()
+    ) {
+        if (borderVisible) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .height(20.dp)
+                    .border(
+                        BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        ),
+                        RoundedCornerShape(
+                            bottomStart = 19.dp,
+                            bottomEnd = 19.dp
+                        ),
+                    )
+            ) { }
+        }
+        TopAppBar(
+            title = {
+                Text(
+                    stringResource(
+                        when (status) {
+                            FlashingStatus.FLASHING -> R.string.flashing
+                            FlashingStatus.SUCCESS -> R.string.flash_success
+                            FlashingStatus.FAILED -> R.string.flash_failed
+                        }
+                    )
                 )
-            )
-        },
-        navigationIcon = {
-            IconButton(
-                onClick = { if (status != FlashingStatus.FLASHING) onBack() },
-                enabled = status != FlashingStatus.FLASHING
-            ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
-        },
-        actions = {
-            IconButton(
-                onClick = { if (status != FlashingStatus.FLASHING) onSave() },
-                enabled = status != FlashingStatus.FLASHING
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Save,
-                    contentDescription = "Localized description"
-                )
-            }
-        },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior
-    )
+            },
+            navigationIcon = {
+                IconButton(
+                    onClick = { if (status != FlashingStatus.FLASHING) onBack() },
+                    enabled = status != FlashingStatus.FLASHING
+                ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+            },
+            actions = {
+                IconButton(
+                    onClick = { if (status != FlashingStatus.FLASHING) onSave() },
+                    enabled = status != FlashingStatus.FLASHING
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Save,
+                        contentDescription = "Localized description"
+                    )
+                }
+            },
+            windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+            scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(if (borderVisible) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
+            modifier = Modifier
+                .padding(bottom = 1.dp)
+                .graphicsLayer {
+                    shape = RoundedCornerShape(
+                        bottomStart = 20.dp,
+                        bottomEnd = 20.dp
+                    )
+                    clip = true
+                }
+        )
+    }
 }
 
 @Preview

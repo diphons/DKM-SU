@@ -1,6 +1,8 @@
 package com.diphons.dkmsu.ui.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,9 +15,13 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -44,6 +50,18 @@ fun SuperUserScreen(navigator: DestinationsNavigator) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val listState = rememberLazyListState()
 
+    var scrollPos by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = scrollPos - delta
+                scrollPos = newOffset
+                return Offset.Zero
+            }
+        }
+    }
     LaunchedEffect(key1 = navigator) {
         viewModel.search = ""
         if (viewModel.appList.isEmpty()) {
@@ -66,65 +84,89 @@ fun SuperUserScreen(navigator: DestinationsNavigator) {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {},
-                actions = {
-                    SearchAppBar(
-                        title = { Text(stringResource(R.string.superuser)) },
-                        searchText = viewModel.search,
-                        onSearchTextChange = { viewModel.search = it },
-                        onClearClick = { viewModel.search = "" },
-                        dropdownContent = {
-                            var showDropdown by remember { mutableStateOf(false) }
+            Box(modifier = Modifier
+                .fillMaxWidth()
+            ) {
+                if (scrollPos > 0.1f) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                            .height(20.dp)
+                            .border(
+                                BorderStroke(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                                ),
+                                RoundedCornerShape(
+                                    bottomStart = 19.dp,
+                                    bottomEnd = 19.dp
+                                ),
+                            )
+                    ) { }
+                }
+                TopAppBar(
+                    title = {},
+                    actions = {
+                        SearchAppBar(
+                            title = { Text(stringResource(R.string.superuser)) },
+                            searchText = viewModel.search,
+                            onSearchTextChange = { viewModel.search = it },
+                            onClearClick = { viewModel.search = "" },
+                            dropdownContent = {
+                                var showDropdown by remember { mutableStateOf(false) }
 
-                            IconButton(
-                                onClick = { showDropdown = true },
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.MoreVert,
-                                    contentDescription = stringResource(id = R.string.settings)
-                                )
+                                IconButton(
+                                    onClick = { showDropdown = true },
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.MoreVert,
+                                        contentDescription = stringResource(id = R.string.settings)
+                                    )
 
-                                DropdownMenu(expanded = showDropdown, onDismissRequest = {
-                                    showDropdown = false
-                                }) {
-                                    DropdownMenuItem(text = {
-                                        Text(stringResource(R.string.refresh))
-                                    }, onClick = {
-                                        scope.launch {
-                                            viewModel.fetchAppList()
-                                        }
+                                    DropdownMenu(expanded = showDropdown, onDismissRequest = {
                                         showDropdown = false
-                                    })
-                                    DropdownMenuItem(text = {
-                                        Text(
-                                            if (viewModel.showSystemApps) {
-                                                stringResource(R.string.hide_system_apps)
-                                            } else {
-                                                stringResource(R.string.show_system_apps)
+                                    }) {
+                                        DropdownMenuItem(text = {
+                                            Text(stringResource(R.string.refresh))
+                                        }, onClick = {
+                                            scope.launch {
+                                                viewModel.fetchAppList()
                                             }
-                                        )
-                                    }, onClick = {
-                                        viewModel.showSystemApps = !viewModel.showSystemApps
-                                        showDropdown = false
-                                    })
+                                            showDropdown = false
+                                        })
+                                        DropdownMenuItem(text = {
+                                            Text(
+                                                if (viewModel.showSystemApps) {
+                                                    stringResource(R.string.hide_system_apps)
+                                                } else {
+                                                    stringResource(R.string.show_system_apps)
+                                                }
+                                            )
+                                        }, onClick = {
+                                            viewModel.showSystemApps = !viewModel.showSystemApps
+                                            showDropdown = false
+                                        })
+                                    }
                                 }
-                            }
-                        },
-                        scrollBehavior = scrollBehavior,
-                    )
-                },
-                scrollBehavior = scrollBehavior,
-                windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-                modifier = Modifier
-                    .graphicsLayer {
-                        shape = RoundedCornerShape(
-                            bottomStart = 20.dp,
-                            bottomEnd = 20.dp
+                            },
+                            scrollBehavior = scrollBehavior,
+                            colors = TopAppBarDefaults.topAppBarColors(if (scrollPos > 0.1f) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background)
                         )
-                        clip = true
-                    }
-            )
+                    },
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.topAppBarColors(if (scrollPos > 0.1f) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
+                    modifier = Modifier
+                        .padding(bottom = 1.dp)
+                        .graphicsLayer {
+                            shape = RoundedCornerShape(
+                                bottomStart = 20.dp,
+                                bottomEnd = 20.dp
+                            )
+                            clip = true
+                        }
+                )
+            }
         },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     ) { innerPadding ->
@@ -139,7 +181,7 @@ fun SuperUserScreen(navigator: DestinationsNavigator) {
                 state = listState,
                 modifier = Modifier
                     .fillMaxSize()
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                    .nestedScroll(nestedScrollConnection)
             ) {
                 items(viewModel.appList, key = { it.packageName + it.uid }) { app ->
                     AppItem(app) {

@@ -2,6 +2,7 @@ package com.diphons.dkmsu.ui.screen
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -51,7 +52,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -117,6 +121,18 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
 
     val context = LocalContext.current
     val globalConfig = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    var scrollPos by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = scrollPos - delta
+                scrollPos = newOffset
+                return Offset.Zero
+            }
+        }
+    }
 
     var perf_mode by rememberSaveable {
         mutableStateOf(globalConfig.getBoolean(SpfConfig.PERF_MODE, true))
@@ -559,7 +575,8 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                         setProfile(context, profile)
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                borderVisible = if (scrollPos > 0.1f) true else false
             )
         },
         snackbarHost = { SnackbarHost(snackBarHost) },
@@ -568,7 +585,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .nestedScroll(nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 16.dp),
@@ -2144,38 +2161,63 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun TopBar(
     onSwitch: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    borderVisible: Boolean
 ) {
     val context = LocalContext.current
     val globalConfig = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
     var get_perf_mode by rememberSaveable {
         mutableStateOf(globalConfig.getBoolean(SpfConfig.PERF_MODE, true))
     }
-    TopAppBar(
-        title = { Text(stringResource(R.string.performance_mode)) },
-        actions = {
-            Switch(
+    Box(modifier = Modifier
+        .fillMaxWidth()
+    ) {
+        if (borderVisible) {
+            Row(
                 modifier = Modifier
-                    .padding(end = 16.dp),
-                checked = get_perf_mode,
-                onCheckedChange = {
-                    get_perf_mode = it
-                    globalConfig.edit().putBoolean(SpfConfig.PERF_MODE, it).apply()
-                    onSwitch()
-                }
-            )
-        },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior,
-        modifier = Modifier
-            .graphicsLayer {
-                shape = RoundedCornerShape(
-                    bottomStart = 20.dp,
-                    bottomEnd = 20.dp
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .height(20.dp)
+                    .border(
+                        BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        ),
+                        RoundedCornerShape(
+                            bottomStart = 19.dp,
+                            bottomEnd = 19.dp
+                        ),
+                    )
+            ) { }
+        }
+        TopAppBar(
+            title = { Text(stringResource(R.string.performance_mode)) },
+            actions = {
+                Switch(
+                    modifier = Modifier
+                        .padding(end = 16.dp),
+                    checked = get_perf_mode,
+                    onCheckedChange = {
+                        get_perf_mode = it
+                        globalConfig.edit().putBoolean(SpfConfig.PERF_MODE, it).apply()
+                        onSwitch()
+                    }
                 )
-                clip = true
-            }
-    )
+            },
+            windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+            scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(if (borderVisible) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
+            modifier = Modifier
+                .padding(bottom = 1.dp)
+                .graphicsLayer {
+                    shape = RoundedCornerShape(
+                        bottomStart = 20.dp,
+                        bottomEnd = 20.dp
+                    )
+                    clip = true
+                }
+        )
+    }
 }
 
 @Preview

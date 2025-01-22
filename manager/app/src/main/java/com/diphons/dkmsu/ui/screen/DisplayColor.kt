@@ -1,6 +1,8 @@
 package com.diphons.dkmsu.ui.screen
 
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -39,8 +41,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -74,6 +79,18 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
 
+    var scrollPos by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = scrollPos - delta
+                scrollPos = newOffset
+                return Offset.Zero
+            }
+        }
+    }
     //Default value
     val display_rgb = 1f
     val display_sat = 0.6662165f
@@ -163,7 +180,8 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                     setKernel("${(seek_contrast * 383).toInt()}", DISPLAY_CONTRAST)
                     setKernel("${(seek_hue * 1536).toInt()}", DISPLAY_HUE)
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                borderVisible = if (scrollPos > 0.1f) true else false
             )
         },
         snackbarHost = { SnackbarHost(snackBarHost) },
@@ -172,7 +190,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .nestedScroll(nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 16.dp),
@@ -573,45 +591,70 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun TopBar(
     onResetClick: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    borderVisible: Boolean
 ) {
-    TopAppBar(
-        title = { Text(stringResource(R.string.color_calibration)) },
-        actions = {
-            ElevatedCard(
-                colors = CardDefaults.elevatedCardColors(containerColor = run {
-                    MaterialTheme.colorScheme.primary
-                }),
+    Box(modifier = Modifier
+        .fillMaxWidth()
+    ) {
+        if (borderVisible) {
+            Row(
                 modifier = Modifier
-                    .padding(end = 14.dp)
-                    .clickable {
-                        onResetClick()
-                    },
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(vertical = 6.dp, horizontal = 15.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.reset),
-                        style = MaterialTheme.typography.titleSmall,
-                        textAlign = TextAlign.Center
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .height(20.dp)
+                    .border(
+                        BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        ),
+                        RoundedCornerShape(
+                            bottomStart = 19.dp,
+                            bottomEnd = 19.dp
+                        ),
                     )
+            ) { }
+        }
+        TopAppBar(
+            title = { Text(stringResource(R.string.color_calibration)) },
+            actions = {
+                ElevatedCard(
+                    colors = CardDefaults.elevatedCardColors(containerColor = run {
+                        MaterialTheme.colorScheme.primary
+                    }),
+                    modifier = Modifier
+                        .padding(end = 14.dp)
+                        .clickable {
+                            onResetClick()
+                        },
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(vertical = 6.dp, horizontal = 15.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.reset),
+                            style = MaterialTheme.typography.titleSmall,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
-            }
-        },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior,
-        modifier = Modifier
-            .graphicsLayer {
-                shape = RoundedCornerShape(
-                    bottomStart = 20.dp,
-                    bottomEnd = 20.dp
-                )
-                clip = true
-            }
-    )
+            },
+            windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+            scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(if (borderVisible) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
+            modifier = Modifier
+                .padding(bottom = 1.dp)
+                .graphicsLayer {
+                    shape = RoundedCornerShape(
+                        bottomStart = 20.dp,
+                        bottomEnd = 20.dp
+                    )
+                    clip = true
+                }
+        )
+    }
 }
 
 @Preview

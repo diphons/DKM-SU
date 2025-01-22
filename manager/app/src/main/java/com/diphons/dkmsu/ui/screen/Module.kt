@@ -7,7 +7,9 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,7 +71,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -145,87 +150,136 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
         contract = ActivityResultContracts.StartActivityForResult()
     ) { viewModel.fetchModuleList() }
 
+    var scrollPos by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = scrollPos - delta
+                scrollPos = newOffset
+                return Offset.Zero
+            }
+        }
+    }
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {},
-                actions = {
-                    SearchAppBar(
-                        title = { Text(stringResource(R.string.module)) },
-                        searchText = viewModel.search,
-                        onSearchTextChange = { viewModel.search = it },
-                        onClearClick = { viewModel.search = "" },
-                        dropdownContent = {
-                            var showDropdown by remember { mutableStateOf(false) }
-                            IconButton(
-                                onClick = { showDropdown = true },
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.MoreVert,
-                                    contentDescription = stringResource(id = R.string.settings)
-                                )
-                                DropdownMenu(
-                                    expanded = showDropdown,
-                                    onDismissRequest = {
-                                        showDropdown = false
-                                    }
+            Box(modifier = Modifier
+                .fillMaxWidth()
+            ) {
+                if (scrollPos > 0.1f) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                            .height(20.dp)
+                            .border(
+                                BorderStroke(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                                ),
+                                RoundedCornerShape(
+                                    bottomStart = 19.dp,
+                                    bottomEnd = 19.dp
+                                ),
+                            )
+                    ) { }
+                }
+                TopAppBar(
+                    title = {},
+                    actions = {
+                        SearchAppBar(
+                            title = { Text(stringResource(R.string.module)) },
+                            searchText = viewModel.search,
+                            onSearchTextChange = { viewModel.search = it },
+                            onClearClick = { viewModel.search = "" },
+                            dropdownContent = {
+                                var showDropdown by remember { mutableStateOf(false) }
+                                IconButton(
+                                    onClick = { showDropdown = true },
                                 ) {
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(stringResource(R.string.module_sort_a_to_z))
-                                        },
-                                        trailingIcon = {
-                                            Checkbox(checked = viewModel.sortAToZ, onCheckedChange = null)
-                                        },
-                                        onClick = {
-                                            viewModel.sortAToZ = !viewModel.sortAToZ
-                                            viewModel.sortZToA = false
-                                            prefs.edit()
-                                                .putBoolean("module_sort_a_to_z", viewModel.sortAToZ)
-                                                .putBoolean("module_sort_z_to_a", false)
-                                                .apply()
-                                            scope.launch {
-                                                viewModel.fetchModuleList()
-                                            }
-                                        }
+                                    Icon(
+                                        imageVector = Icons.Filled.MoreVert,
+                                        contentDescription = stringResource(id = R.string.settings)
                                     )
+                                    DropdownMenu(
+                                        expanded = showDropdown,
+                                        onDismissRequest = {
+                                            showDropdown = false
+                                        }
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(stringResource(R.string.module_sort_a_to_z))
+                                            },
+                                            trailingIcon = {
+                                                Checkbox(
+                                                    checked = viewModel.sortAToZ,
+                                                    onCheckedChange = null
+                                                )
+                                            },
+                                            onClick = {
+                                                viewModel.sortAToZ = !viewModel.sortAToZ
+                                                viewModel.sortZToA = false
+                                                prefs.edit()
+                                                    .putBoolean(
+                                                        "module_sort_a_to_z",
+                                                        viewModel.sortAToZ
+                                                    )
+                                                    .putBoolean("module_sort_z_to_a", false)
+                                                    .apply()
+                                                scope.launch {
+                                                    viewModel.fetchModuleList()
+                                                }
+                                            }
+                                        )
 
-                                    DropdownMenuItem(
-                                        text = {
-                                            Text(stringResource(R.string.module_sort_z_to_a))
-                                        },
-                                        trailingIcon = {
-                                            Checkbox(checked = viewModel.sortZToA, onCheckedChange = null)
-                                        },
-                                        onClick = {
-                                            viewModel.sortZToA = !viewModel.sortZToA
-                                            viewModel.sortAToZ = false
-                                            prefs.edit()
-                                                .putBoolean("module_sort_z_to_a", viewModel.sortZToA)
-                                                .putBoolean("module_sort_a_to_z", false)
-                                                .apply()
-                                            scope.launch {
-                                                viewModel.fetchModuleList()
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(stringResource(R.string.module_sort_z_to_a))
+                                            },
+                                            trailingIcon = {
+                                                Checkbox(
+                                                    checked = viewModel.sortZToA,
+                                                    onCheckedChange = null
+                                                )
+                                            },
+                                            onClick = {
+                                                viewModel.sortZToA = !viewModel.sortZToA
+                                                viewModel.sortAToZ = false
+                                                prefs.edit()
+                                                    .putBoolean(
+                                                        "module_sort_z_to_a",
+                                                        viewModel.sortZToA
+                                                    )
+                                                    .putBoolean("module_sort_a_to_z", false)
+                                                    .apply()
+                                                scope.launch {
+                                                    viewModel.fetchModuleList()
+                                                }
                                             }
-                                        }
-                                    )
+                                        )
+                                    }
                                 }
-                            }
-                        },
-                        scrollBehavior = scrollBehavior,
-                    )
-                },
-                scrollBehavior = scrollBehavior,
-                windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-                modifier = Modifier
-                    .graphicsLayer {
-                        shape = RoundedCornerShape(
-                            bottomStart = 20.dp,
-                            bottomEnd = 20.dp
+                            },
+                            scrollBehavior = scrollBehavior,
+                            colors = TopAppBarDefaults.topAppBarColors(if (scrollPos > 0.1f) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
                         )
-                        clip = true
-                    }
-            )
+                    },
+                    scrollBehavior = scrollBehavior,
+                    windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+                    colors = TopAppBarDefaults.topAppBarColors(if (scrollPos > 0.1f) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
+                    modifier = Modifier
+                        .padding(bottom = 1.dp)
+                        .graphicsLayer {
+                            shape = RoundedCornerShape(
+                                bottomStart = 20.dp,
+                                bottomEnd = 20.dp
+                            )
+                            clip = true
+                        }
+                )
+            }
         },
         floatingActionButton = {
             if (!hideInstallButton) {
@@ -315,7 +369,7 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                 ModuleList(
                     navigator,
                     viewModel = viewModel,
-                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+                    modifier = Modifier.nestedScroll(nestedScrollConnection),
                     boxModifier = Modifier.padding(innerPadding),
                     onInstallModule = {
                         navigator.navigate(FlashScreenDestination(FlashIt.FlashModule(it)))

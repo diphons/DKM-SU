@@ -45,9 +45,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import com.diphons.dkmsu.ui.component.rememberCustomDialog
@@ -67,6 +70,18 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 
     val context = LocalContext.current
     val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    var scrollPos by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = scrollPos - delta
+                scrollPos = newOffset
+                return Offset.Zero
+            }
+        }
+    }
     Scaffold(
         topBar = {
             TopBar(
@@ -77,7 +92,8 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                 onInstallClick = {
                     navigator.navigate(InstallScreenDestination)
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
+                borderVisible = if (scrollPos > 0.1f) true else false
             )
         },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
@@ -111,7 +127,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .nestedScroll(nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -208,91 +224,122 @@ private fun TopBar(
     kernelVersion: KernelVersion,
     onInstallClick: () -> Unit,
     onSettingsClick: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    borderVisible: Boolean
 ) {
-    TopAppBar(
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_dkm_su),
-                    contentDescription = null
-                )
-                Column(Modifier.padding(start = 5.dp)) {
-                    Text(
-                        stringResource(R.string.app_name_long)
+    Box(modifier = Modifier
+        .fillMaxWidth()
+    ) {
+        if (borderVisible) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .height(20.dp)
+                    .border(
+                        BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                        ),
+                        RoundedCornerShape(
+                            bottomStart = 19.dp,
+                            bottomEnd = 19.dp
+                        ),
                     )
-                }
-            }
-        },
-        actions = {
-            /*
-             * Hide GKI Feature on Spoofed Kernel when SuSFS available
-             */
-            val realGKI: Boolean = if (getSuSFS() == "Supported")
-                if (getSuSFSVariant() == "GKI")
-                    true
-                else
-                    false
-            else
-                true
-            if (kernelVersion.isGKI() && realGKI) {
-                IconButton(onClick = onInstallClick) {
+            ) { }
+        }
+        TopAppBar(
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Filled.InstallMobile,
-                        contentDescription = stringResource(id = R.string.install)
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_dkm_su),
+                        contentDescription = null
                     )
-                }
-            }
-
-            val isManager = Natives.becomeManager(ksuApp.packageName)
-            var showDropdown by remember { mutableStateOf(false) }
-            if (isManager) {
-                IconButton(onClick = {
-                    showDropdown = true
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Refresh,
-                        contentDescription = stringResource(id = R.string.reboot)
-                    )
-
-                    DropdownMenu(expanded = showDropdown, onDismissRequest = {
-                        showDropdown = false
-                    }) {
-
-                        RebootDropdownItem(id = R.string.shutdown, reason = "shutdown")
-                        RebootDropdownItem(id = R.string.reboot)
-
-                        val pm =
-                            LocalContext.current.getSystemService(Context.POWER_SERVICE) as PowerManager?
-                        @Suppress("DEPRECATION")
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && pm?.isRebootingUserspaceSupported == true) {
-                            RebootDropdownItem(id = R.string.reboot_userspace, reason = "userspace")
-                        }
-                        RebootDropdownItem(id = R.string.reboot_recovery, reason = "recovery")
-                        RebootDropdownItem(id = R.string.reboot_bootloader, reason = "bootloader")
-                        RebootDropdownItem(id = R.string.reboot_download, reason = "download")
-                        RebootDropdownItem(id = R.string.reboot_edl, reason = "edl")
+                    Column(Modifier.padding(start = 5.dp)) {
+                        Text(
+                            stringResource(R.string.app_name_long)
+                        )
                     }
                 }
-            }
-            IconButton(onClick = onSettingsClick) {
-                Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = stringResource(id = R.string.settings)
-                )
-            }
-        },
-        windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
-        scrollBehavior = scrollBehavior,
-        modifier = Modifier
-            .graphicsLayer {
-                shape = RoundedCornerShape(
-                    bottomStart = 20.dp,
-                    bottomEnd = 20.dp
-                )
-                clip = true
-            }
-    )
+            },
+            actions = {
+                /*
+             * Hide GKI Feature on Spoofed Kernel when SuSFS available
+             */
+                val realGKI: Boolean = if (getSuSFS() == "Supported")
+                    if (getSuSFSVariant() == "GKI")
+                        true
+                    else
+                        false
+                else
+                    true
+                if (kernelVersion.isGKI() && realGKI) {
+                    IconButton(onClick = onInstallClick) {
+                        Icon(
+                            imageVector = Icons.Filled.InstallMobile,
+                            contentDescription = stringResource(id = R.string.install)
+                        )
+                    }
+                }
+
+                val isManager = Natives.becomeManager(ksuApp.packageName)
+                var showDropdown by remember { mutableStateOf(false) }
+                if (isManager) {
+                    IconButton(onClick = {
+                        showDropdown = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = stringResource(id = R.string.reboot)
+                        )
+
+                        DropdownMenu(expanded = showDropdown, onDismissRequest = {
+                            showDropdown = false
+                        }) {
+
+                            RebootDropdownItem(id = R.string.shutdown, reason = "shutdown")
+                            RebootDropdownItem(id = R.string.reboot)
+
+                            val pm =
+                                LocalContext.current.getSystemService(Context.POWER_SERVICE) as PowerManager?
+                            @Suppress("DEPRECATION")
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && pm?.isRebootingUserspaceSupported == true) {
+                                RebootDropdownItem(
+                                    id = R.string.reboot_userspace,
+                                    reason = "userspace"
+                                )
+                            }
+                            RebootDropdownItem(id = R.string.reboot_recovery, reason = "recovery")
+                            RebootDropdownItem(
+                                id = R.string.reboot_bootloader,
+                                reason = "bootloader"
+                            )
+                            RebootDropdownItem(id = R.string.reboot_download, reason = "download")
+                            RebootDropdownItem(id = R.string.reboot_edl, reason = "edl")
+                        }
+                    }
+                }
+                IconButton(onClick = onSettingsClick) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = stringResource(id = R.string.settings)
+                    )
+                }
+            },
+            windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
+            scrollBehavior = scrollBehavior,
+            colors = TopAppBarDefaults.topAppBarColors(if (borderVisible) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
+            modifier = Modifier
+                .padding(bottom = 1.dp)
+                .graphicsLayer {
+                    shape = RoundedCornerShape(
+                        bottomStart = 20.dp,
+                        bottomEnd = 20.dp
+                    )
+                    clip = true
+                }
+        )
+    }
 }
 
 @Composable
