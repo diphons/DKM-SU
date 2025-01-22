@@ -1103,7 +1103,7 @@ fun getIOSelect(): String{
 }
 
 fun getListIOSched(): String{
-    return RootUtils.runAndGetOutput("cat $IO_PATH/sda/$IO_SCHEDULER")
+    return RootUtils.runAndGetOutput("cat $IO_PATH/sda/$IO_SCHEDULER | sed 's/\\[//g' | sed 's/\\]//g'")
 }
 
 fun setIOSched(value: String) {
