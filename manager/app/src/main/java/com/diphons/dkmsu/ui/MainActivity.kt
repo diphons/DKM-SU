@@ -92,6 +92,7 @@ class MainActivity : ComponentActivity() {
 
         //Extract Assets
         if (isManager && rootAvailable()) {
+            prefs.edit().putBoolean(SpfConfig.GKI_MODE, getKNVersion()).apply()
             extractXTAssets(this)
         }
         setContent {

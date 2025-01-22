@@ -158,6 +158,9 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
         mutableStateOf(hasModule("${getGPUPath(context)}/$ADRENO_BOOST"))
     }
 
+    val gki_mode by rememberSaveable {
+        mutableStateOf(globalConfig.getBoolean(SpfConfig.GKI_MODE, false))
+    }
     //Live Data
     val profile_load = context.getSharedPreferences(getSpfProfileName(perf_mode, profile), Context.MODE_PRIVATE)
     val profile_balance = context.getSharedPreferences(SpfProfile.BALANCE, Context.MODE_PRIVATE)
@@ -183,7 +186,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
     var gpu_gov = MutableLiveData<String>(profile_load.getString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)))
     var gpu_def_power = MutableLiveData<Int>(profile_load.getInt("gpu_def_power", gpuMaxPwrLevel(context)))
     var gpu_adreno_boost = MutableLiveData<String>(parseAdrenoBoost(context, profile_load.getInt("gpu_adreno_boost", getDefAdrenoBoost(profile))))
-    var thermal_profile = MutableLiveData<String>(getThermalString(context, profile_load.getInt("thermal", getDefThermalProfile(profile))))
+    var thermal_profile = MutableLiveData<String>(getThermalString(context, profile_load.getInt("thermal", getDefThermalProfile(profile, gki_mode)), gki_mode))
     var io_sched = MutableLiveData<String>(profile_load.getString("io_sched", getIOSelect()))
 
     fun reloadDataInfo(pref_profile: SharedPreferences){
@@ -217,7 +220,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
         gpu_def_power.value = pref_profile.getInt("gpu_def_power", gpuMaxPwrLevel(context))
         if (hasAdrenoBoost)
             gpu_adreno_boost.value = parseAdrenoBoost(context, pref_profile.getInt("gpu_adreno_boost", getDefAdrenoBoost(profile)))
-        thermal_profile.value = getThermalString(context, pref_profile.getInt("thermal", getDefThermalProfile(profile)))
+        thermal_profile.value = getThermalString(context, pref_profile.getInt("thermal", getDefThermalProfile(profile, gki_mode)), gki_mode)
         io_sched.value = pref_profile.getString("io_sched", getIOSelect())
     }
 
@@ -263,7 +266,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
         profile_none.edit().putInt("gpu_def_power", gpuMaxPwrLevel(context)).apply()
         if (hasAdrenoBoost)
             profile_none.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
-        profile_none.edit().putInt("thermal", getDefThermalProfile(profile)).apply()
+        profile_none.edit().putInt("thermal", getDefThermalProfile(profile, gki_mode)).apply()
         profile_none.edit().putString("io_sched", getDefIOSched()).apply()
 
         gpu_max_freq.value = getGPUMaxFreq(context)
@@ -272,7 +275,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
         gpu_def_power.value = gpuMaxPwrLevel(context)
         if (hasAdrenoBoost)
             gpu_adreno_boost.value = parseAdrenoBoost(context, getDefAdrenoBoost(profile))
-        thermal_profile.value = getThermalString(context, getDefThermalProfile(profile))
+        thermal_profile.value = getThermalString(context, getDefThermalProfile(profile, gki_mode), gki_mode)
         io_sched.value = getDefIOSched()
 
         setProfile(context, profile)
@@ -481,8 +484,8 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         thermal_profile.value = getValueDialog
-                        profile_none.edit().putInt("thermal", getThermalInt(context, getValueDialog)).apply()
-                        setKernel("${getThermalInt(context, getValueDialog)}", THERMAL_PROFILE, true)
+                        profile_none.edit().putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)).apply()
+                        setKernel("${getThermalInt(context, getValueDialog, gki_mode)}", THERMAL_PROFILE, true)
                     }
                     dialogEvent = null
                     getValueDialog = ""
@@ -2095,8 +2098,8 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                         DialogType.Thermal,
                                         0, getModeSelect,
                                         "Choose Thermal Profile",
-                                        thermalList(context),
-                                        getThermalString(context, profile_none.getInt("thermal", getDefThermalProfile(profile))))
+                                        thermalList(context, gki_mode),
+                                        getThermalString(context, profile_none.getInt("thermal", getDefThermalProfile(profile, gki_mode)), gki_mode))
                                 }
                                 .padding(vertical = 10.dp, horizontal = 22.dp)
                         ) {

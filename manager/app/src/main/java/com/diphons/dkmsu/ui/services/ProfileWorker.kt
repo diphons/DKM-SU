@@ -43,6 +43,7 @@ class ProfileWorker(context : Context, params : WorkerParameters) : Worker(conte
         globalConfig = applicationContext.getSharedPreferences("settings", Context.MODE_PRIVATE)
         val perf_mode = globalConfig.getBoolean(SpfConfig.PERF_MODE, true)
         val profile = globalConfig.getInt(SpfConfig.PROFILE_MODE, 0)
+        val gki_mode = globalConfig.getBoolean(SpfConfig.GKI_MODE, false)
         val prefs = applicationContext.getSharedPreferences(
             if (perf_mode) {
                 if (profile == 1)
@@ -105,7 +106,7 @@ class ProfileWorker(context : Context, params : WorkerParameters) : Worker(conte
             if (check_thermal.contains("8"))
                 setKernel(0, THERMAL_PROFILE, true)
             setKernel(
-                "${prefs.getInt("thermal", getDefThermalProfile(profile))}",
+                "${prefs.getInt("thermal", getDefThermalProfile(profile, gki_mode))}",
                 THERMAL_PROFILE,
                 true
             )

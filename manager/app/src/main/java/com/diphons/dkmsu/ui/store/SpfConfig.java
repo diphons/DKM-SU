@@ -3,6 +3,7 @@ package com.diphons.dkmsu.ui.store;
 public class SpfConfig {
     public static String SETTINGS = "settings";
     public static String PERMISSIONS = "permissions";
+    public static String GKI_MODE = "gki_mode";
     public static String KSUD_MODE = "ksud_mode";
     public static String KSUD_MODE_WARN = "ksud_mode_warn";
     public static String DEVICE_BOARD = "device_board";

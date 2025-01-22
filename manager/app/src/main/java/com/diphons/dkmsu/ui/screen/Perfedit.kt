@@ -185,8 +185,11 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
     var gpu_adreno_boost by rememberSaveable {
         mutableStateOf(parseAdrenoBoost(context, prefs.getInt("gpu_adreno_boost", getDefAdrenoBoost(profile))))
     }
+    var gki_mode by rememberSaveable {
+        mutableStateOf(globalConfig.getBoolean(SpfConfig.GKI_MODE, false))
+    }
     var thermal_profile by rememberSaveable {
-        mutableStateOf(getThermalString(context, prefs.getInt("thermal", getDefThermalProfile(profile))))
+        mutableStateOf(getThermalString(context, prefs.getInt("thermal", getDefThermalProfile(profile, gki_mode)), gki_mode))
     }
     var io_sched by rememberSaveable {
         mutableStateOf(prefs.getString("io_sched", getDefIOSched()))
@@ -238,7 +241,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
         prefs.edit().putInt("gpu_def_power", gpuMaxPwrLevel(context)).apply()
         if (hasAdrenoBoost)
             prefs.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
-        prefs.edit().putInt("thermal", getDefThermalProfile(profile)).apply()
+        prefs.edit().putInt("thermal", getDefThermalProfile(profile, gki_mode)).apply()
         prefs.edit().putString("io_sched", getDefIOSched()).apply()
 
         gpu_max_freq = getGPUMaxFreq(context)
@@ -247,7 +250,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
         gpu_def_power = gpuMaxPwrLevel(context)
         if (hasAdrenoBoost)
             gpu_adreno_boost = parseAdrenoBoost(context, getDefAdrenoBoost(profile))
-        thermal_profile = getThermalString(context, getDefThermalProfile(profile))
+        thermal_profile = getThermalString(context, getDefThermalProfile(profile, gki_mode), gki_mode)
         io_sched = getDefIOSched()
 
         setProfile(context, profile)
@@ -456,8 +459,8 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         thermal_profile = getValueDialog
-                        prefs.edit().putInt("thermal", getThermalInt(context, getValueDialog)).apply()
-                        setKernel("${getThermalInt(context, getValueDialog)}", THERMAL_PROFILE, true)
+                        prefs.edit().putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)).apply()
+                        setKernel("${getThermalInt(context, getValueDialog, gki_mode)}", THERMAL_PROFILE, true)
                     }
                     dialogEvent = null
                     getValueDialog = ""
@@ -1124,8 +1127,8 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                                     DialogType.Thermal,
                                     0, getModeSelect,
                                     "Choose Thermal Profile",
-                                    thermalList(context),
-                                    getThermalString(context, prefs.getInt("thermal", getDefThermalProfile(profile))))
+                                    thermalList(context, gki_mode),
+                                    getThermalString(context, prefs.getInt("thermal", getDefThermalProfile(profile, gki_mode)), gki_mode))
                             }
                             .padding(vertical = 10.dp, horizontal = 22.dp)
                     ) {

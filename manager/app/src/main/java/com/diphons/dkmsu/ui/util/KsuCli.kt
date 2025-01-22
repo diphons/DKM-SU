@@ -916,85 +916,143 @@ fun setChgMax(preferences: SharedPreferences, value: Int, position: Int){
     setKernel("$value", CHG_CUR_MAX)
 }
 
-fun getThermalString(context: Context, posisi: Int): String {
-    when (posisi) {
-        10 -> {
-            return context.getString(R.string.evaluation)
+fun getThermalString(context: Context, posisi: Int, gki: Boolean): String {
+    if (gki) {
+        when (posisi) {
+            6 -> {
+                return context.getString(R.string.performance)
+            }
+            1 -> {
+                return context.getString(R.string.battery)
+            }
+            else -> {
+                return context.getString(R.string.balance)
+            }
         }
-        11 -> {
-            return context.getString(R.string.class_0)
-        }
-        15 -> {
-            return context.getString(R.string.ar_vr)
-        }
-        8 -> {
-            return context.getString(R.string.in_calls)
-        }
-        9 -> {
-            return context.getString(R.string.game)
-        }
-        16 -> {
-            return context.getString(R.string.game2)
-        }
-        2 -> {
-            return context.getString(R.string.extreme)
-        }
-        12 -> {
-            return context.getString(R.string.camera)
-        }
-        13 -> {
-            return context.getString(R.string.pubg)
-        }
-        14 -> {
-            return context.getString(R.string.youtube)
-        }
-        else -> {
-            return context.getString(R.string.not_set)
+    } else {
+        when (posisi) {
+            10 -> {
+                return context.getString(R.string.evaluation)
+            }
+
+            11 -> {
+                return context.getString(R.string.class_0)
+            }
+
+            15 -> {
+                return context.getString(R.string.ar_vr)
+            }
+
+            8 -> {
+                return context.getString(R.string.in_calls)
+            }
+
+            9 -> {
+                return context.getString(R.string.game)
+            }
+
+            16 -> {
+                return context.getString(R.string.game2)
+            }
+
+            2 -> {
+                return context.getString(R.string.extreme)
+            }
+
+            12 -> {
+                return context.getString(R.string.camera)
+            }
+
+            13 -> {
+                return context.getString(R.string.pubg)
+            }
+
+            14 -> {
+                return context.getString(R.string.youtube)
+            }
+
+            else -> {
+                return context.getString(R.string.not_set)
+            }
         }
     }
 }
 
-fun getThermalInt(context: Context, value: String): Int {
-    if (value.contains(context.getString(R.string.evaluation)))
-        return 10
-    else if (value.contains(context.getString(R.string.class_0)))
-        return 11
-    else if (value.contains(context.getString(R.string.ar_vr)))
-        return 15
-    else if (value.contains(context.getString(R.string.in_calls)))
-        return 8
-    else if (value.contains(context.getString(R.string.game)))
-        return 9
-    else if (value.contains(context.getString(R.string.game2)))
-        return 16
-    else if (value.contains(context.getString(R.string.extreme)))
-        return 2
-    else if (value.contains(context.getString(R.string.camera)))
-        return 12
-    else if (value.contains(context.getString(R.string.pubg)))
-        return 13
-    else if (value.contains(context.getString(R.string.youtube)))
-        return 14
-    else
-        return -1
+fun getThermalInt(context: Context, value: String, gki: Boolean): Int {
+    if (gki) {
+        return if (value.contains(context.getString(R.string.performance)))
+            6
+        else if (value.contains(context.getString(R.string.battery)))
+            1
+        else
+            0
+    } else {
+        if (value.contains(context.getString(R.string.evaluation)))
+            return 10
+        else if (value.contains(context.getString(R.string.class_0)))
+            return 11
+        else if (value.contains(context.getString(R.string.ar_vr)))
+            return 15
+        else if (value.contains(context.getString(R.string.in_calls)))
+            return 8
+        else if (value.contains(context.getString(R.string.game)))
+            return 9
+        else if (value.contains(context.getString(R.string.game2)))
+            return 16
+        else if (value.contains(context.getString(R.string.extreme)))
+            return 2
+        else if (value.contains(context.getString(R.string.camera)))
+            return 12
+        else if (value.contains(context.getString(R.string.pubg)))
+            return 13
+        else if (value.contains(context.getString(R.string.youtube)))
+            return 14
+        else
+            return -1
+    }
 }
 
-fun getDefThermalProfile(profile: Int): Int{
-    if (profile == 1 || profile == 3)
-        return 10
-    else if (profile == 2)
-        return 16
-    else if (profile == 4)
-        return 8
-    else
-        return -1
+fun getDefThermalProfile(profile: Int, gki: Boolean): Int{
+    if (gki) {
+        if (profile == 1 || profile == 2 || profile == 3)
+            return 6
+        else if (profile == 4)
+            return 1
+        else
+            return 0
+    } else {
+        if (profile == 1 || profile == 3)
+            return 10
+        else if (profile == 2)
+            return 16
+        else if (profile == 4)
+            return 8
+        else
+            return -1
+    }
 }
 
-fun thermalList(context: Context): String{
-    return "${context.getString(R.string.evaluation)};${context.getString(R.string.class_0)};${context.getString(R.string.ar_vr)};" +
-            "${context.getString(R.string.in_calls)};${context.getString(R.string.game)};${context.getString(R.string.game2)};" +
-            "${context.getString(R.string.extreme)};${context.getString(R.string.camera)};${context.getString(R.string.pubg)};" +
-            context.getString(R.string.not_set)
+fun thermalList(context: Context, gki: Boolean): String{
+    if (gki) {
+        return "${context.getString(R.string.performance)};${context.getString(R.string.battery)};${context.getString(R.string.balance)}"
+    } else {
+        return "${context.getString(R.string.evaluation)};${context.getString(R.string.class_0)};${
+            context.getString(
+                R.string.ar_vr
+            )
+        };" +
+                "${context.getString(R.string.in_calls)};${context.getString(R.string.game)};${
+                    context.getString(
+                        R.string.game2
+                    )
+                };" +
+                "${context.getString(R.string.extreme)};${context.getString(R.string.camera)};${
+                    context.getString(
+                        R.string.pubg
+                    )
+                };" +
+                context.getString(R.string.not_set)
+    }
 }
 
 fun stringToList(s : String) = s.trim().splitToSequence(' ')
@@ -1561,4 +1619,18 @@ fun getBattHealth(): Int{
         batt_health = result
     }
     return strToInt(batt_health)
+}
+
+fun getKNVersion(): Boolean{
+    val result = RootUtils.runAndGetOutput("getKn=$(cat /proc/version | sed 's/Linux version //g');parse=\${getKn%%-*};parse1=\${parse%.*}; echo \$parse1")
+    val out = strToInt(result.substring(0, result.indexOf(".")))
+    if (out > 5)
+        return true
+    else if (out == 5) {
+        if (result.contains("$out.15"))
+            return true
+        else
+            return false
+    }
+    return false
 }

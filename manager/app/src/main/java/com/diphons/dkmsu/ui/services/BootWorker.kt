@@ -31,6 +31,7 @@ import com.diphons.dkmsu.ui.util.Utils.STEP_CHARGING
 import com.diphons.dkmsu.ui.util.Utils.TOUCH_SAMPLE
 import com.diphons.dkmsu.ui.util.getCurrentCharger
 import com.diphons.dkmsu.ui.util.getDefDT2W
+import com.diphons.dkmsu.ui.util.getKNVersion
 import com.diphons.dkmsu.ui.util.getXMPath
 import com.diphons.dkmsu.ui.util.hasModule
 import com.diphons.dkmsu.ui.util.hasXiaomiDevice
@@ -47,6 +48,7 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
 
         KeepShellPublic.doCmdSync("dumpsys deviceidle whitelist +${applicationContext.packageName}")
 
+        globalConfig.edit().putBoolean(SpfConfig.GKI_MODE, getKNVersion()).apply()
         if (globalConfig.getBoolean(SpfConfig.PERF_MODE, true)) {
             if (hasModule(GAME_AI)) {
                 if (globalConfig.getBoolean(SpfConfig.GAME_AI, true))
