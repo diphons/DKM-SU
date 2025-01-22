@@ -34,6 +34,7 @@
             android:shadowDy="0"
             android:shadowRadius="0"
             android:text=""
+            android:textStyle="bold"
             android:textColor="@color/white" />
 
         <TextView
@@ -68,6 +69,7 @@
             android:shadowDy="0"
             android:shadowRadius="0"
             android:text=""
+            android:textStyle="bold"
             android:textColor="@color/white" />
 
         <TextView
@@ -102,6 +104,7 @@
             android:shadowDy="0"
             android:shadowRadius="0"
             android:text=""
+            android:textStyle="bold"
             android:textColor="@color/white" />
 
         <TextView
@@ -143,6 +146,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="0"
                 android:text=""
+                android:textStyle="bold"
                 android:textColor="@color/white" />
 
             <TextView
@@ -186,6 +190,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="0"
                 android:text=""
+                android:textStyle="bold"
                 android:textColor="@color/white" />
 
             <TextView
@@ -229,6 +234,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="0"
                 android:text=""
+                android:textStyle="bold"
                 android:textColor="@color/white" />
 
             <TextView
@@ -291,6 +297,7 @@
             android:shadowDy="0"
             android:shadowRadius="0"
             android:text=""
+            android:textStyle="bold"
             android:textColor="@color/white"
             android:textSize="8sp" />
 
@@ -327,6 +334,7 @@
             android:shadowDy="0"
             android:shadowRadius="0"
             android:text=""
+            android:textStyle="bold"
             android:textColor="@color/white"
             android:textSize="8sp" />
 
@@ -363,6 +371,7 @@
             android:shadowDy="0"
             android:shadowRadius="0"
             android:text=""
+            android:textStyle="bold"
             android:textColor="@color/white"
             android:textSize="8sp" />
 
@@ -406,6 +415,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="0"
                 android:text=""
+                android:textStyle="bold"
                 android:textColor="@color/white"
                 android:textSize="8sp" />
 
@@ -451,6 +461,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="0"
                 android:text=""
+                android:textStyle="bold"
                 android:textColor="@color/white"
                 android:textSize="8sp" />
 
@@ -496,6 +507,7 @@
                 android:shadowDy="0"
                 android:shadowRadius="0"
                 android:text=""
+                android:textStyle="bold"
                 android:textColor="@color/white"
                 android:textSize="8sp" />
 

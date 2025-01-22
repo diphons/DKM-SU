@@ -121,7 +121,6 @@ public class FPSMonitor(private val mContext: Context) {
     private var cpuLoadTextView_small: TextView? = null
     private var gpuLoadTextView_small: TextView? = null
     private var gpuPanel: View? = null
-    private var temperaturePanel: View? = null
     private var temperatureText: TextView? = null
     private var battpercentTextView: TextView? = null
     private var battTextView: TextView? = null
@@ -227,6 +226,7 @@ public class FPSMonitor(private val mContext: Context) {
         val totalMem = (info.totalMem / 1024 / 1024f).toInt()
         val availMem = (info.availMem / 1024 / 1024f).toInt()
         var color_profile: Int
+        var color_default: Int
         var batteryCapacity: Int
 
         myHandler2.post {
@@ -242,6 +242,7 @@ public class FPSMonitor(private val mContext: Context) {
                 if (getMode == 2) {
                     bg_stage_ht!!.backgroundTintList = mContext.getColorStateList(R.color.wallbgdark)
                     color_profile = ContextCompat.getColor(mContext, R.color.color_ht1)
+                    color_default = ContextCompat.getColor(mContext, R.color.white)
                     fpsText!!.setTextColor(color_profile)
                     gpuLoadTextView!!.setTextColor(color_profile)
                     cpuLoadTextView!!.setTextColor(color_profile)
@@ -302,7 +303,16 @@ public class FPSMonitor(private val mContext: Context) {
                     battpercentTextView_small!!.text = "$batteryCapacity%"
                     battTextView_small!!.text = GlobalStatus.updateBatteryTemperature().toString() + "°C"
                     if (prefs.getBoolean(SpfConfig.MONITOR_MINI_EXPAND, false)) {
-                        //Misc.HTEx = 1
+                        gpuText_t_small!!.setTextColor(color_profile)
+                        gpuText_t!!.setTextColor(color_profile)
+                        cpuText_t!!.setTextColor(color_profile)
+                        cpuText_t_small!!.setTextColor(color_profile)
+                        ramText_t!!.setTextColor(color_profile)
+                        ramText_t_small!!.setTextColor(color_profile)
+                        percText_t!!.setTextColor(color_profile)
+                        percText_t_small!!.setTextColor(color_profile)
+                        batText_t!!.setTextColor(color_profile)
+                        batText_t_small!!.setTextColor(color_profile)
                         fpsText_t!!.text = " "
                         gpuText_t!!.text = "  ·  "
                         cpuText_t!!.text = "  ·  "
@@ -316,7 +326,16 @@ public class FPSMonitor(private val mContext: Context) {
                         percText_t_small!!.text = "  ·  "
                         batText_t_small!!.text = "  ·  "
                     } else {
-                        //Misc.HTEx = 0
+                        gpuText_t_small!!.setTextColor(color_default)
+                        gpuText_t!!.setTextColor(color_default)
+                        cpuText_t!!.setTextColor(color_default)
+                        cpuText_t_small!!.setTextColor(color_default)
+                        ramText_t!!.setTextColor(color_default)
+                        ramText_t_small!!.setTextColor(color_default)
+                        percText_t!!.setTextColor(color_default)
+                        percText_t_small!!.setTextColor(color_default)
+                        batText_t!!.setTextColor(color_default)
+                        batText_t_small!!.setTextColor(color_default)
                         fpsText_t!!.text = " FPS "
                         gpuText_t!!.text = "   GPU "
                         cpuText_t!!.text = "   CPU "
