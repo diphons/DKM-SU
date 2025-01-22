@@ -89,7 +89,7 @@ class ProfileWorker(context : Context, params : WorkerParameters) : Worker(conte
         }
         //GPU
         val gpu_mx_freq = "${prefs.getInt("gpu_max_freq", getGPUMaxFreq(applicationContext))}"
-        val gpu_mn_freq = "${prefs.getInt("gpu_max_freq", getGPUMinFreq(applicationContext))}"
+        val gpu_mn_freq = "${prefs.getInt("gpu_min_freq", getGPUMinFreq(applicationContext))}"
         setKernel(gpu_mx_freq, "${getGPUPath(applicationContext)}/$GPU_MAX_FREQ")
         setKernel(gpu_mx_freq, "${getGPUPath(applicationContext)}/$GPU_MAX_GPUCLK")
         setKernel("${strToInt(gpu_mx_freq) / 1000000}", "${getGPUPath(applicationContext)}/$GPU_MAX_CKL")
