@@ -89,13 +89,9 @@ public class FPSMonitor(private val mContext: Context) {
         params.x = 0
         params.y = 0
 
-        if (bola || getMode == 1) {
-            params.flags = LayoutParams.FLAG_NOT_TOUCH_MODAL or LayoutParams.FLAG_NOT_FOCUSABLE or LayoutParams.FLAG_NOT_TOUCHABLE
-        } else {
-            params.flags = LayoutParams.FLAG_NOT_FOCUSABLE
-            val gestureDetector = GestureDetector(view.context, simpleOnGestureListener)
-            view.setOnTouchListener(FPSTouchListener(params, mWindowManager, gestureDetector))
-        }
+        params.flags = LayoutParams.FLAG_NOT_FOCUSABLE
+        val gestureDetector = GestureDetector(view.context, simpleOnGestureListener)
+        view.setOnTouchListener(FPSTouchListener(params, mWindowManager, gestureDetector))
 
         params.layoutInDisplayCutoutMode = LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 

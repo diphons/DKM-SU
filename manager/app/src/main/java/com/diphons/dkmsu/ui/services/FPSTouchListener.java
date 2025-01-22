@@ -82,7 +82,10 @@ public class FPSTouchListener implements View.OnTouchListener {
                 break;
             case MotionEvent.ACTION_MOVE:
                 params.x = prefs.getInt(SpfConfig.MONITOR_MINI_INITIAL_X, 0) + (int) (event.getRawX() - initialTouchX);
-                params.y = prefs.getInt(SpfConfig.MONITOR_MINI_INITIAL_Y, 0) + (int) (event.getRawY() - initialTouchY);
+                if (getMode == 1)
+                    params.y = 0;
+                else
+                    params.y = prefs.getInt(SpfConfig.MONITOR_MINI_INITIAL_Y, 0) + (int) (event.getRawY() - initialTouchY);
                 windowManager.updateViewLayout(v, params);
                 break;
         }
