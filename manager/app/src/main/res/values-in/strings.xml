@@ -184,6 +184,7 @@
     <string name="game_ai_sum2">Matikan untuk menggunakan Profile Mode</string>
     <string name="game_ai_log">Log Game Ai</string>
     <string name="game_ai_log_sum">Aktifkan untuk menampilkan Game Ai yang berjalan di log kernel</string>
+    <string name="game_mode">Mode Game</string>
     <string name="profile_mode">Mode Profile</string>
     <string name="touch">Sentuh</string>
     <string name="touch_mode">Mode Sentuh</string>
@@ -219,6 +220,7 @@
     <string name="color_calibration">Kalibrasi Warna</string>
     <string name="color_calibration_sum" >Atur Kalibrasi Warna, AMOLED atau atur sendiri</string>
     <string name="reset">Atur ulang</string>
+    <string name="remove">Hapus</string>
     <string name="rgb_adjustments">Penyesuaian RGB</string>
     <string name="display_saturated">Saturasi</string>
     <string name="display_value">Nilai</string>

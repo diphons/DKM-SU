@@ -995,9 +995,9 @@ fun getThermalInt(context: Context, value: String, gki: Boolean): Int {
             return 15
         else if (value.contains(context.getString(R.string.in_calls)))
             return 8
-        else if (value.contains(context.getString(R.string.game)))
+        else if (value.equals(context.getString(R.string.game)))
             return 9
-        else if (value.contains(context.getString(R.string.game2)))
+        else if (value.equals(context.getString(R.string.game2)))
             return 16
         else if (value.contains(context.getString(R.string.extreme)))
             return 2
@@ -1075,6 +1075,28 @@ fun getSpfProfileName(mode: Boolean, profile: Int): String{
             return SpfProfile.BALANCE
     } else
         return SpfProfile.NONE
+}
+
+fun getProfileString(context: Context, profile: Int): String{
+    if (profile == 1)
+        return context.getString(R.string.performance)
+    else if (profile == 2)
+        return context.getString(R.string.game)
+    else if (profile == 4)
+        return context.getString(R.string.battery)
+    else
+        return context.getString(R.string.balance)
+}
+
+fun getProfileInt(context: Context, profile: String): Int{
+    if (profile.contains(context.getString(R.string.performance)))
+        return 1
+    else if (profile.contains(context.getString(R.string.game)))
+        return 2
+    else if (profile.contains(context.getString(R.string.battery)))
+        return 4
+    else
+        return 0
 }
 
 var defval_ioSched = ""
@@ -1633,4 +1655,47 @@ fun getKNVersion(): Boolean{
             return false
     }
     return false
+}
+
+var getGameDef = ""
+var getGameNewList = ""
+var reloadData = false
+fun getGameAllList(context: Context): String{
+    val prefs = context.getSharedPreferences("game_ai", Context.MODE_PRIVATE)
+    if (getGameDef.isEmpty()) {
+        var list_default = prefs.getString("game_ai_default", "")
+        if (list_default!!.isEmpty()) {
+            list_default = RootUtils.runAndGetOutput("cat $GAME_AI_LIST_DEFAULT | sed 's/\"/#/g'")
+            prefs.edit().putString("game_ai_default", list_default).apply()
+        }
+        getGameDef = list_default
+    }
+    val list = prefs.getString("game_ai_list", "")
+    getGameNewList = "$list"
+    var spacer = ""
+    if (getGameNewList.isNotEmpty())
+        spacer="&#10;"
+    return "$getGameDef$spacer$getGameNewList"
+}
+
+fun getGameList(context: Context, pkg: String): String{
+    val prefs = context.getSharedPreferences("game_ai", Context.MODE_PRIVATE)
+    val listDefault = prefs.getString("game_ai_default", "")
+    val list = prefs.getString("game_ai_list", "")
+    var result = ""
+    if (list!!.isNotEmpty())
+        result = RootUtils.runAndGetOutput("echo \"$list\" | sed 's/&#10;/\\n/g' | grep '$pkg'")
+    if (result.isEmpty())
+        result = RootUtils.runAndGetOutput("echo \"$listDefault\" | sed 's/&#10;/\\n/g' | grep '$pkg'")
+    return result
+}
+
+fun setGameList(context: Context){
+    clearEndData(context)
+    val prefs = context.getSharedPreferences("game_ai", Context.MODE_PRIVATE)
+    val list = prefs.getString("game_ai_list", "")
+    RootUtils.runCommand("path=/data/data/${context.packageName}/files/game_ai_list; rm -fr \$path; echo \"\" > \$path")
+    if (list!!.isNotEmpty())
+        RootUtils.runCommand("path=/data/data/${context.packageName}/files/game_ai_list; echo -e \"$list\" | sed 's/&#10;/\\n/g' | sed 's/#/\"/g' > \$path")
+    RootUtils.runCommand("cat /data/data/${context.packageName}/files/game_ai_list > $GAME_AI_LIST")
 }

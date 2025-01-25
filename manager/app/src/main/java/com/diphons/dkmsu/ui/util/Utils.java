@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -34,6 +35,8 @@ public class Utils {
     public static String D8G_PATH = "/sys/module/d8g_helper/parameters/";
     public static String OPROFILE = D8G_PATH + "oprofile";
     public static String GAME_AI = D8G_PATH + "game_ai_enable";
+    public static String GAME_AI_LIST = D8G_PATH + "game_ai_list";
+    public static String GAME_AI_LIST_DEFAULT = D8G_PATH + "game_ai_list_default";
     public static String GAME_AI_LOG = D8G_PATH + "game_ai_log";
     public static String HAPTIC_LEVEL = D8G_PATH + "haptic_gain";
     public static String DYNAMIC_CHARGING = D8G_PATH + "dynamic_charger";
@@ -301,5 +304,24 @@ public class Utils {
     public static Bitmap getBitmapFromDrawable(Context context, Integer mode, @DrawableRes int drawableId) {
         Drawable drawable = AppCompatResources.getDrawable(context, drawableId);
         return getBitmapFromDrawable(mode, drawable);
+    }
+
+    /*
+     * Game Ai Json format
+     * {pkg: @, gm: @, op: @, gov: @, t: @, gpu: @}
+     *
+     * value set : json file
+     * param set : gm, op, gov, t, gpu
+     */
+    public static String parserGameList(String value, String param) {
+        String getStart = value.replace("#", "").replace(param + ": ", "=").replace("}", "");
+        getStart = getStart.replaceAll(".+=", "");
+        if (getStart.contains(","))
+            getStart = getStart.substring(0, getStart.indexOf(","));
+        return getStart;
+    }
+
+    public static void clearEndData(Context context){
+        RootUtils.runCommand("path=/data/data/" + context.getPackageName() + "/shared_prefs/game_ai.xml; sed -i 's/&#10;    //g' $path; sed -i 's/&#10;</</g' $path");
     }
 }

@@ -184,6 +184,7 @@
     <string name="game_ai_sum2">Отключите, чтобы использовать режим профиля.</string>
     <string name="game_ai_log">Журнал игры ИИ</string>
     <string name="game_ai_log_sum">Включить отображение запущенных игр с искусственным интеллектом в журнале ядра</string>
+    <string name="game_mode">Игровой режим</string>
     <string name="profile_mode">Режим профиля</string>
     <string name="touch">Трогать</string>
     <string name="touch_mode">Сенсорный режим</string>
@@ -219,6 +220,7 @@
     <string name="color_calibration">Калибровка цвета</string>
     <string name="color_calibration_sum">Установите калибровку цвета, AMOLED или настройте ее самостоятельно</string>
     <string name="reset">Перезагрузить</string>
+    <string name="remove">Удалять</string>
     <string name="rgb_adjustments">Регулировка RGB</string>
     <string name="display_saturated">Насыщенность</string>
     <string name="display_value">Отметка</string>

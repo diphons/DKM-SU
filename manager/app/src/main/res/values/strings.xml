@@ -190,6 +190,7 @@
     <string name="game_ai_sum2">Disable to use Profile Mode</string>
     <string name="game_ai_log">Game Ai Log</string>
     <string name="game_ai_log_sum">Enable to show Game Ai running in kernel log</string>
+    <string name="game_mode">Game Mode</string>
     <string name="profile_mode">Profile Mode</string>
     <string name="touch">Touch</string>
     <string name="touch_mode">Touch Mode</string>
@@ -225,6 +226,7 @@
     <string name="color_calibration">Color Calibration</string>
     <string name="color_calibration_sum">Set Color Calibration, AMOLED or set it yourself</string>
     <string name="reset">Reset</string>
+    <string name="remove">Remove</string>
     <string name="rgb_adjustments">RGB Adjustments</string>
     <string name="display_saturated">Saturation</string>
     <string name="display_value">Value</string>

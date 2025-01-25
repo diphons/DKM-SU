@@ -184,6 +184,7 @@
     <string name="game_ai_sum2">Profil Modunu kullanmak için kapatın</string>
     <string name="game_ai_log">Yapay Zeka Oyun Günlüğü</string>
     <string name="game_ai_log_sum">Çekirdek günlüğünde çalışan Yapay Zeka Oyunlarını göstermeyi etkinleştirin</string>
+    <string name="game_mode">Oyun Modu</string>
     <string name="profile_mode">Profil Modu</string>
     <string name="touch">Dokunmak</string>
     <string name="touch_mode">Dokunmatik Mod</string>
@@ -219,6 +220,7 @@
     <string name="color_calibration">Renk Kalibrasyonu</string>
     <string name="color_calibration_sum">Renk Kalibrasyonunu AMOLED olarak ayarlayın veya kendiniz ayarlayın</string>
     <string name="reset">Sıfırla</string>
+    <string name="remove">Kaldırmak</string>
     <string name="rgb_adjustments">RGB Ayarı</string>
     <string name="display_saturated">Doygunluk</string>
     <string name="display_value">İşaret</string>

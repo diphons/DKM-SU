@@ -184,6 +184,7 @@
     <string name="game_ai_sum2">禁用配置文件模式</string>
     <string name="game_ai_log">游戏人工智能日志</string>
     <string name="game_ai_log_sum">启用在内核日志中显示游戏 AI 运行</string>
+    <string name="game_mode">游戏模式</string>
     <string name="profile_mode">配置文件模式</string>
     <string name="touch">触碰</string>
     <string name="touch_mode">触摸模式</string>
@@ -219,6 +220,7 @@
     <string name="color_calibration">颜色校准</string>
     <string name="color_calibration_sum">设置颜色校准、AMOLED 或自行设置</string>
     <string name="reset">重置</string>
+    <string name="remove">消除</string>
     <string name="rgb_adjustments">RGB 调整</string>
     <string name="display_saturated">饱和度</string>
     <string name="display_value">值</string>

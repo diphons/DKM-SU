@@ -6,6 +6,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.diphons.dkmsu.ui.component.KeepShellPublic
 import com.diphons.dkmsu.ui.store.*
+import com.diphons.dkmsu.ui.util.RootUtils
 import com.diphons.dkmsu.ui.util.Utils.CHG_CUR_MAX
 import com.diphons.dkmsu.ui.util.Utils.DISPLAY_BLUE
 import com.diphons.dkmsu.ui.util.Utils.DISPLAY_CONTRAST
@@ -20,6 +21,7 @@ import com.diphons.dkmsu.ui.util.Utils.DYNAMIC_CHARGING
 import com.diphons.dkmsu.ui.util.Utils.EARPIECE_GAIN
 import com.diphons.dkmsu.ui.util.Utils.FCHG_SYS
 import com.diphons.dkmsu.ui.util.Utils.GAME_AI
+import com.diphons.dkmsu.ui.util.Utils.GAME_AI_LIST_DEFAULT
 import com.diphons.dkmsu.ui.util.Utils.GAME_AI_LOG
 import com.diphons.dkmsu.ui.util.Utils.HAPTIC_LEVEL
 import com.diphons.dkmsu.ui.util.Utils.HEADPHONE_GAIN
@@ -36,19 +38,30 @@ import com.diphons.dkmsu.ui.util.getXMPath
 import com.diphons.dkmsu.ui.util.hasModule
 import com.diphons.dkmsu.ui.util.hasXiaomiDevice
 import com.diphons.dkmsu.ui.util.runSVCWorker
+import com.diphons.dkmsu.ui.util.setGameList
 import com.diphons.dkmsu.ui.util.setKernel
 import com.diphons.dkmsu.ui.util.setProfile
 import com.diphons.dkmsu.ui.util.setXiaomiTouch
 
 class BootWorker(context : Context, params : WorkerParameters) : Worker(context,params) {
     private lateinit var globalConfig: SharedPreferences
+    private lateinit var gameai_prefs: SharedPreferences
 
     override fun doWork(): Result {
         globalConfig = applicationContext.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        gameai_prefs = applicationContext.getSharedPreferences("game_ai", Context.MODE_PRIVATE)
 
         KeepShellPublic.doCmdSync("dumpsys deviceidle whitelist +${applicationContext.packageName}")
 
         globalConfig.edit().putBoolean(SpfConfig.GKI_MODE, getKNVersion()).apply()
+        if (hasModule(GAME_AI)) {
+            var list_default = gameai_prefs.getString("game_ai_default", "")
+            if (list_default!!.isEmpty()) {
+                list_default = RootUtils.runAndGetOutput("cat $GAME_AI_LIST_DEFAULT | sed 's/\"/#/g'")
+                gameai_prefs.edit().putString("game_ai_default", list_default).apply()
+            }
+            setGameList(applicationContext)
+        }
         if (globalConfig.getBoolean(SpfConfig.PERF_MODE, true)) {
             if (hasModule(GAME_AI)) {
                 if (globalConfig.getBoolean(SpfConfig.GAME_AI, true))
