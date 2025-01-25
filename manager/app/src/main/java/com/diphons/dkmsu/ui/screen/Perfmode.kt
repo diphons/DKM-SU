@@ -93,6 +93,10 @@ import com.diphons.dkmsu.ui.viewmodel.AIViewModel
 import com.ramcosta.composedestinations.generated.destinations.PerfeditScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppGameAIScreenDestination
 
+/**
+ * @author diphons
+ * @date 2025/01/25.
+ */
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
 @Composable
