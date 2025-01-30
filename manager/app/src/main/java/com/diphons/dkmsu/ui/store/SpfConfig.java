@@ -4,6 +4,8 @@ public class SpfConfig {
     public static String SETTINGS = "settings";
     public static String PERMISSIONS = "permissions";
     public static String GKI_MODE = "gki_mode";
+    public static String KEEP_ALIVE = "keep_alive";
+    public static String PER_APP_LIST = "perapp_list";
     public static String KSUD_MODE = "ksud_mode";
     public static String KSUD_MODE_WARN = "ksud_mode_warn";
     public static String DEVICE_BOARD = "device_board";

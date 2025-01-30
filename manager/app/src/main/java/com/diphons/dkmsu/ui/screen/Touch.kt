@@ -19,8 +19,12 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -88,6 +92,9 @@ fun TouchScreen(navigator: DestinationsNavigator) {
     Scaffold(
         topBar = {
             TopBar(
+                onBack = {
+                    navigator.popBackStack()
+                },
                 scrollBehavior = scrollBehavior,
                 borderVisible = if (scrollPos > 0.1f) true else false
             )
@@ -341,6 +348,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
+    onBack: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     borderVisible: Boolean
 ) {
@@ -367,6 +375,11 @@ private fun TopBar(
         }
         TopAppBar(
             title = { Text(stringResource(R.string.touch_mode)) },
+            navigationIcon = {
+                IconButton(
+                    onClick = onBack
+                ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+            },
             windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
             scrollBehavior = scrollBehavior,
             colors = TopAppBarDefaults.topAppBarColors(if (borderVisible) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),

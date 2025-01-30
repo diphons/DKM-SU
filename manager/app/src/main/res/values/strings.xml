@@ -318,4 +318,6 @@
     <string name="ufs_health_info">UFS Health Info</string>
     <string name="ufs_health_info_die">Your UFS storage will die soon</string>
     <string name="health">Health</string>
+    <string name="per_app">Per-App Profile</string>
+    <string name="per_app_sum">Set per-app profiles for your use</string>
 </resources>

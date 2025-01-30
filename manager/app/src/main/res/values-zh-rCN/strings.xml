@@ -295,4 +295,6 @@
     <string name="ufs_health_info">UFS 健康信息</string>
     <string name="ufs_health_info_die">你的 UFS 存储很快就会死掉</string>
     <string name="health">健康</string>
+    <string name="per_app">每个应用程序的配置文件</string>
+    <string name="per_app_sum">设置每个应用程序的配置文件以供您使用</string>
 </resources>

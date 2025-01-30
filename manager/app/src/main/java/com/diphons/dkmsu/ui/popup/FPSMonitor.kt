@@ -22,6 +22,7 @@ import com.diphons.dkmsu.ui.store.SpfConfig
 import com.diphons.dkmsu.ui.util.Utils.*
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.services.FPSTouchListener
+import com.diphons.dkmsu.ui.util.FPSActive
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -39,7 +40,7 @@ public class FPSMonitor(private val mContext: Context) {
      */
     @SuppressLint("SuspiciousIndentation")
     fun showPopupWindow(): Boolean {
-        prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, true).apply()
+        //FPSActive = true
         if (show!!) {
             return true
         }
@@ -57,7 +58,7 @@ public class FPSMonitor(private val mContext: Context) {
                 intent.data = uri
                 Toast.makeText(mContext, mContext.getString(R.string.permission_float), Toast.LENGTH_LONG).show()
                 mContext.startActivity(intent)
-                prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, false).apply()
+               // FPSActive = false
                 return false
             }
         }
@@ -393,7 +394,7 @@ public class FPSMonitor(private val mContext: Context) {
             mView = null
         }
        // if (!Utils.GameActive)
-        prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, false).apply()
+        //FPSActive = false
         show = false
     }
 

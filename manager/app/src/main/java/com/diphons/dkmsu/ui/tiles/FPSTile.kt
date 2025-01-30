@@ -10,6 +10,7 @@ import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.popup.FPSMonitor
+import com.diphons.dkmsu.ui.util.FPSActive
 
 class FPSTile : TileService() {
     lateinit var prefs: SharedPreferences
@@ -28,10 +29,11 @@ class FPSTile : TileService() {
 
         state = prefs.getBoolean(SpfConfig.MONITOR_MINI, false)
         prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, !state).apply()
-        if (state) {
+        if (state || FPSActive) {
             newState = Tile.STATE_INACTIVE
             FPSMonitor(applicationContext).hidePopupWindow()
         } else {
+            FPSActive = false
             newState = Tile.STATE_ACTIVE
             FPSMonitor(applicationContext).showPopupWindow()
         }
@@ -55,7 +57,7 @@ class FPSTile : TileService() {
         val tile = this.qsTile
         val newState: Int
         if (isManager) {
-            if (state) {
+            if (state || FPSActive) {
                 newState = Tile.STATE_ACTIVE
                 FPSMonitor(applicationContext).showPopupWindow()
             } else {

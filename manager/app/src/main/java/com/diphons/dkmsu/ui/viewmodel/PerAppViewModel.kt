@@ -1,8 +1,10 @@
 package com.diphons.dkmsu.ui.viewmodel
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.SharedPreferences
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.os.IBinder
@@ -21,23 +23,23 @@ import kotlinx.parcelize.Parcelize
 import com.diphons.dkmsu.IKsuInterface
 import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.KsuService
+import com.diphons.dkmsu.ui.store.SpfConfig
 import com.diphons.dkmsu.ui.util.HanziToPinyin
 import com.diphons.dkmsu.ui.util.KsuCli
-import com.diphons.dkmsu.ui.util.Utils.*
-import com.diphons.dkmsu.ui.util.getGameAllList
-import com.diphons.dkmsu.ui.util.getGameList
-import com.diphons.dkmsu.ui.util.reloadData
 import java.text.Collator
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class AIViewModel : ViewModel() {
+class PerAppViewModel : ViewModel() {
+    private lateinit var globalConfig: SharedPreferences
+    private lateinit var prefs: SharedPreferences
+
     var refreshOnReturn by mutableStateOf(false)
         public set
 
     companion object {
-        private const val TAG = "AIViewModel"
+        private const val TAG = "PerfViewModel"
         private var apps by mutableStateOf<List<AppInfo>>(emptyList())
     }
 
@@ -45,29 +47,23 @@ class AIViewModel : ViewModel() {
     data class AppInfo(
         val label: String,
         val packageInfo: PackageInfo,
-        val gameai: Boolean,
-        val game: Boolean,
-        val op: String,
-        val gov: String,
-        val t: String,
-        val gpu: String
+        val perapp: Boolean,
+        val refreshrate: String,
+        val fpsMon: Boolean,
+        val touchdev: Boolean,
     ) : Parcelable {
         val packageName: String
             get() = packageInfo.packageName
         val uid: Int
             get() = packageInfo.applicationInfo!!.uid
-        val gameAi: Boolean
-            get() = gameai
-        val gameMode: Boolean
-            get() = game
-        val oprofile: String
-            get () = op
-        val governor: String
-            get () = gov
-        val thermal: String
-            get () = t
-        val adreno: String
-            get () = gpu
+        val perApp: Boolean
+            get() = perapp
+        val refreshRate: String
+            get() = if (refreshrate.contains("Default")) "" else "Refreshrate: $refreshrate Hz"
+        val fpsMoninor: Boolean
+            get() = fpsMon
+        val touchImprove: Boolean
+            get() = touchdev
     }
 
     var search by mutableStateOf("")
@@ -78,9 +74,8 @@ class AIViewModel : ViewModel() {
     private val sortedList by derivedStateOf {
         val comparator = compareBy<AppInfo> {
             when {
-                it.gameAi -> 0
-                it.oprofile.isNotEmpty() || it.governor.isNotEmpty() || it.thermal.isNotEmpty() || it.adreno.isNotEmpty() -> 1
-                else -> 2
+                it.perApp -> 0
+                else -> 1
             }
         }.then(compareBy(Collator.getInstance(Locale.getDefault()), AppInfo::label))
         apps.sortedWith(comparator).also {
@@ -151,26 +146,21 @@ class AIViewModel : ViewModel() {
             val packages = allPackages.list
 
             apps = packages.map {
+                globalConfig = ksuApp.applicationContext.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+                prefs = ksuApp.applicationContext.getSharedPreferences(it.packageName, Context.MODE_PRIVATE)
                 val appInfo = it.applicationInfo
                 val uid = appInfo!!.uid
-                if (reloadData) {
-                    reloadData = false
-                    clearEndData(ksuApp.applicationContext)
-                }
-                val gameAi = getGameAllList(ksuApp.applicationContext).contains(it.packageName)
-                var getlist = ""
-                if (gameAi) {
-                    getlist = getGameList(ksuApp.applicationContext, it.packageName)
-                }
+                val perApp = globalConfig.getString(SpfConfig.PER_APP_LIST, "")!!.contains(it.packageName)
+                val rrMode = prefs.getString("refresh_rate", "Default")
+                val fpsM = prefs.getBoolean(SpfConfig.MONITOR_MINI, false)
+                val touchDev = prefs.getBoolean(SpfConfig.TOUCH_SAMPLE, false)
                 AppInfo(
                     label = appInfo.loadLabel(pm).toString(),
                     packageInfo = it,
-                    gameai = gameAi,
-                    game = parserGameList(getlist, "gm").contains("1"),
-                    op = parserGameList(getlist, "op"),
-                    gov = parserGameList(getlist, "gov"),
-                    t = parserGameList(getlist, "t"),
-                    gpu = parserGameList(getlist, "gpu")
+                    perapp = perApp,
+                    refreshrate = "$rrMode",
+                    fpsMon = fpsM,
+                    touchdev = touchDev
                 )
             }.filter { it.packageName != ksuApp.packageName }
             Log.i(TAG, "load cost: ${SystemClock.elapsedRealtime() - start}")

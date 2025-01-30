@@ -55,10 +55,10 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
 
         globalConfig.edit().putBoolean(SpfConfig.GKI_MODE, getKNVersion()).apply()
         if (hasModule(GAME_AI)) {
-            var list_default = gameai_prefs.getString("game_ai_default", "")
-            if (list_default!!.isEmpty()) {
-                list_default = RootUtils.runAndGetOutput("cat $GAME_AI_LIST_DEFAULT | sed 's/\"/#/g'")
-                gameai_prefs.edit().putString("game_ai_default", list_default).apply()
+            var listDefault = gameai_prefs.getString("game_ai_default", "")
+            if (listDefault!!.isEmpty()) {
+                listDefault = RootUtils.runAndGetOutput("cat $GAME_AI_LIST_DEFAULT | sed 's/\"/#/g'")
+                gameai_prefs.edit().putString("game_ai_default", listDefault).apply()
             }
             setGameList(applicationContext)
         }
@@ -162,8 +162,8 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
                 setKernel("1", STEP_CHARGING)
         }
 
-        // Apply SuSFS on Boot
-        runSVCWorker(applicationContext, "susfs9")
+        // Start DKM Service
+        runSVCWorker(applicationContext, "")
 
         return Result.success()
     }

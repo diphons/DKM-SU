@@ -1,19 +1,28 @@
 package com.diphons.dkmsu.ui.util
 
 import android.annotation.SuppressLint
+import android.app.AppOpsManager
+import android.app.NotificationManager
+import android.app.Service.NOTIFICATION_SERVICE
+import android.app.usage.UsageStats
+import android.app.usage.UsageStatsManager
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.database.Cursor
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.os.Parcelable
+import android.os.Process
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.system.Os
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.diphons.dkmsu.BuildConfig
@@ -38,7 +47,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import org.json.JSONArray
 import java.io.File
-
+import java.util.TreeMap
 
 /**
  * @author weishu
@@ -294,7 +303,7 @@ fun getSpoofKnVersion(): String{
     return result
 }
 fun getKnVersion(): String{
-    var result = RootUtils.runAndGetOutput("uname -v")
+    val result = RootUtils.runAndGetOutput("uname -v")
     return result
 }
 
@@ -305,17 +314,14 @@ fun susfsEnableFeatures(): String{
 fun hasModule(path: String): Boolean {
     val shell = getRootShell()
     val result = ShellUtils.fastCmd(shell, "if [[ -f $path ]] || [[ -d $path ]]; then echo 1;else echo 0;fi;")
-    return if (result.equals("1"))
-        true
-    else
-        false
+    return result.equals("1")
 }
 
 fun readKernel(path: String, name: String): String {
-    if (name.isEmpty())
-        return RootUtils.runAndGetOutput("if [[ -f $path ]]; then cat $path;else echo \"\";fi;")
+    return if (name.isEmpty())
+        RootUtils.runAndGetOutput("if [[ -f $path ]]; then cat $path;else echo \"\";fi;")
     else
-        return RootUtils.runAndGetOutput("if [[ -f $path/$name ]]; then cat $path/$name;else echo \"\";fi;")
+        RootUtils.runAndGetOutput("if [[ -f $path/$name ]]; then cat $path/$name;else echo \"\";fi;")
 }
 
 fun setKernel(value: String, path: String, perm: Boolean) {
@@ -332,16 +338,14 @@ fun setKernel(value: Int, path: String, perm: Boolean) {
 fun hasXiaomiDevice(): Boolean{
     val shell = getRootShell()
     var result = ShellUtils.fastCmd(shell, "resetprop | grep 'xiaomi'")
-    if (result.isEmpty()) {
+    return if (result.isEmpty()) {
         result = ShellUtils.fastCmd(shell, "resetprop | grep 'miui'")
         if (result.isEmpty()) {
-            if (hasModule(TOUCH_DEV))
-                return true
-            return false
+            hasModule(TOUCH_DEV)
         } else
-            return true
+            true
     } else
-        return true
+        true
 }
 
 fun getBoard(context: Context): String {
@@ -427,16 +431,13 @@ fun setRefreshRate(value: Int){
         }
 
         if (hasModule(CEK_OP) || hasModule(CEK_OP2) || hasModule(CEK_OP3)) {
-            val valset = if (value == 120) {
-                3;
-            } else if (value == 90) {
-                0;
-            } else if (value == 144) {
-                2;
-            } else {
-                1;
+            val valSet = when (value) {
+                120 -> 3
+                90 -> 0
+                144 -> 2
+                else -> 1
             }
-            ShellUtils.fastCmd(shell, "settings put system oneplus_screen_refresh_rate $valset")
+            ShellUtils.fastCmd(shell, "settings put system oneplus_screen_refresh_rate $valSet")
         }
     }
 }
@@ -452,10 +453,7 @@ fun getXMPath(context: Context): String {
 
 fun getStartedSVC(): Boolean{
     val result = RootUtils.runAndGetOutput("getprop init.dkmsvc")
-    if (result.isEmpty() || result.equals("0"))
-        return false
-    else
-        return true
+    return !(result.isEmpty() || result.equals("0"))
 }
 
 fun getSVCCMD(): String{
@@ -464,15 +462,15 @@ fun getSVCCMD(): String{
 
 fun setSVCCMD(value: String){
     var result = getSVCCMD()
-    if (result.isNotEmpty())
-        result = "$result-$value"
+    result = if (result.isNotEmpty())
+        "$result-$value"
     else
-        result = value
+        value
     RootUtils.runCommand("setprop init.dkmsvc.cmd \"$result\"")
 }
 
 fun startSVC(){
-    RootUtils.runCommand("(dkmsvc &)&")
+    RootUtils.runCommand("dkmsvc service")
 }
 
 fun setXiaomiTouch(active: Boolean, value: Int, context: Context){
@@ -514,10 +512,10 @@ fun getGPUPath(context: Context): String {
     if (gpuPath.isEmpty()) {
         var getPath = prefs.getString("gpu_path", "")
         if (getPath.toString().isEmpty()) {
-            if (hasModule(GPU_MALI))
-                getPath = GPU_MALI
+            getPath = if (hasModule(GPU_MALI))
+                GPU_MALI
             else
-                getPath = GPU_ADRENO
+                GPU_ADRENO
             prefs.edit().putString("gpu_path", getPath).apply()
         }
         gpuPath = getPath.toString()
@@ -558,29 +556,28 @@ fun setKernel(value: String, cpu: Int, name: String) {
 }
 
 fun setCPU(value: String, cpu: Int, mode: Int) {
-    if (mode == 0)
-        setKernel(value, cpu, CPU_MAX_FREQ)
-    else if (mode == 1)
-        setKernel(value, cpu, CPU_MIN_FREQ)
-    else if (mode == 2)
-        setKernel(value, cpu, CPU_GOV)
+    when (mode) {
+        0 -> setKernel(value, cpu, CPU_MAX_FREQ)
+        1 -> setKernel(value, cpu, CPU_MIN_FREQ)
+        2 -> setKernel(value, cpu, CPU_GOV)
+    }
 }
 
 fun setGPU(context: Context, value: String, mode: Int) {
-    if (mode == 0) {
-        setKernel(value, "${getGPUPath(context)}/$GPU_MAX_FREQ")
-        setKernel(value, "${getGPUPath(context)}/$GPU_MAX_GPUCLK")
-        setKernel("${strToInt(value) / 1000000}", "${getGPUPath(context)}/$GPU_MAX_CKL")
-    } else if (mode == 1) {
-        setKernel(value, "${getGPUPath(context)}/$GPU_MIN_FREQ")
-        setKernel(value, "${getGPUPath(context)}/$GPU_MIN_GPUCLK")
-        setKernel("${strToInt(value) / 1000000}", "${getGPUPath(context)}/$GPU_MIN_CKL")
-    } else if (mode == 2) {
-        setKernel(value, "${getGPUPath(context)}/$GPU_GOV")
-    } else if (mode == 3) {
-        setKernel(value, "${getGPUPath(context)}/$GPU_DEF_PWRLEVEL")
-    } else if (mode == 4) {
-        setKernel(value, "${getGPUPath(context)}/$ADRENO_BOOST")
+    when (mode) {
+        0 -> {
+            setKernel(value, "${getGPUPath(context)}/$GPU_MAX_FREQ")
+            setKernel(value, "${getGPUPath(context)}/$GPU_MAX_GPUCLK")
+            setKernel("${strToInt(value) / 1000000}", "${getGPUPath(context)}/$GPU_MAX_CKL")
+        }
+        1 -> {
+            setKernel(value, "${getGPUPath(context)}/$GPU_MIN_FREQ")
+            setKernel(value, "${getGPUPath(context)}/$GPU_MIN_GPUCLK")
+            setKernel("${strToInt(value) / 1000000}", "${getGPUPath(context)}/$GPU_MIN_CKL")
+        }
+        2 -> setKernel(value, "${getGPUPath(context)}/$GPU_GOV")
+        3 -> setKernel(value, "${getGPUPath(context)}/$GPU_DEF_PWRLEVEL")
+        4 -> setKernel(value, "${getGPUPath(context)}/$ADRENO_BOOST")
     }
 }
 
@@ -624,22 +621,27 @@ var cpuAvFreq3: String = ""
 var cpuAvFreq4: String = ""
 fun cpu_av_freq(context: Context, cpu: Int): String{
     val result: String
-    if (cpu == 4) {
-        if (cpuAvFreq4.isEmpty())
-            cpuAvFreq4 = get_cpu_av_freq(context, cpu)
-        result = cpuAvFreq4
-    } else if (cpu == 3) {
-        if (cpuAvFreq3.isEmpty())
-            cpuAvFreq3 = get_cpu_av_freq(context, cpu)
-        result = cpuAvFreq3
-    } else if (cpu == 2) {
-        if (cpuAvFreq2.isEmpty())
-            cpuAvFreq2 = get_cpu_av_freq(context, cpu)
-        result = cpuAvFreq2
-    } else {
-        if (cpuAvFreq1.isEmpty())
-            cpuAvFreq1 = get_cpu_av_freq(context, cpu)
-        result = cpuAvFreq1
+    when (cpu) {
+        4 -> {
+            if (cpuAvFreq4.isEmpty())
+                cpuAvFreq4 = get_cpu_av_freq(context, cpu)
+            result = cpuAvFreq4
+        }
+        3 -> {
+            if (cpuAvFreq3.isEmpty())
+                cpuAvFreq3 = get_cpu_av_freq(context, cpu)
+            result = cpuAvFreq3
+        }
+        2 -> {
+            if (cpuAvFreq2.isEmpty())
+                cpuAvFreq2 = get_cpu_av_freq(context, cpu)
+            result = cpuAvFreq2
+        }
+        else -> {
+            if (cpuAvFreq1.isEmpty())
+                cpuAvFreq1 = get_cpu_av_freq(context, cpu)
+            result = cpuAvFreq1
+        }
     }
     return result
 }
@@ -654,17 +656,17 @@ fun cpu_av_gov(context: Context, cpu: Int): String{
 }
 
 fun getDefCPUGov(context: Context, profile: Int, cpu: Int): String{
-    if (profile == 1 || profile == 2 || profile == 3) {
+    return if (profile == 1 || profile == 2 || profile == 3) {
         if (cpu_av_gov(context, cpu).contains("game"))
-            return "game"
+            "game"
         else if (cpu_av_gov(context, cpu).contains("game_walt"))
-            return "game_walt"
+            "game_walt"
         else if (cpu_av_gov(context, cpu).contains("walt"))
-            return "walt"
+            "walt"
         else
-            return "schedutil"
+            "schedutil"
     } else
-        return "schedutil"
+        "schedutil"
 }
 
 fun getCPUCurProfile(context: Context, cpu: Int, profile: Int): Int{
@@ -672,10 +674,10 @@ fun getCPUCurProfile(context: Context, cpu: Int, profile: Int): Int{
         RootUtils.runAndGetOutput("cpulist=\"${cpu_av_freq(context, cpu)}\";parse0=\${cpulist% *};parse1=\${parse0% *};parse2=\${parse1% *};parse3=\${parse2% *};parse4=\${parse3##* };echo \$parse4")
     else
         RootUtils.runAndGetOutput("cpulist=\"${cpu_av_freq(context, cpu)}\";parse0=\${cpulist% *};parse1=\${parse0##* };echo \$parse1")
-    if (getValue.isEmpty())
-        return 0
+    return if (getValue.isEmpty())
+        0
     else
-        return strToInt(getValue)
+        strToInt(getValue)
 }
 
 fun parseMaxFreq(context: Context, cpu: Int): Int{
@@ -690,26 +692,31 @@ var maxFreq2 = 0
 var maxFreq3 = 0
 var maxFreq4 = 0
 fun getMaxFreq(context: Context, cpu: Int): Int{
-    if (cpu == 4) {
-        if (maxFreq4 == 0) {
-            maxFreq4 = parseMaxFreq(context, cpu)
+    when (cpu) {
+        4 -> {
+            if (maxFreq4 == 0) {
+                maxFreq4 = parseMaxFreq(context, cpu)
+            }
+            return maxFreq4
         }
-        return maxFreq4
-    } else if (cpu == 3) {
-        if (maxFreq3 == 0) {
-            maxFreq3 = parseMaxFreq(context, cpu)
+        3 -> {
+            if (maxFreq3 == 0) {
+                maxFreq3 = parseMaxFreq(context, cpu)
+            }
+            return maxFreq3
         }
-        return maxFreq3
-    } else if (cpu == 2) {
-        if (maxFreq2 == 0) {
-            maxFreq2 = parseMaxFreq(context, cpu)
+        2 -> {
+            if (maxFreq2 == 0) {
+                maxFreq2 = parseMaxFreq(context, cpu)
+            }
+            return maxFreq2
         }
-        return maxFreq2
-    } else {
-        if (maxFreq1 == 0) {
-            maxFreq1 = parseMaxFreq(context, cpu)
+        else -> {
+            if (maxFreq1 == 0) {
+                maxFreq1 = parseMaxFreq(context, cpu)
+            }
+            return maxFreq1
         }
-        return maxFreq1
     }
 }
 
@@ -725,26 +732,31 @@ var minFreq2 = 0
 var minFreq3 = 0
 var minFreq4 = 0
 fun getMinFreq(context: Context, cpu: Int): Int{
-    if (cpu == 4) {
-        if (minFreq4 == 0) {
-            minFreq4 = parseMinFreq(context, cpu)
+    when (cpu) {
+        4 -> {
+            if (minFreq4 == 0) {
+                minFreq4 = parseMinFreq(context, cpu)
+            }
+            return minFreq4
         }
-        return minFreq4
-    } else if (cpu == 3) {
-        if (minFreq3 == 0) {
-            minFreq3 = parseMinFreq(context, cpu)
+        3 -> {
+            if (minFreq3 == 0) {
+                minFreq3 = parseMinFreq(context, cpu)
+            }
+            return minFreq3
         }
-        return minFreq3
-    } else if (cpu == 2) {
-        if (minFreq2 == 0) {
-            minFreq2 = parseMinFreq(context, cpu)
+        2 -> {
+            if (minFreq2 == 0) {
+                minFreq2 = parseMinFreq(context, cpu)
+            }
+            return minFreq2
         }
-        return minFreq2
-    } else {
-        if (minFreq1 == 0) {
-            minFreq1 = parseMinFreq(context, cpu)
+        else -> {
+            if (minFreq1 == 0) {
+                minFreq1 = parseMinFreq(context, cpu)
+            }
+            return minFreq1
         }
-        return minFreq1
     }
 }
 
@@ -753,18 +765,18 @@ fun getDefCPUMaxFreq(context: Context, profile: Int, cpu: Int): Int{
         if (profile == 1 || profile == 3 || profile == 5) {
             return getMaxFreq(context, cpu)
         } else {
-            if (getMaxCluster(context) > 3) {
+            return if (getMaxCluster(context) > 3) {
                 if (cpu > 3)
-                    return getCPUCurProfile(context, cpu, profile)
+                    getCPUCurProfile(context, cpu, profile)
                 else
-                    return getMaxFreq(context, cpu)
+                    getMaxFreq(context, cpu)
             } else if (getMaxCluster(context) > 2) {
                 if (cpu > 2)
-                    return getCPUCurProfile(context, cpu, profile)
+                    getCPUCurProfile(context, cpu, profile)
                 else
-                    return getMaxFreq(context, cpu)
+                    getMaxFreq(context, cpu)
             } else
-                return getCPUCurProfile(context, cpu, profile)
+                getCPUCurProfile(context, cpu, profile)
         }
     } else
         return getMaxFreq(context, cpu)
@@ -781,6 +793,10 @@ fun extractXTAssets(context: Context) {
 fun setProfile(context: Context, profile: Int){
     val preferences: SharedPreferences = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
     preferences.edit().putInt(SpfConfig.PROFILE_MODE, profile).apply()
+    runProfileWorker(context)
+}
+
+fun runProfileWorker(context: Context){
     val startSetProfile = OneTimeWorkRequest.Builder(ProfileWorker::class.java)
         .build()
     val workManager = WorkManager.getInstance(context)
@@ -788,7 +804,7 @@ fun setProfile(context: Context, profile: Int){
 }
 
 fun isInternetAvailable(context: Context): Boolean {
-    var result: Boolean
+    val result: Boolean
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val networkCapabilities = connectivityManager.activeNetwork ?: return false
     val actNw = connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
@@ -834,10 +850,10 @@ fun getGPUMinFreq(context: Context): Int{
     if (gpuMinFreq == 0) {
         val result =
             RootUtils.runAndGetOutput("gpulist=\"${getGpuAVFreq(context)}\";parse=\${gpulist##* }; echo \$parse")
-        if (result.isEmpty())
-            gpuMinFreq = 0
+        gpuMinFreq = if (result.isEmpty())
+            0
         else
-            gpuMinFreq = strToInt(result)
+            strToInt(result)
     }
     return gpuMinFreq
 }
@@ -847,10 +863,10 @@ fun getGPUMaxFreq(context: Context): Int{
     if (gpuMinFreq == 0) {
         val result =
             RootUtils.runAndGetOutput("gpulist=\"${getGpuAVFreq(context)}\";parse=\${gpulist%% *}; echo \$parse")
-        if (result.isEmpty())
-            gpuMaxFreq = 0
+        gpuMaxFreq = if (result.isEmpty())
+            0
         else
-            gpuMaxFreq = strToInt(result)
+            strToInt(result)
     }
     return gpuMaxFreq
 }
@@ -868,46 +884,42 @@ var listPwrLevel: String = ""
 fun getListPwrLevel(context: Context): String{
     if (listPwrLevel.isEmpty()) {
         for (i in 0..gpuMaxPwrLevel(context)) {
-            if (listPwrLevel.isEmpty())
-                listPwrLevel = "$i"
+            listPwrLevel = if (listPwrLevel.isEmpty())
+                "$i"
             else
-                listPwrLevel = "$listPwrLevel $i"
+                "$listPwrLevel $i"
         }
     }
     return listPwrLevel
 }
 
 fun parseAdrenoBoost(context: Context, value: Int): String{
-    if (value == 3)
-        return context.getString(R.string.high)
-    else if (value == 2)
-        return context.getString(R.string.medium)
-    else if (value == 1)
-        return context.getString(R.string.low)
-    else
-        return context.getString(R.string.off)
+    return when (value) {
+        3 -> context.getString(R.string.high)
+        2 -> context.getString(R.string.medium)
+        1 -> context.getString(R.string.low)
+        else -> context.getString(R.string.off)
+    }
 }
 
 fun parseAdrenoBoost(context: Context, value: String): Int{
-    if (value.contains(context.getString(R.string.high)))
-        return 3
+    return if (value.contains(context.getString(R.string.high)))
+        3
     else if (value.contains(context.getString(R.string.medium)))
-        return 2
+        2
     else if (value.contains(context.getString(R.string.low)))
-        return 1
+        1
     else
-        return 0
+        0
 }
 
 fun getDefAdrenoBoost(profile: Int): Int{
-    if (profile == 1)
-        return 3
-    else if (profile == 3)
-        return 2
-    else if (profile == 2)
-        return 1
-    else
-        return 0
+    return when (profile) {
+        1 -> 3
+        3 -> 2
+        2 -> 1
+        else -> 0
+    }
 }
 
 fun setChgMax(preferences: SharedPreferences, value: Int, position: Int){
@@ -918,62 +930,24 @@ fun setChgMax(preferences: SharedPreferences, value: Int, position: Int){
 
 fun getThermalString(context: Context, posisi: Int, gki: Boolean): String {
     if (gki) {
-        when (posisi) {
-            6 -> {
-                return context.getString(R.string.performance)
-            }
-            1 -> {
-                return context.getString(R.string.battery)
-            }
-            else -> {
-                return context.getString(R.string.balance)
-            }
+        return when (posisi) {
+            6 -> context.getString(R.string.performance)
+            1 -> context.getString(R.string.battery)
+            else -> context.getString(R.string.balance)
         }
     } else {
-        when (posisi) {
-            10 -> {
-                return context.getString(R.string.evaluation)
-            }
-
-            11 -> {
-                return context.getString(R.string.class_0)
-            }
-
-            15 -> {
-                return context.getString(R.string.ar_vr)
-            }
-
-            8 -> {
-                return context.getString(R.string.in_calls)
-            }
-
-            9 -> {
-                return context.getString(R.string.game)
-            }
-
-            16 -> {
-                return context.getString(R.string.game2)
-            }
-
-            2 -> {
-                return context.getString(R.string.extreme)
-            }
-
-            12 -> {
-                return context.getString(R.string.camera)
-            }
-
-            13 -> {
-                return context.getString(R.string.pubg)
-            }
-
-            14 -> {
-                return context.getString(R.string.youtube)
-            }
-
-            else -> {
-                return context.getString(R.string.not_set)
-            }
+        return when (posisi) {
+            10 -> context.getString(R.string.evaluation)
+            11 -> context.getString(R.string.class_0)
+            15 -> context.getString(R.string.ar_vr)
+            8 -> context.getString(R.string.in_calls)
+            9 -> context.getString(R.string.game)
+            16 -> context.getString(R.string.game2)
+            2 -> context.getString(R.string.extreme)
+            12 -> context.getString(R.string.camera)
+            13 -> context.getString(R.string.pubg)
+            14 -> context.getString(R.string.youtube)
+            else -> context.getString(R.string.not_set)
         }
     }
 }
@@ -1014,21 +988,21 @@ fun getThermalInt(context: Context, value: String, gki: Boolean): Int {
 
 fun getDefThermalProfile(profile: Int, gki: Boolean): Int{
     if (gki) {
-        if (profile == 1 || profile == 2 || profile == 3)
-            return 6
-        else if (profile == 4)
-            return 1
-        else
-            return 0
+        return when (profile) {
+            1 -> 6
+            2 -> 6
+            3 -> 6
+            4 -> 1
+            else -> 0
+        }
     } else {
-        if (profile == 1 || profile == 3)
-            return 10
-        else if (profile == 2)
-            return 16
-        else if (profile == 4)
-            return 8
-        else
-            return -1
+        return when (profile) {
+            1 -> 10
+            3 -> 10
+            2 -> 16
+            4 -> 8
+            else -> -1
+        }
     }
 }
 
@@ -1064,58 +1038,54 @@ fun stringToList2(s : String) = s.trim().splitToSequence(';')
     .toList()
 
 fun getSpfProfileName(mode: Boolean, profile: Int): String{
-    if (mode) {
-        if (profile == 1)
-            return SpfProfile.PERFORMANCE
-        else if (profile == 2)
-            return SpfProfile.GAME
-        else if (profile == 4)
-            return SpfProfile.BATTERY
-        else
-            return SpfProfile.BALANCE
+    return if (mode) {
+        when (profile) {
+            1 -> SpfProfile.PERFORMANCE
+            2 -> SpfProfile.GAME
+            4 -> SpfProfile.BATTERY
+            else -> SpfProfile.BALANCE
+        }
     } else
-        return SpfProfile.NONE
+        SpfProfile.NONE
 }
 
 fun getProfileString(context: Context, profile: Int): String{
-    if (profile == 1)
-        return context.getString(R.string.performance)
-    else if (profile == 2)
-        return context.getString(R.string.game)
-    else if (profile == 4)
-        return context.getString(R.string.battery)
-    else
-        return context.getString(R.string.balance)
+    return when (profile) {
+        1 -> context.getString(R.string.performance)
+        2 -> context.getString(R.string.game)
+        4 -> context.getString(R.string.battery)
+        else -> context.getString(R.string.balance)
+    }
 }
 
 fun getProfileInt(context: Context, profile: String): Int{
-    if (profile.contains(context.getString(R.string.performance)))
-        return 1
+    return if (profile.contains(context.getString(R.string.performance)))
+        1
     else if (profile.contains(context.getString(R.string.game)))
-        return 2
+        2
     else if (profile.contains(context.getString(R.string.battery)))
-        return 4
+        4
     else
-        return 0
+        0
 }
 
 var defval_ioSched = ""
 fun getDefIOSched(): String{
     if (defval_ioSched.isEmpty()) {
-        if (getListIOSched().contains("cfq"))
-            defval_ioSched = "cfq"
+        defval_ioSched = if (getListIOSched().contains("cfq"))
+            "cfq"
         else if (getListIOSched().contains("ssg"))
-            defval_ioSched = "ssg"
+            "ssg"
         else if (getListIOSched().contains("bfq"))
-            defval_ioSched = "bfq"
+            "bfq"
         else if (getListIOSched().contains("bbr"))
-            defval_ioSched = "bbr"
+            "bbr"
         else if (getListIOSched().contains("mq-deadline"))
-            defval_ioSched = "mq-deadline"
+            "mq-deadline"
         else if (getListIOSched().contains("deadline"))
-            defval_ioSched = "deadline"
+            "deadline"
         else
-            defval_ioSched = getIOSelect()
+            getIOSelect()
     }
     return defval_ioSched
 }
@@ -1604,18 +1574,38 @@ fun grantPermissions(context: Context) {
         "READ_SYNC_SETTINGS",
         "VIBRATE",
         "WAKE_LOCK",
-        "BIND_NOTIFICATION_LISTENER_SERVICE",
-        "POST_NOTIFICATIONS",
         "QUERY_ALL_PACKAGES",
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_SPECIAL_USE",
         "START_FOREGROUND_SERVICES_FROM_BACKGROUND",
-        "FOREGROUND_SERVICE",
+        "REQUEST_COMPANION_START_FOREGROUND_SERVICES_FROM_BACKGROUND",
         "FOREGROUND_SERVICE_DATA_SYNC",
         "FOREGROUND_SERVICE_HEALTH",
         "RUN_USER_INITIATED_JOBS",
         "REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+        "PACKAGE_USAGE_STATS",
+        "ACCESS_NOTIFICATION_POLICY",
+        "CHANGE_OVERLAY_PACKAGES",
+        "REAL_GET_TASKS",
+        "MANAGE_EXTERNAL_STORAGE",
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS",
+        "WRITE_INTERNAL_STORAGE",
+        "ACCESS_NETWORK_STATE",
+        "RECEIVE_USER_PRESENT",
+        "BROADCAST_CLOSE_SYSTEM_DIALOGS",
     )
+
+    val requiredPermission2 = arrayOf(
+        //"android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.PACKAGE_USAGE_STATS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+    )
+
     requiredPermission.forEach {
         CMD_MSG = it
         KeepShellPublic.doCmdSync("appops set ${context.packageName} $it allow")
@@ -1624,6 +1614,10 @@ fun grantPermissions(context: Context) {
             KeepShellPublic.doCmdSync("dumpsys deviceidle whitelist +${context.packageName}")
             prefs.edit().putBoolean(SpfConfig.PERMISSIONS, true).apply()
         }
+    }
+    requiredPermission2.forEach {
+        CMD_MSG = it
+        KeepShellPublic.doCmdSync("pm grant ${context.packageName} $it")
     }
     if (prefs.getBoolean(SpfConfig.PERMISSIONS, true))
         CMD_MSG = "Finished"
@@ -1649,10 +1643,7 @@ fun getKNVersion(): Boolean{
     if (out > 5)
         return true
     else if (out == 5) {
-        if (result.contains("$out.15"))
-            return true
-        else
-            return false
+        return result.contains("$out.15")
     }
     return false
 }
@@ -1663,12 +1654,12 @@ var reloadData = false
 fun getGameAllList(context: Context): String{
     val prefs = context.getSharedPreferences("game_ai", Context.MODE_PRIVATE)
     if (getGameDef.isEmpty()) {
-        var list_default = prefs.getString("game_ai_default", "")
-        if (list_default!!.isEmpty()) {
-            list_default = RootUtils.runAndGetOutput("cat $GAME_AI_LIST_DEFAULT | sed 's/\"/#/g'")
-            prefs.edit().putString("game_ai_default", list_default).apply()
+        var listDefault = prefs.getString("game_ai_default", "")
+        if (listDefault!!.isEmpty()) {
+            listDefault = RootUtils.runAndGetOutput("cat $GAME_AI_LIST_DEFAULT | sed 's/\"/#/g'")
+            prefs.edit().putString("game_ai_default", listDefault).apply()
         }
-        getGameDef = list_default
+        getGameDef = listDefault
     }
     val list = prefs.getString("game_ai_list", "")
     getGameNewList = "$list"
@@ -1698,4 +1689,80 @@ fun setGameList(context: Context){
     if (list!!.isNotEmpty())
         RootUtils.runCommand("path=/data/data/${context.packageName}/files/game_ai_list; echo -e \"$list\" | sed 's/&#10;/\\n/g' | sed 's/#/\"/g' > \$path")
     RootUtils.runCommand("cat /data/data/${context.packageName}/files/game_ai_list > $GAME_AI_LIST")
+}
+
+/*
+ * exp action : Settings.ACTION_USAGE_ACCESS_SETTINGS
+ */
+fun requestPermission(activity: ComponentActivity, action: String) {
+    val intent = Intent(action)
+    activity.startActivity(intent)
+}
+
+fun requestPermission(activity: ComponentActivity, context: Context, action: String) {
+    val intent = Intent(action)
+    val uri = Uri.fromParts("package", context.packageName, null)
+    intent.data = uri
+    activity.startActivity(intent)
+}
+
+fun hasUsageStatsPermission(context: Context): Boolean {
+    val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+    val mode: Int
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        mode = appOps.unsafeCheckOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            Process.myUid(),
+            context.packageName
+        )
+    } else {
+        @Suppress("DEPRECATION")
+        mode = appOps.checkOpNoThrow(
+            AppOpsManager.OPSTR_GET_USAGE_STATS,
+            Process.myUid(),
+            context.packageName
+        )
+    }
+    return mode == AppOpsManager.MODE_ALLOWED
+}
+
+fun getTopAppPackageName(context: Context): String? {
+    val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+    val time = System.currentTimeMillis()
+    val stats = usageStatsManager.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, time - 1000 * 1000, time)
+
+    if (stats != null) {
+        val sortedMap = TreeMap<Long, UsageStats>()
+        for (usageStats in stats) {
+            sortedMap[usageStats.lastTimeUsed] = usageStats
+        }
+        if (!sortedMap.isEmpty()) {
+            return sortedMap[sortedMap.lastKey()]?.packageName
+        }
+    }
+    return null
+}
+
+fun clearNotification(context: Context) {
+    val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.cancel(1)
+}
+
+var onFocusedApp = ""
+var FPSActive = false
+
+fun restartDkmSVC(context: Context){
+    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    val hash = RootUtils.runAndGetOutput("data=$(dkmsvc hash); echo \${data% *}")
+    if (!prefs.getString("dkmsvc_hash", "")!!.contains(hash)) {
+        prefs.edit().putString("dkmsvc_hash", hash).apply()
+        RootUtils.runCommand("setprop init.dkmsvc.exit 1")
+        for (i in 0 .. 50) {
+            if (i >= 50) {
+                install_dkmsvc()
+                RootUtils.runCommand("setprop init.dkmsvc.exit 0")
+                startSVC()
+            }
+        }
+    }
 }

@@ -295,4 +295,6 @@
     <string name="ufs_health_info">UFS Sağlık Bilgileri</string>
     <string name="ufs_health_info_die">UFS depolama alanınız ölmek üzere</string>
     <string name="health">Sağlık</string>
+    <string name="per_app">Başına-App Profil</string>
+    <string name="per_app_sum">Kullanımınız için uygulama başına profiller ayarlayın</string>
 </resources>

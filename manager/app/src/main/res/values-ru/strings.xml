@@ -295,4 +295,6 @@
     <string name="ufs_health_info">Информация о здоровье UFS</string>
     <string name="ufs_health_info_die">Ваше хранилище UFS скоро умрет</string>
     <string name="health">Здоровье</string>
+    <string name="per_app">Профиль Per-App</string>
+    <string name="per_app_sum">Установите профили для каждого приложения для вашего использования</string>
 </resources>

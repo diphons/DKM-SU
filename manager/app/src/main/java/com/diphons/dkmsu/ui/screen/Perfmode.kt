@@ -2,6 +2,7 @@ package com.diphons.dkmsu.ui.screen
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
@@ -40,6 +43,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.diphons.dkmsu.KernelSUApplication
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -79,8 +83,10 @@ import com.diphons.dkmsu.ui.util.getThermalInt
 import com.diphons.dkmsu.ui.util.getThermalString
 import com.diphons.dkmsu.ui.util.gpuMaxPwrLevel
 import com.diphons.dkmsu.ui.util.hasModule
+import com.diphons.dkmsu.ui.util.hasUsageStatsPermission
 import com.diphons.dkmsu.ui.util.parseAdrenoBoost
 import com.diphons.dkmsu.ui.util.readKernel
+import com.diphons.dkmsu.ui.util.requestPermission
 import com.diphons.dkmsu.ui.util.setCPU
 import com.diphons.dkmsu.ui.util.setGPU
 import com.diphons.dkmsu.ui.util.setIOSched
@@ -90,6 +96,7 @@ import com.diphons.dkmsu.ui.util.stringToList
 import com.diphons.dkmsu.ui.util.stringToList2
 import com.diphons.dkmsu.ui.util.thermalList
 import com.diphons.dkmsu.ui.viewmodel.AIViewModel
+import com.ramcosta.composedestinations.generated.destinations.PerAppScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.PerfeditScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.AppGameAIScreenDestination
 
@@ -591,6 +598,9 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
     }
     Scaffold(
         topBar = {
+            val onBack: () -> Unit = {
+                navigator.popBackStack()
+            }
             Box(modifier = Modifier
                 .fillMaxWidth()
             ) {
@@ -614,6 +624,11 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                 }
                 TopAppBar(
                     title = {Text(if (perf_mode && gameai && hasModule(GAME_AI)) "" else stringResource(R.string.performance_mode))},
+                    navigationIcon = {
+                        IconButton(
+                            onClick = onBack
+                        ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+                    },
                     actions = {
                         if (perf_mode && gameai && hasModule(GAME_AI))  {
                             SearchAppBar(
@@ -621,6 +636,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                 searchText = viewModel.search,
                                 onSearchTextChange = { viewModel.search = it },
                                 onClearClick = { viewModel.search = "" },
+                                onBackClick = onBack,
                                 dropdownContent = {
                                     var showDropdown by remember { mutableStateOf(false) }
 
@@ -660,7 +676,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                     Spacer(modifier = Modifier.width(2.dp))
                                     Switch(
                                         modifier = Modifier
-                                            .padding(end = 8.dp),
+                                            .padding(end = 10.dp),
                                         checked = perf_mode,
                                         onCheckedChange = {
                                             perf_mode_switch(it)
@@ -673,7 +689,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                         } else {
                             Switch(
                                 modifier = Modifier
-                                    .padding(end = 16.dp),
+                                    .padding(end = 14.dp),
                                 checked = perf_mode,
                                 onCheckedChange = {
                                     perf_mode_switch(it)
@@ -1151,6 +1167,38 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                     }
                                 }
                             }
+                        }
+                    }
+
+                    ElevatedCard {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    navigator.navigate(PerAppScreenDestination)
+                                }
+                                .padding(23.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column (modifier = Modifier
+                                .weight(3f)
+                            ){
+                                Text(
+                                    text = stringResource(R.string.per_app),
+                                    fontSize = 15.sp,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(R.string.per_app_sum),
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = null
+                            )
                         }
                     }
                     Row(
@@ -1654,23 +1702,34 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                         }
                     }
                 } else {
-                    ElevatedCard (
-                        colors = CardDefaults.elevatedCardColors(containerColor = run {
-                            MaterialTheme.colorScheme.errorContainer
-                        })
-                    ){
-                        Row (
+                    ElevatedCard {
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .clickable {
+                                    navigator.navigate(PerAppScreenDestination)
+                                }
+                                .padding(23.dp),
                             verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                text = stringResource(R.string.performance_mode_disabled),
-                                style = MaterialTheme.typography.titleSmall,
-                                textAlign = TextAlign.Center
+                        ) {
+                            Column (modifier = Modifier
+                                .weight(3f)
+                            ){
+                                Text(
+                                    text = stringResource(R.string.per_app),
+                                    fontSize = 15.sp,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(R.string.per_app_sum),
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = null
                             )
                         }
                     }

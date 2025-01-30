@@ -1,6 +1,7 @@
 package com.diphons.dkmsu
 
 import android.app.Application
+import androidx.activity.ComponentActivity
 import coil.Coil
 import coil.ImageLoader
 import me.zhanghai.android.appiconloader.coil.AppIconFetcher
@@ -34,6 +35,7 @@ class KernelSUApplication : Application() {
 
     companion object {
         lateinit var context: Application
+        lateinit var ksuActivity: ComponentActivity
     }
 
 }

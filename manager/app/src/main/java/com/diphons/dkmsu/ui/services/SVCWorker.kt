@@ -23,24 +23,26 @@ class SVCWorker(context : Context, params : WorkerParameters) : Worker(context,p
         if (!getStartedSVC())
             startSVC()
 
-        if (svcInit.contains("susfs9")) {
-            if ("$spoof_kernel".isNotEmpty() && !"$spoof_kernel".contains(" "))
-                spoofKernel("$spoof_kernel")
-            setSuSFSLog(susfs_log)
-            setSVCCMD(svcInit)
-        } else if (svcInit.contains("susfs1")) {
-            if ("$spoof_kernel".isNotEmpty() && !"$spoof_kernel".contains(" "))
-                spoofKernel("$spoof_kernel")
-            else
-                spoofKernel("default")
-        } else if (svcInit.contains("susfs2")) {
-            setSuSFSLog(susfs_log)
-        } else {
-            setSVCCMD(svcInit)
-        }
+        if (svcInit.isNotEmpty()) {
+            if (svcInit.contains("susfs9")) {
+                if ("$spoof_kernel".isNotEmpty() && !"$spoof_kernel".contains(" "))
+                    spoofKernel("$spoof_kernel")
+                setSuSFSLog(susfs_log)
+                setSVCCMD(svcInit)
+            } else if (svcInit.contains("susfs1")) {
+                if ("$spoof_kernel".isNotEmpty() && !"$spoof_kernel".contains(" "))
+                    spoofKernel("$spoof_kernel")
+                else
+                    spoofKernel("default")
+            } else if (svcInit.contains("susfs2")) {
+                setSuSFSLog(susfs_log)
+            } else {
+                setSVCCMD(svcInit)
+            }
 
-        // Reset
-        svcInit = ""
+            // Reset
+            svcInit = ""
+        }
 
         return Result.success()
     }

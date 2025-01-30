@@ -1,5 +1,6 @@
 package com.diphons.dkmsu.ui
 
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -47,6 +48,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.diphons.dkmsu.KernelSUApplication
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.NavHostAnimatedDestinationStyle
 import com.ramcosta.composedestinations.generated.destinations.ExecuteModuleActionScreenDestination
@@ -65,6 +67,7 @@ import com.diphons.dkmsu.ui.util.*
 import com.diphons.dkmsu.ui.store.*
 
 class MainActivity : ComponentActivity() {
+    lateinit var prefs: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -75,11 +78,12 @@ class MainActivity : ComponentActivity() {
         }
 
         super.onCreate(savedInstanceState)
+        KernelSUApplication.ksuActivity = this
 
         val isManager = Natives.becomeManager(ksuApp.packageName)
 	    if (isManager) install()
 
-        val prefs = getSharedPreferences(SpfConfig.SETTINGS, MODE_PRIVATE)
+        prefs = getSharedPreferences(SpfConfig.SETTINGS, MODE_PRIVATE)
 
         val isSUS_SU = getSuSFSFeatures()
         if (isSUS_SU == "CONFIG_KSU_SUSFS_SUS_SU") {

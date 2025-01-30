@@ -3,6 +3,7 @@ package com.diphons.dkmsu.ui.screen
 import android.content.Context
 import android.os.Build
 import android.os.PowerManager
+import android.provider.Settings
 import android.system.Os
 import androidx.annotation.StringRes
 import androidx.compose.animation.*
@@ -55,6 +56,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import com.diphons.dkmsu.ui.component.rememberCustomDialog
 import com.diphons.dkmsu.ui.component.runDialog
+import com.diphons.dkmsu.ui.popup.PowerMenu
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.Utils.CMD_MSG
 import com.diphons.dkmsu.ui.util.Utils.DIALOG_MODE
@@ -227,6 +229,7 @@ private fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     borderVisible: Boolean
 ) {
+    val context: Context = LocalContext.current
     Box(modifier = Modifier
         .fillMaxWidth()
     ) {
@@ -286,7 +289,10 @@ private fun TopBar(
                 var showDropdown by remember { mutableStateOf(false) }
                 if (isManager) {
                     IconButton(onClick = {
-                        showDropdown = true
+                        if (Settings.canDrawOverlays(context))
+                            PowerMenu(context).open()
+                        else
+                            showDropdown = true
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Refresh,

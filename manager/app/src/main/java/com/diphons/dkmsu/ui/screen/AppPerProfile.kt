@@ -1,43 +1,54 @@
 package com.diphons.dkmsu.ui.screen
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,91 +58,86 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.diphons.dkmsu.R
+import com.diphons.dkmsu.ui.component.SwitchItem
+import com.diphons.dkmsu.ui.store.SpfConfig
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
-import com.diphons.dkmsu.ui.store.*
+import com.diphons.dkmsu.ui.util.RootUtils
 import com.diphons.dkmsu.ui.util.Utils.*
 import com.diphons.dkmsu.ui.util.cpu_av_freq
 import com.diphons.dkmsu.ui.util.cpu_av_gov
+import com.diphons.dkmsu.ui.util.forceStopApp
 import com.diphons.dkmsu.ui.util.getDefAdrenoBoost
 import com.diphons.dkmsu.ui.util.getDefCPUGov
 import com.diphons.dkmsu.ui.util.getDefCPUMaxFreq
+import com.diphons.dkmsu.ui.util.getDefIOSched
 import com.diphons.dkmsu.ui.util.getDefThermalProfile
+import com.diphons.dkmsu.ui.util.getFPSCount
 import com.diphons.dkmsu.ui.util.getGPUMaxFreq
 import com.diphons.dkmsu.ui.util.getGPUMinFreq
 import com.diphons.dkmsu.ui.util.getGPUPath
 import com.diphons.dkmsu.ui.util.getGpuAVFreq
 import com.diphons.dkmsu.ui.util.getGpuAVGov
-import com.diphons.dkmsu.ui.util.getDefIOSched
 import com.diphons.dkmsu.ui.util.getListIOSched
 import com.diphons.dkmsu.ui.util.getListPwrLevel
 import com.diphons.dkmsu.ui.util.getMaxCluster
 import com.diphons.dkmsu.ui.util.getMinFreq
-import com.diphons.dkmsu.ui.util.getSpfProfileName
 import com.diphons.dkmsu.ui.util.getThermalInt
-import com.diphons.dkmsu.ui.util.gpuMaxPwrLevel
-import com.diphons.dkmsu.ui.util.readKernel
-import com.diphons.dkmsu.ui.util.setCPU
-import com.diphons.dkmsu.ui.util.setGPU
 import com.diphons.dkmsu.ui.util.getThermalString
+import com.diphons.dkmsu.ui.util.getfpsbyid
+import com.diphons.dkmsu.ui.util.gpuMaxPwrLevel
 import com.diphons.dkmsu.ui.util.hasModule
+import com.diphons.dkmsu.ui.util.launchApp
 import com.diphons.dkmsu.ui.util.parseAdrenoBoost
-import com.diphons.dkmsu.ui.util.setIOSched
-import com.diphons.dkmsu.ui.util.setKernel
-import com.diphons.dkmsu.ui.util.setProfile
+import com.diphons.dkmsu.ui.util.readKernel
+import com.diphons.dkmsu.ui.util.restartApp
 import com.diphons.dkmsu.ui.util.stringToList
 import com.diphons.dkmsu.ui.util.stringToList2
 import com.diphons.dkmsu.ui.util.thermalList
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
+import com.diphons.dkmsu.ui.viewmodel.PerAppViewModel
 
 /**
  * @author diphons
- * @date 2024/01/02.
+ * @date 2025/1/25.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
 @Composable
-fun PerfeditScreen(navigator: DestinationsNavigator) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    val snackBarHost = LocalSnackbarHost.current
-
+fun AppPerProfileScreen(
+    navigator: DestinationsNavigator,
+    appInfo: PerAppViewModel.AppInfo,
+) {
     val context = LocalContext.current
+    val snackBarHost = LocalSnackbarHost.current
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val globalConfig = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
-    var scrollPos by remember { mutableStateOf(0f) }
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
 
-                val delta = available.y
-                val newOffset = scrollPos - delta
-                scrollPos = newOffset
-                return Offset.Zero
-            }
-        }
-    }
-
-    var perf_mode by rememberSaveable {
-        mutableStateOf(globalConfig.getBoolean(SpfConfig.PERF_MODE, true))
-    }
+    val packageName = appInfo.packageName
+    val prefs = context.getSharedPreferences(packageName, Context.MODE_PRIVATE)
     val profile by rememberSaveable {
         mutableStateOf(globalConfig.getInt(SpfConfig.PROFILE_MODE, 0))
     }
-    val prefs = context.getSharedPreferences(getSpfProfileName(perf_mode, profile), Context.MODE_PRIVATE)
-
     var getValueDialog by rememberSaveable {
         mutableStateOf("")
     }
@@ -189,7 +195,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
     var gpu_adreno_boost by rememberSaveable {
         mutableStateOf(parseAdrenoBoost(context, prefs.getInt("gpu_adreno_boost", getDefAdrenoBoost(profile))))
     }
-    var gki_mode by rememberSaveable {
+    val gki_mode by rememberSaveable {
         mutableStateOf(globalConfig.getBoolean(SpfConfig.GKI_MODE, false))
     }
     var thermal_profile by rememberSaveable {
@@ -198,66 +204,45 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
     var io_sched by rememberSaveable {
         mutableStateOf(prefs.getString("io_sched", getDefIOSched()))
     }
-
+    var fps_monitor by rememberSaveable {
+        mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI, false))
+    }
     val hasAdrenoBoost by rememberSaveable {
         mutableStateOf(hasModule("${getGPUPath(context)}/$ADRENO_BOOST"))
     }
 
-    fun resetProfile(){
-        prefs.edit().putInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1)).apply()
-        prefs.edit().putInt("cpu1_min_freq", getMinFreq(context, 1)).apply()
-        prefs.edit().putString("cpu1_gov", getDefCPUGov(context, profile, 1)).apply()
+    var scrollPos by remember { mutableStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
 
-        cpu1_max_freq = getDefCPUMaxFreq(context, profile, 1)
-        cpu1_min_freq = getMinFreq(context, 1)
-        cpu1_gov = getDefCPUGov(context, profile, 1)
-        if (getMaxCluster(context) > 1) {
-            prefs.edit().putInt("cpu2_max_freq", getDefCPUMaxFreq(context, profile, 2)).apply()
-            prefs.edit().putInt("cpu2_min_freq", getMinFreq(context, 2)).apply()
-            prefs.edit().putString("cpu2_gov", getDefCPUGov(context, profile, 2)).apply()
-
-            cpu2_max_freq = getDefCPUMaxFreq(context, profile, 2)
-            cpu2_min_freq = getMinFreq(context, 2)
-            cpu2_gov = getDefCPUGov(context, profile, 2)
-            if (getMaxCluster(context) > 2) {
-                prefs.edit().putInt("cpu3_max_freq", getDefCPUMaxFreq(context, profile, 3)).apply()
-                prefs.edit().putInt("cpu3_min_freq", getMinFreq(context, 3)).apply()
-                prefs.edit().putString("cpu3_gov", getDefCPUGov(context, profile, 3)).apply()
-
-                cpu3_max_freq = getDefCPUMaxFreq(context, profile, 3)
-                cpu3_min_freq = getMinFreq(context, 3)
-                cpu3_gov = getDefCPUGov(context, profile, 3)
-                if (getMaxCluster(context) > 3) {
-                    prefs.edit().putInt("cpu4_max_freq", getDefCPUMaxFreq(context, profile, 4)).apply()
-                    prefs.edit().putInt("cpu4_min_freq", getMinFreq(context, 4)).apply()
-                    prefs.edit().putString("cpu4_gov", getDefCPUGov(context, profile, 4)).apply()
-
-                    cpu4_max_freq = getDefCPUMaxFreq(context, profile, 4)
-                    cpu4_min_freq = getMinFreq(context, 4)
-                    cpu4_gov = getDefCPUGov(context, profile, 4)
-                }
+                val delta = available.y
+                val newOffset = scrollPos - delta
+                scrollPos = newOffset
+                return Offset.Zero
             }
         }
+    }
 
-        prefs.edit().putInt("gpu_max_freq", getGPUMaxFreq(context)).apply()
-        prefs.edit().putInt("gpu_min_freq", getGPUMinFreq(context)).apply()
-        prefs.edit().putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)).apply()
-        prefs.edit().putInt("gpu_def_power", gpuMaxPwrLevel(context)).apply()
-        if (hasAdrenoBoost)
-            prefs.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
-        prefs.edit().putInt("thermal", getDefThermalProfile(profile, gki_mode)).apply()
-        prefs.edit().putString("io_sched", getDefIOSched()).apply()
-
-        gpu_max_freq = getGPUMaxFreq(context)
-        gpu_min_freq = getGPUMinFreq(context)
-        gpu_gov = readKernel(getGPUPath(context), GPU_GOV)
-        gpu_def_power = gpuMaxPwrLevel(context)
-        if (hasAdrenoBoost)
-            gpu_adreno_boost = parseAdrenoBoost(context, getDefAdrenoBoost(profile))
-        thermal_profile = getThermalString(context, getDefThermalProfile(profile, gki_mode), gki_mode)
-        io_sched = getDefIOSched()
-
-        setProfile(context, profile)
+    val resetTitletxt by rememberSaveable {
+        mutableStateOf(context.getString(R.string.remove))
+    }
+    var resetVisible by rememberSaveable {
+        mutableStateOf(globalConfig.getString(SpfConfig.PER_APP_LIST, "")!!.contains(packageName))
+    }
+    var getList by rememberSaveable {
+        mutableStateOf(globalConfig.getString(SpfConfig.PER_APP_LIST, ""))
+    }
+    fun updateVisible(){
+        if (!resetVisible)
+           resetVisible = true
+        if (!getList!!.contains(packageName)) {
+            if (getList!!.isEmpty())
+                globalConfig.edit().putString(SpfConfig.PER_APP_LIST, packageName).apply()
+            else
+                globalConfig.edit().putString(SpfConfig.PER_APP_LIST, "$getList $packageName").apply()
+        }
+        getList = globalConfig.getString(SpfConfig.PER_APP_LIST, "")
     }
     @Composable
     fun listDialog(
@@ -402,7 +387,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                                 cpu1_gov = getValueDialog
                             prefs.edit().putString("cpu${event.cpu}_gov", getValueDialog).apply()
                         }
-                        setCPU(getValueDialog, event.cpu, event.mode)
+                        updateVisible()
                     }
                     dialogEvent = null
                     getValueDialog = ""
@@ -432,7 +417,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                             gpu_adreno_boost = getValueDialog
                             prefs.edit().putInt("gpu_adreno_boost", parseAdrenoBoost(context, getValueDialog)).apply()
                         }
-                        setGPU(context, getValueDialog, event.mode)
+                        updateVisible()
                     }
                     dialogEvent = null
                     getValueDialog = ""
@@ -448,7 +433,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                     if (getValueDialog.isNotEmpty()) {
                         io_sched = getValueDialog
                         prefs.edit().putString("io_sched", getValueDialog).apply()
-                        setIOSched(getValueDialog)
+                        updateVisible()
                     }
                     dialogEvent = null
                     getValueDialog = ""
@@ -464,7 +449,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                     if (getValueDialog.isNotEmpty()) {
                         thermal_profile = getValueDialog
                         prefs.edit().putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)).apply()
-                        setKernel("${getThermalInt(context, getValueDialog, gki_mode)}", THERMAL_PROFILE, true)
+                        updateVisible()
                     }
                     dialogEvent = null
                     getValueDialog = ""
@@ -486,7 +471,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
         } else if (mode == 1) {
             cpu_read = "${prefs.getInt("cpu${cpu}_min_freq", getMinFreq(context, cpu))}"
         } else {
-            cpu_read = "${prefs.getString("cpu${cpu}_gov", readKernel(context, cpu, default))}"
+            cpu_read = "${prefs.getString("cpu${cpu}_gov", default)}"
         }
         cpu_read2 = reference
         if (mode == 0) {
@@ -543,25 +528,80 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
         }
         dialogEvent = DialogEvent(DialogType.Gpu, 0, mode, title, gpu_ref, gpu_def)
     }
+    var showDropdown by remember { mutableStateOf(false) }
+    var refreshrete by rememberSaveable { mutableStateOf(
+        prefs.getString(SpfConfig.REFRESH_RATE, "Default")
+    )}
+    var touch_sample by rememberSaveable {
+        mutableStateOf(prefs.getBoolean(SpfConfig.TOUCH_SAMPLE, false))
+    }
+    var seek_microfon by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.SC_MICROFON, 0f))
+    }
+    var seek_earfon by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.SC_EARFON, 0f))
+    }
+    var switch_headfon by rememberSaveable {
+        mutableStateOf(prefs.getBoolean(SpfConfig.SC_SWITCH_HEADFON, false))
+    }
+    var seek_headfon by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.SC_HEADFON, 0f))
+    }
+    var seek_headfon2 by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.SC_HEADFON2, 0f))
+    }
+
+    fun resetValue(){
+        prefs.edit().putInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1)).apply()
+        prefs.edit().putInt("cpu1_min_freq", getMinFreq(context, 1)).apply()
+        prefs.edit().putString("cpu1_gov", getDefCPUGov(context, profile, 1)).apply()
+        prefs.edit().putInt("cpu2_max_freq", getDefCPUMaxFreq(context, profile, 2)).apply()
+        prefs.edit().putInt("cpu2_min_freq", getMinFreq(context, 2)).apply()
+        prefs.edit().putString("cpu2_gov", getDefCPUGov(context, profile, 2)).apply()
+        prefs.edit().putInt("cpu3_max_freq", getDefCPUMaxFreq(context, profile, 3)).apply()
+        prefs.edit().putInt("cpu3_min_freq", getMinFreq(context, 3)).apply()
+        prefs.edit().putString("cpu3_gov", getDefCPUGov(context, profile, 3)).apply()
+        prefs.edit().putInt("cpu4_max_freq", getDefCPUMaxFreq(context, profile, 4)).apply()
+        prefs.edit().putInt("cpu4_min_freq", getMinFreq(context, 4)).apply()
+        prefs.edit().putString("cpu4_gov", getDefCPUGov(context, profile, 4)).apply()
+        prefs.edit().putInt("gpu_max_freq", getGPUMaxFreq(context)).apply()
+        prefs.edit().putInt("gpu_min_freq", getGPUMinFreq(context)).apply()
+        prefs.edit().putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)).apply()
+        prefs.edit().putInt("gpu_def_power", gpuMaxPwrLevel(context)).apply()
+        prefs.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
+        prefs.edit().putInt("thermal", getDefThermalProfile(profile, gki_mode)).apply()
+        prefs.edit().putString("io_sched", getDefIOSched()).apply()
+        prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, false).apply()
+    }
     Scaffold(
         topBar = {
             TopBar(
-                onBack = {
-                    navigator.popBackStack()
-                },
-                onResetClick = {
-                    resetProfile()
-                },
+                onBack = { navigator.popBackStack() },
+                appInfo = appInfo,
                 scrollBehavior = scrollBehavior,
-                borderVisible = if (scrollPos > 0.1f) true else false
+                borderVisible = if (scrollPos > 0.1f) true else false,
+                visibleReset = resetVisible,
+                titleReset = resetTitletxt,
+                onClick = {
+                    if (getList!!.contains(" $packageName"))
+                        getList = getList!!.replace(" $packageName", "")
+                    else if (getList!!.contains("$packageName "))
+                        getList = getList!!.replace("$packageName ", "")
+                    else
+                        getList = getList!!.replace(packageName, "")
+                    globalConfig.edit().putString(SpfConfig.PER_APP_LIST, getList).apply()
+                    resetValue()
+                    RootUtils.runCommand("rm -fr /data/data/${context.packageName}/shared_prefs/$packageName.xml")
+                    navigator.popBackStack()
+                }
             )
         },
-        snackbarHost = { SnackbarHost(snackBarHost) },
+        snackbarHost = { SnackbarHost(hostState = snackBarHost) },
         contentWindowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
-    ) { innerPadding ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(paddingValues)
                 .nestedScroll(nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
@@ -573,6 +613,151 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                if (getFPSCount() > 1) {
+                    @Composable
+                    fun RefreshRateDropdownItem(title: String, reason: Int) {
+                        DropdownMenuItem(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            text = {
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    text = title,
+                                    textAlign = TextAlign.Center
+                                )
+                            }, onClick = {
+                                refreshrete = if (reason == 0) "Default" else "$reason"
+                                prefs.edit().putString(SpfConfig.REFRESH_RATE, "$reason").apply()
+                                showDropdown = false
+                                updateVisible()
+                            })
+                    }
+
+                    ElevatedCard {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    22.dp
+                                )
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterStart)
+                                        .padding(end = 80.dp),
+                                    text = stringResource(R.string.refresh_rate),
+                                    fontSize = 16.sp,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+
+                                ElevatedCard(
+                                    colors = CardDefaults.elevatedCardColors(containerColor = run {
+                                        MaterialTheme.colorScheme.primary
+                                    }),
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .clickable {
+                                                showDropdown = true
+                                            }
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                        ) {
+                                            Text(
+                                                modifier = Modifier
+                                                    .padding(
+                                                        top = 9.dp,
+                                                        bottom = 9.dp,
+                                                        start = 15.dp,
+                                                        end = 32.dp
+                                                    ),
+                                                text = "$refreshrete${if (refreshrete!!.contains("Default")) "" else " Hz"}",
+                                                fontSize = 16.sp,
+                                                style = MaterialTheme.typography.titleSmall,
+                                                textAlign = TextAlign.Center
+                                            )
+
+                                            Row(
+                                                modifier = Modifier
+                                                    .align(Alignment.CenterEnd)
+                                                    .padding(end = 6.dp)
+                                            ) {
+                                                Icon(
+                                                    Icons.Filled.KeyboardArrowDown, "",
+                                                )
+                                            }
+                                        }
+                                        if (getFPSCount() > 1) {
+                                            DropdownMenu(
+                                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                                expanded = showDropdown, onDismissRequest = {
+                                                    showDropdown = false
+                                                }) {
+                                                RefreshRateDropdownItem("Default", reason = 0)
+                                                for (i in 1..getFPSCount()) {
+                                                    RefreshRateDropdownItem(
+                                                        "${getfpsbyid(i)} Hz", reason = strToInt(
+                                                            getfpsbyid(i)
+                                                        )
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                ElevatedCard {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
+                    ) {
+                        SwitchItem(
+                            title = stringResource(R.string.fps_monitor_show),
+                            checked = fps_monitor,
+                            summary = if (fps_monitor)
+                                stringResource(R.string.fps_monitor_show_disable)
+                            else
+                                stringResource(R.string.fps_monitor_show_enable)
+                        ) {
+                            prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, it).apply()
+                            fps_monitor = it
+                            updateVisible()
+                        }
+                    }
+                }
+
+                if (hasModule(TOUCH_SAMPLE)) {
+                    ElevatedCard {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
+                        ) {
+                            SwitchItem(
+                                title = stringResource(id = R.string.touch_sample),
+                                checked = touch_sample,
+                                summary = stringResource(id = R.string.touch_sample_sum)
+                            ) {
+                                prefs.edit().putBoolean(SpfConfig.TOUCH_SAMPLE, it).apply()
+                                touch_sample = it
+                                updateVisible()
+                            }
+                        }
+                    }
+                }
+
                 if (getMaxCluster(context) > 3) {
                     ElevatedCard(
                         modifier = Modifier
@@ -599,7 +784,6 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                                         cpu_av_freq(context, 4),
                                         CPU_INFO_MAX
                                     )
-                                    //dialogEvent = DialogEvent(DialogType.CpuPrime, 0, "Choose Freq Cpu Prime", readKernel(2, CPU_AV_FREQ), readKernel(2, CPU_INFO_MAX))
                                 }
                                 .padding(vertical = 10.dp, horizontal = 22.dp)
                         ) {
@@ -658,7 +842,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                                         4,
                                         getModeSelect,
                                         cpu_av_gov(context, 4),
-                                        CPU_GOV
+                                        "$cpu4_gov"
                                     )
                                 }
                                 .padding(vertical = 10.dp, horizontal = 22.dp)
@@ -768,7 +952,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                                         3,
                                         getModeSelect,
                                         cpu_av_gov(context, 3),
-                                        CPU_GOV
+                                        "$cpu3_gov"
                                     )
                                 }
                                 .padding(vertical = 10.dp, horizontal = 22.dp)
@@ -878,7 +1062,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                                         2,
                                         getModeSelect,
                                         cpu_av_gov(context, 2),
-                                        CPU_GOV
+                                        "$cpu2_gov"
                                     )
                                 }
                                 .padding(vertical = 10.dp, horizontal = 22.dp)
@@ -972,7 +1156,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                                 .fillMaxWidth()
                                 .clickable {
                                     getModeSelect = 2
-                                    setCpu("Choose Governor Cpu Little", 1, getModeSelect, cpu_av_gov(context, 1), CPU_GOV)
+                                    setCpu("Choose Governor Cpu Little", 1, getModeSelect, cpu_av_gov(context, 1), "$cpu1_gov")
                                 }
                                 .padding(vertical = 10.dp, horizontal = 22.dp)
                         ) {
@@ -994,7 +1178,6 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                         }
                     }
                 }
-
                 ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1222,6 +1405,212 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                         )
                     }
                 }
+
+                if (hasModule(SOUND_CONTROL)) {
+                    ElevatedCard {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(start = 16.dp, top = 5.dp),
+                                text = stringResource(id = R.string.microphone_gain)
+                            )
+                            Box (
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(start = 9.dp, end = 22.dp),
+                            ){
+                                Slider(
+                                    modifier = Modifier
+                                        .padding(end = 30.dp),
+                                    value = seek_microfon,
+                                    onValueChange = {
+                                        prefs.edit().putFloat(SpfConfig.SC_MICROFON, it).apply()
+                                        seek_microfon = it
+                                        updateVisible()
+                                    },
+                                    colors = SliderDefaults.colors(
+                                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                                        inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.4f
+                                        )
+                                    ),
+                                    thumb = {
+                                        SliderDefaults.Thumb(interactionSource = remember {
+                                            MutableInteractionSource()
+                                        },
+                                            thumbSize = DpSize(20.dp, 20.dp),
+                                            colors = SliderDefaults.colors(
+                                                thumbColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        )
+                                    }
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd)
+                                        .padding(bottom = 1.dp),
+                                    text = "${(seek_microfon * 100).toInt() * 20 / 100}")
+                            }
+
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Text(
+                                modifier = Modifier
+                                    .padding(start = 16.dp, top = 5.dp),
+                                text = stringResource(id = R.string.earpiece_gain)
+                            )
+                            Box (
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(start = 9.dp, end = 22.dp),
+                            ){
+                                Slider(
+                                    modifier = Modifier
+                                        .padding(end = 30.dp),
+                                    value = seek_earfon,
+                                    onValueChange = {
+                                        prefs.edit().putFloat(SpfConfig.SC_EARFON, it).apply()
+                                        seek_earfon = it
+                                        updateVisible()
+                                    },
+                                    colors = SliderDefaults.colors(
+                                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                                        inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.4f
+                                        )
+                                    ),
+                                    thumb = {
+                                        SliderDefaults.Thumb(interactionSource = remember {
+                                            MutableInteractionSource()
+                                        },
+                                            thumbSize = DpSize(20.dp, 20.dp),
+                                            colors = SliderDefaults.colors(
+                                                thumbColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        )
+                                    }
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd)
+                                        .padding(bottom = 1.dp),
+                                    text = "${(seek_earfon * 100).toInt() * 20 / 100}")
+                            }
+
+                            Spacer(modifier = Modifier.height(5.dp))
+                            SwitchItem(
+                                title = stringResource(id = R.string.per_channel_controls),
+                                checked = switch_headfon
+                            ) {
+                                prefs.edit().putBoolean("sc_switch_headfon", it).apply()
+                                switch_headfon = it
+                                if (!switch_headfon) {
+                                    seek_headfon2 = seek_headfon
+                                    prefs.edit()
+                                        .putFloat("sc_headfon2", seek_headfon2)
+                                        .apply()
+                                }
+                                updateVisible()
+                            }
+                            Text(
+                                modifier = Modifier
+                                    .padding(start = 16.dp),
+                                text = if (switch_headfon) stringResource(id = R.string.headphone_gain_left) else stringResource(id = R.string.headphone_gain)
+                            )
+                            Box (
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(start = 9.dp, end = 22.dp),
+                            ){
+                                Slider(
+                                    modifier = Modifier
+                                        .padding(end = 30.dp),
+                                    value = seek_headfon,
+                                    onValueChange = {
+                                        prefs.edit().putFloat(SpfConfig.SC_HEADFON, it).apply()
+                                        if (!switch_headfon) {
+                                            prefs.edit()
+                                                .putFloat(SpfConfig.SC_HEADFON2, it)
+                                                .apply()
+                                            seek_headfon2 = it
+                                        }
+                                        seek_headfon = it
+                                        updateVisible()
+                                    },
+                                    colors = SliderDefaults.colors(
+                                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                                        inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.4f
+                                        )
+                                    ),
+                                    thumb = {
+                                        SliderDefaults.Thumb(interactionSource = remember {
+                                            MutableInteractionSource()
+                                        },
+                                            thumbSize = DpSize(20.dp, 20.dp),
+                                            colors = SliderDefaults.colors(
+                                                thumbColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        )
+                                    }
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd)
+                                        .padding(bottom = 1.dp),
+                                    text = "${(seek_headfon * 100).toInt() * 20 / 100}")
+                            }
+
+                            if (switch_headfon) {
+                                Text(
+                                    modifier = Modifier
+                                        .padding(start = 16.dp),
+                                    text = stringResource(id = R.string.headphone_gain_right)
+                                )
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                        .padding(start = 9.dp, end = 22.dp),
+                                ) {
+                                    Slider(
+                                        modifier = Modifier
+                                            .padding(end = 30.dp),
+                                        value = seek_headfon2,
+                                        onValueChange = {
+                                            prefs.edit()
+                                                .putFloat(SpfConfig.SC_HEADFON2, it)
+                                                .apply()
+                                            seek_headfon2 = it
+                                            updateVisible()
+                                        },
+                                        colors = SliderDefaults.colors(
+                                            activeTrackColor = MaterialTheme.colorScheme.primary,
+                                            inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
+                                                alpha = 0.4f
+                                            )
+                                        ),
+                                        thumb = {
+                                            SliderDefaults.Thumb(
+                                                interactionSource = remember {
+                                                    MutableInteractionSource()
+                                                },
+                                                thumbSize = DpSize(20.dp, 20.dp),
+                                                colors = SliderDefaults.colors(
+                                                    thumbColor = MaterialTheme.colorScheme.primary
+                                                )
+                                            )
+                                        }
+                                    )
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterEnd)
+                                            .padding(bottom = 1.dp),
+                                        text = "${(seek_headfon2 * 100).toInt() * 20 / 100}"
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -1231,15 +1620,16 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun TopBar(
     onBack: () -> Unit,
-    onResetClick: () -> Unit,
+    appInfo: PerAppViewModel.AppInfo,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    borderVisible: Boolean
+    borderVisible: Boolean,
+    visibleReset: Boolean,
+    titleReset: String,
+    onClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
-    val get_profile_position by rememberSaveable {
-        mutableStateOf(prefs.getInt(SpfConfig.PROFILE_MODE, 0))
-    }
+    val packageName = appInfo.packageName
+
     Box(modifier = Modifier
         .fillMaxWidth()
     ) {
@@ -1263,18 +1653,24 @@ private fun TopBar(
         }
         TopAppBar(
             title = {
-                Text(
-                    "${stringResource(R.string.power_profile)} : ${
-                        if (get_profile_position == 1)
-                            stringResource(R.string.performance)
-                        else if (get_profile_position == 2)
-                            stringResource(R.string.game)
-                        else if (get_profile_position == 4)
-                            stringResource(R.string.battery)
-                        else
-                            stringResource(R.string.balance)
-                    }"
-                )
+                val appIcon: @Composable () -> Unit = {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context).data(appInfo.packageInfo).crossfade(true).build(),
+                        contentDescription = appInfo.label,
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .width(48.dp)
+                            .height(48.dp)
+                    )
+                }
+                AppMenuBox(packageName) {
+                    ListItem(
+                        colors = ListItemDefaults.colors(Color.Transparent),
+                        headlineContent = { Text(appInfo.label) },
+                        supportingContent = { Text(packageName) },
+                        leadingContent = appIcon,
+                    )
+                }
             },
             navigationIcon = {
                 IconButton(
@@ -1282,26 +1678,28 @@ private fun TopBar(
                 ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
             },
             actions = {
-                ElevatedCard(
-                    colors = CardDefaults.elevatedCardColors(containerColor = run {
-                        MaterialTheme.colorScheme.primary
-                    }),
-                    modifier = Modifier
-                        .padding(end = 14.dp)
-                        .clickable {
-                            onResetClick()
-                        },
-                ) {
-                    Row(
+                if (visibleReset) {
+                    ElevatedCard(
+                        colors = CardDefaults.elevatedCardColors(containerColor = run {
+                            MaterialTheme.colorScheme.primary
+                        }),
                         modifier = Modifier
-                            .padding(vertical = 6.dp, horizontal = 15.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(end = 14.dp)
+                            .clickable {
+                                onClick()
+                            },
                     ) {
-                        Text(
-                            text = stringResource(R.string.reset),
-                            style = MaterialTheme.typography.titleSmall,
-                            textAlign = TextAlign.Center
-                        )
+                        Row(
+                            modifier = Modifier
+                                .padding(vertical = 6.dp, horizontal = 15.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = titleReset,
+                                style = MaterialTheme.typography.titleSmall,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
             },
@@ -1321,24 +1719,65 @@ private fun TopBar(
     }
 }
 
-data class DialogEvent(
-    val type: DialogType,
-    val cpu: Int,
-    val mode: Int,
-    val title: String,
-    val value: String,
-    val selected: String
-)
+@SuppressLint("UnusedBoxWithConstraintsScope")
+@Composable
+private fun AppMenuBox(packageName: String, content: @Composable () -> Unit) {
 
-enum class DialogType {
-    Cpu,
-    Gpu,
-    Io,
-    Thermal,
+    var expanded by remember { mutableStateOf(false) }
+    var touchPoint: Offset by remember { mutableStateOf(Offset.Zero) }
+    val density = LocalDensity.current
+
+    BoxWithConstraints(
+        Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    touchPoint = it
+                    expanded = true
+                }
+            }
+    ) {
+
+        content()
+
+        val (offsetX, offsetY) = with(density) {
+            (touchPoint.x.toDp()) to (touchPoint.y.toDp())
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            offset = DpOffset(offsetX, -offsetY),
+            onDismissRequest = {
+                expanded = false
+            },
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.launch_app)) },
+                onClick = {
+                    expanded = false
+                    launchApp(packageName)
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.force_stop_app)) },
+                onClick = {
+                    expanded = false
+                    forceStopApp(packageName)
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.restart_app)) },
+                onClick = {
+                    expanded = false
+                    restartApp(packageName)
+                },
+            )
+        }
+    }
 }
 
 @Preview
 @Composable
-private fun KernelPreview() {
-    PerfeditScreen(EmptyDestinationsNavigator)
+private fun AppPerProfilePreview() {
 }
+
