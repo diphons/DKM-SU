@@ -126,10 +126,10 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
     val scope = rememberCoroutineScope()
     val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
 
+    viewModel.sortAToZ = prefs.getBoolean("module_sort_a_to_z", true)
+    viewModel.sortZToA = prefs.getBoolean("module_sort_z_to_a", false)
     LaunchedEffect(Unit) {
         if (viewModel.moduleList.isEmpty() || viewModel.isNeedRefresh) {
-            viewModel.sortAToZ = prefs.getBoolean("module_sort_a_to_z", true)
-            viewModel.sortZToA = prefs.getBoolean("module_sort_z_to_a", false)
             viewModel.fetchModuleList()
         }
     }
