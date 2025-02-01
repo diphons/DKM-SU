@@ -937,6 +937,7 @@ fun setChgMax(preferences: SharedPreferences, value: Int, position: Int){
 fun getThermalString(context: Context, posisi: Int, gki: Boolean): String {
     if (gki) {
         return when (posisi) {
+            19 -> context.getString(R.string.game)
             6 -> context.getString(R.string.performance)
             1 -> context.getString(R.string.battery)
             else -> context.getString(R.string.balance)
@@ -960,7 +961,9 @@ fun getThermalString(context: Context, posisi: Int, gki: Boolean): String {
 
 fun getThermalInt(context: Context, value: String, gki: Boolean): Int {
     if (gki) {
-        return if (value.contains(context.getString(R.string.performance)))
+        return if (value.contains(context.getString(R.string.game)))
+            19
+        else if (value.contains(context.getString(R.string.battery)))
             6
         else if (value.contains(context.getString(R.string.battery)))
             1
@@ -996,7 +999,7 @@ fun getDefThermalProfile(profile: Int, gki: Boolean): Int{
     if (gki) {
         return when (profile) {
             1 -> 6
-            2 -> 6
+            2 -> 19
             3 -> 6
             4 -> 1
             else -> 0
@@ -1014,7 +1017,7 @@ fun getDefThermalProfile(profile: Int, gki: Boolean): Int{
 
 fun thermalList(context: Context, gki: Boolean): String{
     if (gki) {
-        return "${context.getString(R.string.performance)};${context.getString(R.string.battery)};${context.getString(R.string.balance)}"
+        return "${context.getString(R.string.performance)};${context.getString(R.string.game)};${context.getString(R.string.battery)};${context.getString(R.string.balance)}"
     } else {
         return "${context.getString(R.string.evaluation)};${context.getString(R.string.class_0)};${
             context.getString(
