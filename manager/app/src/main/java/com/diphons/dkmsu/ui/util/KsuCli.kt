@@ -47,7 +47,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import org.json.JSONArray
 import java.io.File
+import java.time.Duration
 import java.util.TreeMap
+import java.util.concurrent.TimeUnit
 
 /**
  * @author weishu
@@ -61,6 +63,10 @@ private fun ksuDaemonMagicPath(): String {
 
 private fun ksuDaemonOverlayfsPath(): String {
     return ksuApp.applicationInfo.nativeLibraryDir + File.separator + "libksud_overlayfs.so"
+}
+
+private fun dkmsvcDaemonPath(): String {
+    return ksuApp.applicationInfo.nativeLibraryDir + File.separator + "libdkmsvc.so"
 }
 
 // Get the path based on the user's choice
@@ -1754,15 +1760,59 @@ var FPSActive = false
 fun restartDkmSVC(context: Context){
     val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
     val hash = RootUtils.runAndGetOutput("data=$(dkmsvc hash); echo \${data% *}")
+    val pool = SingleSchedulePool()
     if (!prefs.getString("dkmsvc_hash", "")!!.contains(hash)) {
         prefs.edit().putString("dkmsvc_hash", hash).apply()
         RootUtils.runCommand("setprop init.dkmsvc.exit 1")
-        for (i in 0 .. 50) {
-            if (i >= 50) {
-                install_dkmsvc()
-                RootUtils.runCommand("setprop init.dkmsvc.exit 0")
-                startSVC()
-            }
+        pool.delay(2, TimeUnit.SECONDS) {
+            install_dkmsvc()
+            RootUtils.runCommand("setprop init.dkmsvc.exit 0")
+            startSVC()
         }
+        pool.shutdown()
     }
+}
+
+var forceReloadWlList = true
+var genWlList = ""
+fun getwakelockList(): String {
+    if (genWlList.isEmpty()) {
+        val shell = getRootShell()
+        val out =
+            shell.newJob().add("${dkmsvcDaemonPath()} wakelock read").to(ArrayList(), null).exec().out
+        genWlList = out.joinToString("\n").ifBlank { "[]" }
+    }
+    return genWlList
+}
+
+@SuppressLint("DefaultLocale")
+fun wakelockTimesFormat(millis: Long): String {
+    val duration = Duration.ofMillis(millis)
+    val hours = duration.toHours()
+    val minutes = duration.toMinutes() % 60
+    val seconds = duration.seconds % 60
+    if (hours > 0)
+        return String.format(if (hours < 10L) "%01d" + "h " else "%02d" + "h " + if (minutes < 10L) "%01d" + "m "  else "%02d" + "m " + if (seconds < 10L) "%01d" + "s" else "%02d" + "s", hours, minutes, seconds)
+    else if (minutes > 0)
+        return String.format(if (minutes < 10L) "%01d" + "m "  else "%02d" + "m " + if (seconds < 10L) "%01d" + "s" else "%02d" + "s", minutes, seconds)
+    return String.format(if (seconds < 10L) "%01d" + "s" else "%02d" + "s", seconds)
+}
+
+fun setWLBlocker(context: Context) {
+    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    if (prefs.getString(SpfConfig.WAKELOCK_BLOCKER, "")!!.isEmpty())
+        prefs.edit().putString(SpfConfig.WAKELOCK_BLOCKER, getWakelockBlockDef()).apply()
+    // Set Wakelock Blocker
+    setKernel(getWakelockBlockDef(), BOEFFLA_WL_BLOCKER)
+    // Clear Default Wakelock Blocker
+    setKernel("", BOEFFLA_WL_BLOCKER_DEFAULT)
+}
+
+var getWLBlocker = ""
+fun getWakelockBlockDef(): String{
+    if (getWLBlocker.isEmpty())
+        getWLBlocker = RootUtils.runAndGetOutput("cat $BOEFFLA_WL_BLOCKER_DEFAULT")
+    if (getWLBlocker.isEmpty())
+        getWLBlocker = RootUtils.runAndGetOutput("cat $BOEFFLA_WL_BLOCKER")
+    return getWLBlocker
 }

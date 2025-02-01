@@ -297,4 +297,11 @@
     <string name="health">Sağlık</string>
     <string name="per_app">Başına-App Profil</string>
     <string name="per_app_sum">Kullanımınız için uygulama başına profiller ayarlayın</string>
+    <string name="wakelock_sum">Wakelock listesini görüntüle veya engelle - desteklendiğinde wakelock\'ların engellemesini kaldır</string>
+    <string name="wakelock_active">activated</string>
+    <string name="wakelock_abort">abort suspend</string>
+    <string name="wakelock_times">active times</string>
+    <string name="wakelock_block">blocked</string>
+    <string name="wakelock_btn_block">Block</string>
+    <string name="wakelock_btn_unblock">Unblock</string>
 </resources>

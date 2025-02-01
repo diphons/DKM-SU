@@ -297,4 +297,11 @@
     <string name="health">Kesehatan</string>
     <string name="per_app">Profil Per-App</string>
     <string name="per_app_sum">Atur profile per-app untuk anda gunakan</string>
+    <string name="wakelock_sum">Lihat daftar wakelock atau blokir - buka blokir wakelock saat didukung</string>
+    <string name="wakelock_active">diaktifkan</string>
+    <string name="wakelock_abort">batalkan suspend</string>
+    <string name="wakelock_times">waktu aktif</string>
+    <string name="wakelock_block">diblokir</string>
+    <string name="wakelock_btn_block">Blokir</string>
+    <string name="wakelock_btn_unblock">Buka blokir</string>
 </resources>

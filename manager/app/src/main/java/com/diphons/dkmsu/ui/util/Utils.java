@@ -105,6 +105,8 @@ public class Utils {
     public static String TOUCH_DEV = "/sys/devices/virtual/touch/touch_dev";
     public static String DATA_DATA = "/data/data";
     public static Boolean AV_INTERNET = false;
+    public static String BOEFFLA_WL_BLOCKER = "/sys/class/misc/boeffla_wakelock_blocker/wakelock_blocker";
+    public static String BOEFFLA_WL_BLOCKER_DEFAULT = "/sys/class/misc/boeffla_wakelock_blocker/wakelock_blocker_default";
 
     public static String UFS_HEALTH = "/sys/devices/platform/soc/1d84000.ufshc/health_descriptor/life_time_estimation_a";
 
@@ -323,5 +325,19 @@ public class Utils {
 
     public static void clearEndData(Context context){
         RootUtils.runCommand("path=/data/data/" + context.getPackageName() + "/shared_prefs/game_ai.xml; sed -i 's/&#10;    //g' $path; sed -i 's/&#10;</</g' $path");
+    }
+
+    /*
+     * name : name of wakelock
+     * active : active count wakelock
+     * abort : count abort suspend
+     * times : times all wakelock
+     */
+    public static String parseWakelock(String value, String param) {
+        String getStart = value.replace(param + ": ", "=");
+        getStart = getStart.replaceAll(".+=", "");
+        if (getStart.contains(","))
+            getStart = getStart.substring(0, getStart.indexOf(","));
+        return getStart;
     }
 }

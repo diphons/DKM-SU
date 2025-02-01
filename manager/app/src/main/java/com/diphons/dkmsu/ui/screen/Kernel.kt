@@ -76,7 +76,7 @@ import com.ramcosta.composedestinations.generated.destinations.DisplayScreenDest
 import com.ramcosta.composedestinations.generated.destinations.PowerScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.PerfmodeScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MiscScreenDestination
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.ramcosta.composedestinations.generated.destinations.WakelocksScreenDestination
 
 /**
  * @author diphons
@@ -497,6 +497,38 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                         Spacer(Modifier.height(4.dp))
                         Text(
                             text = stringResource(R.string.misc_sum),
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null
+                    )
+                }
+            }
+            ElevatedCard {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            forceReloadWlList = true
+                            navigator.navigate(WakelocksScreenDestination)
+                        }
+                        .padding(23.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column (modifier = Modifier
+                        .weight(3f)
+                    ){
+                        Text(
+                            text = "Wakelocks",
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.wakelock_sum),
                             fontSize = 13.sp,
                             style = MaterialTheme.typography.bodyMedium
                         )

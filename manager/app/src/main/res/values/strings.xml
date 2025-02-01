@@ -320,4 +320,11 @@
     <string name="health">Health</string>
     <string name="per_app">Per-App Profile</string>
     <string name="per_app_sum">Set per-app profiles for your use</string>
+    <string name="wakelock_sum">View wakelock list or block - unblock wakelock when supported</string>
+    <string name="wakelock_active">activated</string>
+    <string name="wakelock_abort">abort suspend</string>
+    <string name="wakelock_times">active times</string>
+    <string name="wakelock_block">blocked</string>
+    <string name="wakelock_btn_block">Block</string>
+    <string name="wakelock_btn_unblock">Unblock</string>
 </resources>

@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import com.diphons.dkmsu.ui.component.KeepShellPublic
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.RootUtils
+import com.diphons.dkmsu.ui.util.Utils.BOEFFLA_WL_BLOCKER
 import com.diphons.dkmsu.ui.util.Utils.CHG_CUR_MAX
 import com.diphons.dkmsu.ui.util.Utils.DISPLAY_BLUE
 import com.diphons.dkmsu.ui.util.Utils.DISPLAY_CONTRAST
@@ -41,6 +42,7 @@ import com.diphons.dkmsu.ui.util.runSVCWorker
 import com.diphons.dkmsu.ui.util.setGameList
 import com.diphons.dkmsu.ui.util.setKernel
 import com.diphons.dkmsu.ui.util.setProfile
+import com.diphons.dkmsu.ui.util.setWLBlocker
 import com.diphons.dkmsu.ui.util.setXiaomiTouch
 
 class BootWorker(context : Context, params : WorkerParameters) : Worker(context,params) {
@@ -77,16 +79,10 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
         if (hasModule(HAPTIC_LEVEL)) {
             setKernel("${(globalConfig.getFloat(SpfConfig.HAPTIC_LEVEL, 0.8f) * 100).toInt()}", HAPTIC_LEVEL)
         }
-        if (hasModule(DT2W) || hasModule(DT2W_LEGACY)) {
-            if (globalConfig.getBoolean(SpfConfig.DT2W, getDefDT2W())) {
-                setKernel("1", DT2W)
-            }
-        }
-        if (hasModule(TOUCH_SAMPLE)) {
-            if (globalConfig.getBoolean(SpfConfig.TOUCH_SAMPLE, false)) {
-                setKernel("1", TOUCH_SAMPLE)
-            }
-        }
+        if ((hasModule(DT2W) || hasModule(DT2W_LEGACY)) && globalConfig.getBoolean(SpfConfig.DT2W, getDefDT2W()))
+            setKernel("1", DT2W)
+        if (hasModule(TOUCH_SAMPLE) && globalConfig.getBoolean(SpfConfig.TOUCH_SAMPLE, false))
+            setKernel("1", TOUCH_SAMPLE)
         if (hasModule(SOUND_CONTROL)) {
             setKernel("${(globalConfig.getFloat(SpfConfig.SC_MICROFON, 0f) * 100).toInt() * 20 / 100}", MICROPHONE_GAIN)
             setKernel("${(globalConfig.getFloat(SpfConfig.SC_EARFON, 0f) * 100).toInt() * 20 / 100}", EARPIECE_GAIN)
@@ -145,23 +141,16 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
         } else {
             setKernel("${globalConfig.getInt(SpfConfig.CHG_MAX_CUR_PROF, getCurrentCharger())}", CHG_CUR_MAX)
         }
-        if (hasModule(SKIP_THERMAL)) {
-            if (globalConfig.getBoolean(SpfConfig.SKIP_THERMAL, false))
-                setKernel("1", SKIP_THERMAL)
-        }
-        if (hasModule(FCHG_SYS)) {
-            if (globalConfig.getBoolean(SpfConfig.FAST_CHARGING, false))
-                setKernel("1", FCHG_SYS)
-        }
-        if (hasModule(NIGHT_CHARGING)) {
-            if (globalConfig.getBoolean(SpfConfig.NIGHT_CHARGING, false))
-                setKernel("1", NIGHT_CHARGING)
-        }
-        if (hasModule(STEP_CHARGING)) {
-            if (globalConfig.getBoolean(SpfConfig.STEP_CHARGING, false))
-                setKernel("1", STEP_CHARGING)
-        }
-
+        if (hasModule(SKIP_THERMAL) && globalConfig.getBoolean(SpfConfig.SKIP_THERMAL, false))
+            setKernel("1", SKIP_THERMAL)
+        if (hasModule(FCHG_SYS) && globalConfig.getBoolean(SpfConfig.FAST_CHARGING, false))
+            setKernel("1", FCHG_SYS)
+        if (hasModule(NIGHT_CHARGING) && globalConfig.getBoolean(SpfConfig.NIGHT_CHARGING, false))
+            setKernel("1", NIGHT_CHARGING)
+        if (hasModule(STEP_CHARGING) && globalConfig.getBoolean(SpfConfig.STEP_CHARGING, false))
+            setKernel("1", STEP_CHARGING)
+        if (hasModule(BOEFFLA_WL_BLOCKER))
+            setWLBlocker(applicationContext)
         // Start DKM Service
         runSVCWorker(applicationContext, "")
 

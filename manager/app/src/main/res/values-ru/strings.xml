@@ -297,4 +297,11 @@
     <string name="health">Здоровье</string>
     <string name="per_app">Профиль Per-App</string>
     <string name="per_app_sum">Установите профили для каждого приложения для вашего использования</string>
+    <string name="wakelock_sum">Просмотр списка блокировок сна или блокировка — разблокировка блокировок сна, если поддерживается</string>
+    <string name="wakelock_active">activated</string>
+    <string name="wakelock_abort">abort suspend</string>
+    <string name="wakelock_times">active times</string>
+    <string name="wakelock_block">blocked</string>
+    <string name="wakelock_btn_block">Block</string>
+    <string name="wakelock_btn_unblock">Unblock</string>
 </resources>

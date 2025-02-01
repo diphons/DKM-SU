@@ -297,4 +297,11 @@
     <string name="health">健康</string>
     <string name="per_app">每个应用程序的配置文件</string>
     <string name="per_app_sum">设置每个应用程序的配置文件以供您使用</string>
+    <string name="wakelock_sum">查看唤醒锁列表或阻止 - 在支持时解除阻止唤醒锁</string>
+    <string name="wakelock_active">活性</string>
+    <string name="wakelock_abort">中止暂停</string>
+    <string name="wakelock_times">活跃时间</string>
+    <string name="wakelock_block">受阻</string>
+    <string name="wakelock_btn_block">堵塞</string>
+    <string name="wakelock_btn_unblock">解除封锁</string>
 </resources>
