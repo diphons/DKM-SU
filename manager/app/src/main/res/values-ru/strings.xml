@@ -304,4 +304,14 @@
     <string name="wakelock_block">blocked</string>
     <string name="wakelock_btn_block">Block</string>
     <string name="wakelock_btn_unblock">Unblock</string>
+    <string name="battery_status">Состояние батареи</string>
+    <string name="battery_status_sum">Показывать состояние батареи в уведомлении</string>
+    <string name="full_charging">Полностью заряжен</string>
+    <string name="turbo">Турбо</string>
+    <string name="fast">Быстрый</string>
+    <string name="charging">Зарядка</string>
+    <string name="slowly">Медленно</string>
+    <string name="not_charging">Не заряжается</string>
+    <string name="discharging">Разрядка</string>
+    <string name="unknown">Неизвестный</string>
 </resources>

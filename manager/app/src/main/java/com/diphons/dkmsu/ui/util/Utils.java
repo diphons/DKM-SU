@@ -2,9 +2,9 @@ package com.diphons.dkmsu.ui.util;
 
 import static android.content.ContentValues.TAG;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,9 +17,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.VectorDrawable;
+import android.hardware.display.DisplayManager;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Display;
+
+import com.diphons.dkmsu.R;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
@@ -327,17 +332,46 @@ public class Utils {
         RootUtils.runCommand("path=/data/data/" + context.getPackageName() + "/shared_prefs/game_ai.xml; sed -i 's/&#10;    //g' $path; sed -i 's/&#10;</</g' $path");
     }
 
-    /*
-     * name : name of wakelock
-     * active : active count wakelock
-     * abort : count abort suspend
-     * times : times all wakelock
-     */
-    public static String parseWakelock(String value, String param) {
-        String getStart = value.replace(param + ": ", "=");
-        getStart = getStart.replaceAll(".+=", "");
-        if (getStart.contains(","))
-            getStart = getStart.substring(0, getStart.indexOf(","));
-        return getStart;
+    public static Notification notificationbs;
+    public static final int NOTIF_ID_BS=80;
+
+    public static String getStatusString(int status, int value, Context context) {
+        String statusString = context.getString(R.string.unknown);
+
+        switch (status) {
+            case BatteryManager.BATTERY_STATUS_CHARGING:
+                if (value > 4000) {
+                    statusString = context.getString(R.string.turbo);
+                } else if (value >= 2500) {
+                    statusString = context.getString(R.string.fast);
+                } else if (value >= 1500) {
+                    statusString = context.getString(R.string.charging);
+                } else if (value >= 1) {
+                    statusString = context.getString(R.string.slowly);
+                } else {
+                    statusString = context.getString(R.string.not_charging);
+                }
+                break;
+            case BatteryManager.BATTERY_STATUS_DISCHARGING:
+                statusString = context.getString(R.string.discharging);
+                break;
+            case BatteryManager.BATTERY_STATUS_FULL:
+                statusString = context.getString(R.string.full_charging);
+                break;
+            case BatteryManager.BATTERY_STATUS_NOT_CHARGING:
+                statusString = context.getString(R.string.not_charging);
+                break;
+        }
+        return statusString;
+    }
+
+    public static boolean getScreenState(Context context) {
+        DisplayManager dm = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
+        for (Display display : dm.getDisplays()) {
+            if (display.getState() != Display.STATE_OFF) {
+                return true;
+            }
+        }
+        return false;
     }
 }

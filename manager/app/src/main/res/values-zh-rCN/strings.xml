@@ -304,4 +304,14 @@
     <string name="wakelock_block">受阻</string>
     <string name="wakelock_btn_block">堵塞</string>
     <string name="wakelock_btn_unblock">解除封锁</string>
+    <string name="battery_status">电池状态</string>
+    <string name="battery_status_sum">在通知中显示电池状态</string>
+    <string name="full_charging">充满电</string>
+    <string name="turbo">涡轮</string>
+    <string name="fast">快速地</string>
+    <string name="charging">收费</string>
+    <string name="slowly">慢慢地</string>
+    <string name="not_charging">未充电</string>
+    <string name="discharging">放电</string>
+    <string name="unknown">未知</string>
 </resources>

@@ -75,4 +75,8 @@ public class SpfConfig {
     public static String MONITOR_MINI_RAM = "monitor_mini_ram_percent";
     public static String MONITOR_MINI_INITIAL_X = "initial_x";
     public static String MONITOR_MINI_INITIAL_Y = "initial_y";
+    public static String CURRENT_NOW_UNIT = "global_current_now_unit";
+    public static int CURRENT_NOW_UNIT_DEFAULT = -1000;
+    public static String BATTERY_NOTIF = "battery_notif";
+    public static String BATTERY_NOTIF_STATUS = "battery_notif_status";
 }

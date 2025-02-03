@@ -304,4 +304,14 @@
     <string name="wakelock_block">blocked</string>
     <string name="wakelock_btn_block">Block</string>
     <string name="wakelock_btn_unblock">Unblock</string>
+    <string name="battery_status">Pil Durumu</string>
+    <string name="battery_status_sum">Bildirimde pil durumunu göster</string>
+    <string name="full_charging">Tam şarjlı</string>
+    <string name="turbo">Turbo</string>
+    <string name="fast">Hızlı</string>
+    <string name="charging">Şarj etme</string>
+    <string name="slowly">Yavaşça</string>
+    <string name="not_charging">Şarj olmuyor</string>
+    <string name="discharging">Boşaltma</string>
+    <string name="unknown">Bilinmeyen</string>
 </resources>

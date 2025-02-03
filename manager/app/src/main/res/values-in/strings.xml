@@ -304,4 +304,14 @@
     <string name="wakelock_block">diblokir</string>
     <string name="wakelock_btn_block">Blokir</string>
     <string name="wakelock_btn_unblock">Buka blokir</string>
+    <string name="battery_status">Status Baterai</string>
+    <string name="battery_status_sum">Tampilkan status baterai dalam notifikasi</string>
+    <string name="full_charging">Terisi penuh</string>
+    <string name="turbo">Turbo</string>
+    <string name="fast">Cepat</string>
+    <string name="charging">Mengisi</string>
+    <string name="slowly">Lambat</string>
+    <string name="not_charging">Tidak Mengisi</string>
+    <string name="discharging">Pemakaian</string>
+    <string name="unknown">Tidak dikenal</string>
 </resources>

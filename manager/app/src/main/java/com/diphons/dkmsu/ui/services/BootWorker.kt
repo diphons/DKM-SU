@@ -151,6 +151,8 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
             setKernel("1", STEP_CHARGING)
         if (hasModule(BOEFFLA_WL_BLOCKER))
             setWLBlocker(applicationContext)
+        if (globalConfig.getBoolean(SpfConfig.BATTERY_NOTIF, false))
+            RootUtils.runCommand("setprop init.dkmsvc.cmd battery")
         // Start DKM Service
         runSVCWorker(applicationContext, "")
 

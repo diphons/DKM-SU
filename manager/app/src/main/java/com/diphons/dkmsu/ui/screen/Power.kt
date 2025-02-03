@@ -61,6 +61,7 @@ import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.SwitchItem
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.store.*
+import com.diphons.dkmsu.ui.util.RootUtils
 import com.diphons.dkmsu.ui.util.Utils.CHG_CUR_MAX
 import com.diphons.dkmsu.ui.util.Utils.DYNAMIC_CHARGING
 import com.diphons.dkmsu.ui.util.getCurrentCharger
@@ -490,6 +491,28 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                                 fontSize = 14.sp
                             )
                         }
+                    }
+                }
+            }
+
+            ElevatedCard {
+                var batteryNotif by rememberSaveable {
+                    mutableStateOf(prefs.getBoolean(SpfConfig.BATTERY_NOTIF, false))
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(5.dp)
+                ) {
+                    SwitchItem(
+                        title = stringResource(R.string.battery_status),
+                        checked = batteryNotif,
+                        summary = stringResource(R.string.battery_status_sum)
+                    ) {
+                        prefs.edit().putBoolean(SpfConfig.BATTERY_NOTIF, it).apply()
+                        batteryNotif = it
+                        if (it)
+                            RootUtils.runCommand("setprop init.dkmsvc.cmd battery")
                     }
                 }
             }
