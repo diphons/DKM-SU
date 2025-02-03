@@ -1,5 +1,6 @@
 package com.diphons.dkmsu.ui.services
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.work.Worker
@@ -48,6 +49,7 @@ class ProfileWorker(context : Context, params : WorkerParameters) : Worker(conte
     private lateinit var globalConfig: SharedPreferences
     private lateinit var prefs: SharedPreferences
 
+    @SuppressLint("SuspiciousIndentation")
     override fun doWork(): Result {
         globalConfig = applicationContext.getSharedPreferences("settings", Context.MODE_PRIVATE)
         val perf_mode = globalConfig.getBoolean(SpfConfig.PERF_MODE, true)
