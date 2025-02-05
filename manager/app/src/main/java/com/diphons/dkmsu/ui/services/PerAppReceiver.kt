@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import com.diphons.dkmsu.ui.popup.FPSMonitor
 import com.diphons.dkmsu.ui.store.SpfConfig
+import com.diphons.dkmsu.ui.util.FPSActive
 import com.diphons.dkmsu.ui.util.RootUtils
 import com.diphons.dkmsu.ui.util.Utils
 import com.diphons.dkmsu.ui.util.onFocusedApp
@@ -22,8 +23,11 @@ class PerAppReceiver : BroadcastReceiver() {
             prefs = context.getSharedPreferences(onFocusedApp, Context.MODE_PRIVATE)
 
             if (prefs.getBoolean(SpfConfig.MONITOR_MINI, false))
-                FPSMonitor(context).showPopupWindow()
-            else if (globalSPF.getBoolean(SpfConfig.MONITOR_MINI, false))
+                FPSActive = true
+            else
+                FPSActive = false
+
+            if (prefs.getBoolean(SpfConfig.MONITOR_MINI, false) || globalSPF.getBoolean(SpfConfig.MONITOR_MINI, false))
                 FPSMonitor(context).showPopupWindow()
             else
                 FPSMonitor(context).hidePopupWindow()
