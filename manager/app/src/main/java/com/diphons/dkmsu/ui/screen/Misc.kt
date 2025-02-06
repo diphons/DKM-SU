@@ -3,7 +3,6 @@ package com.diphons.dkmsu.ui.screen
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,7 +50,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -86,7 +84,6 @@ import com.diphons.dkmsu.ui.util.startPIFWorker
 import com.diphons.dkmsu.ui.util.startSVC
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.SuSFSScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import kotlinx.coroutines.delay
@@ -462,57 +459,6 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                                     )
                                 }
                             }
-                        }
-                    }
-                }
-                ElevatedCard (
-                    colors = CardDefaults.elevatedCardColors(containerColor = run {
-                        if (dkm_service.contains("Not"))
-                            MaterialTheme.colorScheme.secondaryContainer
-                        else
-                            CardDefaults.elevatedCardColors().containerColor
-                    }),
-                ){
-                    Row(
-                        modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            if (!dkm_service.contains("Not")) {
-                                navigator.navigate(SuSFSScreenDestination)
-                            }
-                        }
-                        .padding(23.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (dkm_service.contains("Not")) {
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                text = stringResource(R.string.dkm_service),
-                                fontSize = 15.sp,
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.titleSmall
-                            )
-                        } else {
-                            Column (modifier = Modifier
-                                .weight(3f)
-                            ){
-                                Text(
-                                    text = stringResource(R.string.custom_susfs_settings),
-                                    fontSize = 15.sp,
-                                    style = MaterialTheme.typography.titleSmall
-                                )
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    text = stringResource(R.string.custom_susfs_settings_sum),
-                                    fontSize = 13.sp,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                contentDescription = null
-                            )
                         }
                     }
                 }

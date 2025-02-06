@@ -71,7 +71,6 @@ import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.SearchAppBar
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.store.*
-import com.diphons.dkmsu.ui.util.RootUtils
 import com.diphons.dkmsu.ui.util.Utils.BOEFFLA_WL_BLOCKER
 import com.diphons.dkmsu.ui.util.forceReloadWlList
 import com.diphons.dkmsu.ui.util.genWlList
@@ -94,10 +93,6 @@ fun WakelocksScreen(navigator: DestinationsNavigator) {
     viewModel.sortZToA = prefs.getBoolean("wakelock_sort_z_to_a", false)
 
     if (forceReloadWlList) {
-        if (RootUtils.runAndGetOutput("getprop init.dkmsvc.wl").contains("0")) {
-            RootUtils.runCommand("rm -f /data/data/${context.packageName}/files/wakelock.json")
-            RootUtils.runCommand("setprop init.dkmsvc.wl 1; dkmsvc wakelock file_bg")
-        }
         forceReloadWlList = false
         genWlList = ""
         viewModel.emptyWakelock()

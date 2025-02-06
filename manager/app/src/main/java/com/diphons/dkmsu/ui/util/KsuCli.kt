@@ -1778,11 +1778,11 @@ fun restartDkmSVC(context: Context){
 
 var forceReloadWlList = true
 var genWlList = ""
-fun getwakelockList(): String {
+fun getWakelockList(): String {
     if (genWlList.isEmpty()) {
         val shell = getRootShell()
         val out =
-            shell.newJob().add("${dkmsvcDaemonPath()} wakelock read").to(ArrayList(), null).exec().out
+            shell.newJob().add("${dkmsvcDaemonPath()} wakelock").to(ArrayList(), null).exec().out
         genWlList = out.joinToString("\n").ifBlank { "[]" }
     }
     return genWlList

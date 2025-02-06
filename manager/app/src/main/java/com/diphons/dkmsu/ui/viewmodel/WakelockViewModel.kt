@@ -11,8 +11,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.diphons.dkmsu.ui.util.HanziToPinyin
-import com.diphons.dkmsu.ui.util.RootUtils
-import com.diphons.dkmsu.ui.util.getwakelockList
+import com.diphons.dkmsu.ui.util.getWakelockList
 import com.diphons.dkmsu.ui.util.overlayFsAvailable
 import org.json.JSONArray
 import org.json.JSONObject
@@ -72,10 +71,6 @@ class WakelockViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             isRefreshing = true
 
-            val getStatusLoad = RootUtils.runAndGetOutput("getprop init.dkmsvc.wl").contains("1")
-            if (getStatusLoad)
-                return@launch fetchWakelockList()
-
             val oldWakelockList = wakelock
 
             val start = SystemClock.elapsedRealtime()
@@ -83,7 +78,7 @@ class WakelockViewModel : ViewModel() {
             kotlin.runCatching {
                 isOverlayAvailable = overlayFsAvailable()
 
-                val result = getwakelockList()
+                val result = getWakelockList()
 
                 Log.i(TAG, "result: $result")
 
