@@ -963,7 +963,7 @@ fun getThermalInt(context: Context, value: String, gki: Boolean): Int {
     if (gki) {
         return if (value.contains(context.getString(R.string.game)))
             19
-        else if (value.contains(context.getString(R.string.battery)))
+        else if (value.contains(context.getString(R.string.performance)))
             6
         else if (value.contains(context.getString(R.string.battery)))
             1
