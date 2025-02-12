@@ -132,9 +132,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                                 checked = dt2w,
                                 summary = stringResource(id = R.string.dt2w_summary)
                             ) {
-                                if (getKernelVersion().isGKI()) {
-                                    setXiaomiTouch(it, 14, context)
-                                } else {
+                                if (hasModule(DT2W) || hasModule(DT2W_LEGACY)) {
                                     if (it) {
                                         if (hasModule(DT2W))
                                             setKernel("1", DT2W)
@@ -146,7 +144,8 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                                         else
                                             setKernel("0", DT2W_LEGACY)
                                     }
-                                }
+                                } else if (hasXiaomiDevice())
+                                    setXiaomiTouch(it, 14, context)
                                 prefs.edit().putBoolean(SpfConfig.DT2W, it).apply()
                                 dt2w = it
                             }

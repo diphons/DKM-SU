@@ -489,7 +489,7 @@ fun setXiaomiTouch(active: Boolean, value: Int, context: Context){
         setbol = "enable"
         setbol2 = "1"
     }
-    if (kernelVersion.isGKI()) {
+    if (kernelVersion.isGKI() || kernelVersion.isQGKI()) {
         ShellUtils.fastCmd(shell, "su -c ${getXMPath(context)}-gki --$setbol $value")
         ShellUtils.fastCmd(shell, "su -c ${getXMPath(context)}-gki-aosp --$setbol2 $value")
     } else {
