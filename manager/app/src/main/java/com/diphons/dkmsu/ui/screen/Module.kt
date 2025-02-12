@@ -3,6 +3,7 @@ package com.diphons.dkmsu.ui.screen
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -150,6 +151,8 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
         contract = ActivityResultContracts.StartActivityForResult()
     ) { viewModel.fetchModuleList() }
 
+    // Set mount mode
+    viewModel.setMountMode(prefs.getBoolean(SpfConfig.KSUD_MODE, false))
     var scrollPos by remember { mutableStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -385,7 +388,8 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                         }
                     },
                     context = context,
-                    snackBarHost = snackBarHost
+                    snackBarHost = snackBarHost,
+                    prefs
                 )
             }
         }
@@ -402,7 +406,8 @@ private fun ModuleList(
     onInstallModule: (Uri) -> Unit,
     onClickModule: (id: String, name: String, hasWebUi: Boolean) -> Unit,
     context: Context,
-    snackBarHost: SnackbarHostState
+    snackBarHost: SnackbarHostState,
+    prefs: SharedPreferences
 ) {
     val failedEnable = stringResource(R.string.module_failed_to_enable)
     val failedDisable = stringResource(R.string.module_failed_to_disable)
@@ -578,7 +583,7 @@ private fun ModuleList(
             },
         ) {
             when {
-                !viewModel.isOverlayAvailable -> {
+                prefs.getBoolean(SpfConfig.KSUD_MODE, false) && !viewModel.isOverlayAvailable -> {
                     item {
                         Box(
                             modifier = Modifier.fillParentMaxSize(),

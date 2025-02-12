@@ -48,7 +48,13 @@ class ModuleViewModel : ViewModel() {
         val changelog: String,
     )
 
-    var isOverlayAvailable by mutableStateOf(overlayFsAvailable())
+    var isOverlayFS by mutableStateOf(false)
+
+    fun setMountMode(boolean: Boolean){
+        isOverlayFS = boolean
+    }
+
+    var isOverlayAvailable by mutableStateOf(isOverlayFS)
         private set
 
     var isRefreshing by mutableStateOf(false)
@@ -71,7 +77,6 @@ class ModuleViewModel : ViewModel() {
         }
     }
 
-
     var isNeedRefresh by mutableStateOf(false)
         private set
 
@@ -88,7 +93,8 @@ class ModuleViewModel : ViewModel() {
             val start = SystemClock.elapsedRealtime()
 
             kotlin.runCatching {
-                isOverlayAvailable = overlayFsAvailable()
+                if (isOverlayFS)
+                    isOverlayAvailable = overlayFsAvailable()
                 
                 val result = listModules()
 
