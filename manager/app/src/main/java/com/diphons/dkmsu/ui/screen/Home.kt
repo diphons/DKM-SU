@@ -425,12 +425,14 @@ private fun StatusCard(
                                     fontSize = 13.sp,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
-                                Spacer(Modifier.height(1.dp))
-                                Text(
-                                    text = stringResource(R.string.home_susfs),
-                                    fontSize = 13.sp,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
+                                if (getSuSFS() == "Supported") {
+                                    Spacer(Modifier.height(1.dp))
+                                    Text(
+                                        text = stringResource(R.string.home_susfs),
+                                        fontSize = 13.sp,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
                                 if (dkmsvc.isNotEmpty()) {
                                     Spacer(Modifier.height(1.dp))
                                     Text(
@@ -462,12 +464,6 @@ private fun StatusCard(
                                 if (suSFS == "Supported") {
                                     Text(
                                         text = ": ${getSuSFSVersion()} (${if (workingMode.contains("GKI")) "GKI" else getSuSFSVariant()}) $susSUMode",
-                                        fontSize = 13.sp,
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                } else {
-                                    Text(
-                                        text = ": $suSFS",
                                         fontSize = 13.sp,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
