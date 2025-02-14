@@ -738,7 +738,7 @@ fun AppPerProfileScreen(
                     }
                 }
 
-                if (hasModule(TOUCH_SAMPLE)) {
+                if (hasModule(TOUCH_SAMPLE) || hasModule(TOUCH_SAMPLE_GOODIX)) {
                     ElevatedCard {
                         Column(
                             modifier = Modifier

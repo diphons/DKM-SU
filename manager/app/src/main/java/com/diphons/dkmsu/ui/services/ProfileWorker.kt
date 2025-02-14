@@ -26,6 +26,7 @@ import com.diphons.dkmsu.ui.util.Utils.OPROFILE
 import com.diphons.dkmsu.ui.util.Utils.SOUND_CONTROL
 import com.diphons.dkmsu.ui.util.Utils.THERMAL_PROFILE
 import com.diphons.dkmsu.ui.util.Utils.TOUCH_SAMPLE
+import com.diphons.dkmsu.ui.util.Utils.TOUCH_SAMPLE_GOODIX
 import com.diphons.dkmsu.ui.util.Utils.strToInt
 import com.diphons.dkmsu.ui.util.getDefCPUGov
 import com.diphons.dkmsu.ui.util.getDefCPUMaxFreq
@@ -178,7 +179,10 @@ class ProfileWorker(context : Context, params : WorkerParameters) : Worker(conte
                 preferences = prefs
 
             // Touch Improve
-            setKernel(if (preferences.getBoolean(SpfConfig.TOUCH_SAMPLE, false)) "1" else "0", TOUCH_SAMPLE)
+            if (hasModule(TOUCH_SAMPLE_GOODIX))
+                setKernel(if (preferences.getBoolean(SpfConfig.TOUCH_SAMPLE, false)) "1" else "0", TOUCH_SAMPLE_GOODIX)
+            else if (hasModule(TOUCH_SAMPLE))
+                setKernel(if (preferences.getBoolean(SpfConfig.TOUCH_SAMPLE, false)) "1" else "0", TOUCH_SAMPLE)
 
             // Sound Control
             if (hasModule(SOUND_CONTROL)) {
