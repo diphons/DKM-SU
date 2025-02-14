@@ -71,8 +71,13 @@
     <string name="reboot_message">Changes will take effect after rebooting the system. Would you like to reboot now?</string>
     <string name="module_restore">Restore module</string>
     <string name="module_restore_message">Restore modules from recent backup.</string>
+    <string name="backup_restore">Backup &amp; Restore</string>
     <string name="module_backup">Backup module</string>
     <string name="module_backup_message">Backup currently installed modules.</string>
+    <string name="allowlist_restore">Restore allowlist</string>
+    <string name="allowlist_restore_message">Restore allowlist from recent backup.</string>
+    <string name="allowlist_backup">Backup allowlist</string>
+    <string name="allowlist_backup_message">Backup currently configured allowlist.</string>
     <string name="warning">Warning</string>
     <string name="warning_message">This feature is still in beta and under development. Please ensure you backup your modules before proceeding. Use this feature only if you understand the potential risks. Proceed with caution.</string>
     <string name="proceed">Proceed</string>

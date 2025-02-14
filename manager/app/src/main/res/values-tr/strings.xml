@@ -66,8 +66,13 @@
     <string name="reboot_message">Değişiklikler sistem yeniden başlatıldıktan sonra geçerli olacaktır. Şimdi yeniden başlatmak istiyor musunuz?</string>
     <string name="module_restore">Modülü geri yükle</string>
     <string name="module_restore_message">Modülü en son yedeklemeden geri yükleyin.</string>
+    <string name="backup_restore">Yedekleme &amp; Eski haline getirmek</string>
     <string name="module_backup">Yedekleme modülü</string>
     <string name="module_backup_message">Şu anda yüklü modülleri yedekle.</string>
+    <string name="allowlist_restore">İzin verilenler listesini geri yükle</string>
+    <string name="allowlist_restore_message">Son yedeklemeden izin verilenler listesini geri yükleyin.</string>
+    <string name="allowlist_backup">Yedekleme izin listesi</string>
+    <string name="allowlist_backup_message">Şu anda yapılandırılmış izin verilenler listesini yedekle.</string>
     <string name="warning">Uyarı</string>
     <string name="warning_message">Bu özellik hala beta aşamasındadır ve geliştirilme aşamasındadır. Devam etmeden önce modüllerinizin yedeğini aldığınızdan emin olun. Bu özelliği yalnızca olası riskleri anlıyorsanız kullanın. Dikkatli ilerleyin.</string>
     <string name="proceed">Devam etmek</string>

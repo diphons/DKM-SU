@@ -66,8 +66,13 @@
     <string name="reboot_message">Perubahan akan berlaku setelah sistem di-boot ulang. Apakah Anda ingin melakukan boot ulang sekarang?</string>
     <string name="module_restore">Pulihkan modul</string>
     <string name="module_restore_message">Pulihkan modul dari cadangan terkini.</string>
+    <string name="backup_restore">Cadangkan &amp; Pulihkan</string>
     <string name="module_backup">Cadangkan modul</string>
     <string name="module_backup_message">Cadangkan modul yang saat ini terinstal.</string>
+    <string name="allowlist_restore">Pulihkan daftar putih</string>
+    <string name="allowlist_restore_message">Pulihkan daftar putih dari cadangan terkini.</string>
+    <string name="allowlist_backup">Daftar putih cadangan</string>
+    <string name="allowlist_backup_message">Daftar putih yang saat ini dikonfigurasikan.</string>
     <string name="warning">Peringatan</string>
     <string name="warning_message">Fitur ini masih dalam tahap beta dan sedang dalam tahap pengembangan. Pastikan Anda mencadangkan modul Anda sebelum melanjutkan. Gunakan fitur ini hanya jika Anda memahami potensi risikonya. Lanjutkan dengan hati-hati.</string>
     <string name="proceed">Lanjutkan</string>

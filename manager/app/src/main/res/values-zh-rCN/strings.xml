@@ -66,8 +66,13 @@
     <string name="reboot_message">更改将在重新启动系统后生效。您要立即重新启动吗？</string>
     <string name="module_restore">恢复模块</string>
     <string name="module_restore_message">从最近的备份中恢复模块。</string>
+    <string name="backup_restore">备份 &amp; 恢复</string>
     <string name="module_backup">备份模块</string>
     <string name="module_backup_message">备份当前安装的模块。</string>
+    <string name="allowlist_restore">恢复允许列表</string>
+    <string name="allowlist_restore_message">从最近的备份中恢复允许列表。</string>
+    <string name="allowlist_backup">备份允许列表</string>
+    <string name="allowlist_backup_message">备份当前配置的允许列表。</string>
     <string name="warning">警告</string>
     <string name="warning_message">此功能仍处于测试阶段，正在开发中。请确保在继续操作之前备份您的模块。只有了解潜在风险后才使用此功能。请谨慎操作。</string>
     <string name="proceed">继续</string>

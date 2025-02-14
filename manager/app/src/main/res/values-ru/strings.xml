@@ -66,8 +66,13 @@
     <string name="reboot_message">Изменения вступят в силу после перезагрузки системы. Хотите перезагрузить сейчас?</string>
     <string name="module_restore">Восстановить модуль</string>
     <string name="module_restore_message">Восстановите модуль из последней резервной копии.</string>
+    <string name="backup_restore">Резервное копирование &amp; Восстановить</string>
     <string name="module_backup">Резервный модуль</string>
     <string name="module_backup_message">Резервное копирование установленных модулей.</string>
+    <string name="allowlist_restore">Восстановить белый список</string>
+    <string name="allowlist_restore_message">Восстановить белый список из последней резервной копии.</string>
+    <string name="allowlist_backup">Резервный список разрешений</string>
+    <string name="allowlist_backup_message">Резервное копирование текущего настроенного списка разрешенных адресов.</string>
     <string name="warning">Предупреждение</string>
     <string name="warning_message">Эта функция все еще находится в стадии бета-тестирования и разработки. Перед продолжением обязательно сделайте резервную копию своих модулей. Используйте эту функцию только в том случае, если вы осознаете потенциальные риски. Действуйте осторожно.</string>
     <string name="proceed">Продолжать</string>
