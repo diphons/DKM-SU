@@ -150,7 +150,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                                 dt2w = it
                             }
                         }
-                        if (hasModule(TOUCH_SAMPLE)) {
+                        if (hasModule(TOUCH_SAMPLE) || hasModule(TOUCH_SAMPLE_GOODIX)) {
                             var touch_sample by rememberSaveable {
                                 mutableStateOf(prefs.getBoolean(SpfConfig.TOUCH_SAMPLE, false))
                             }
@@ -160,9 +160,15 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                                 summary = stringResource(id = R.string.touch_sample_sum)
                             ) {
                                 if (it) {
-                                    setKernel("1", TOUCH_SAMPLE)
+                                    if (hasModule(TOUCH_SAMPLE_GOODIX))
+                                        setKernel("1", TOUCH_SAMPLE_GOODIX)
+                                    else
+                                        setKernel("1", TOUCH_SAMPLE)
                                 } else {
-                                    setKernel("0", TOUCH_SAMPLE)
+                                    if (hasModule(TOUCH_SAMPLE_GOODIX))
+                                        setKernel("0", TOUCH_SAMPLE_GOODIX)
+                                    else
+                                        setKernel("0", TOUCH_SAMPLE)
                                 }
                                 prefs.edit().putBoolean(SpfConfig.TOUCH_SAMPLE, it).apply()
                                 touch_sample = it

@@ -52,6 +52,7 @@ public class Utils {
     public static String DT2W = "/sys/touchpanel/double_tap";
     public static String DT2W_LEGACY = "/proc/tp_gesture";
     public static String TOUCH_SAMPLE = "/sys/devices/virtual/touch/touch_dev/bump_sample_rate";
+    public static String TOUCH_SAMPLE_GOODIX = "/sys/devices/platform/goodix_ts.0/switch_report_rate";
     public static String SOUND_CONTROL = "/sys/kernel/sound_control";
     public static String HEADPHONE_GAIN = SOUND_CONTROL + "/headphone_gain";
     public static String MICROPHONE_GAIN = SOUND_CONTROL + "/mic_gain";
