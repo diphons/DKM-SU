@@ -314,4 +314,6 @@
     <string name="not_charging">Şarj olmuyor</string>
     <string name="discharging">Boşaltma</string>
     <string name="unknown">Bilinmeyen</string>
+    <string name="settings_disable_su">Su uyumluluğunu devre dışı bırak</string>
+    <string name="settings_disable_su_summary">⁠su komutu aracılığıyla herhangi bir uygulamanın kök ayrıcalıkları elde etmesini geçici olarak devre dışı bırakın (mevcut kök süreçleri etkilenmeyecektir).</string>
 </resources>

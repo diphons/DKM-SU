@@ -314,6 +314,16 @@ JNIEXPORT jboolean JNICALL
 Java_com_diphons_dkmsu_Natives_uidShouldUmount(JNIEnv *env, jobject thiz, jint uid) {
     return uid_should_umount(uid);
 }
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_diphons_dkmsu_Natives_isSuEnabled(JNIEnv *env, jobject thiz) {
+    return is_su_enabled();
+}
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_diphons_dkmsu_Natives_setSuEnabled(JNIEnv *env, jobject thiz, jboolean enabled) {
+    return set_su_enabled(enabled);
+}
 
 extern "C"
 JNIEXPORT jlong JNICALL

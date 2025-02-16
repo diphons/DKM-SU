@@ -314,4 +314,6 @@
     <string name="not_charging">未充电</string>
     <string name="discharging">放电</string>
     <string name="unknown">未知</string>
+    <string name="settings_disable_su">关闭 su 兼容</string>
+    <string name="settings_disable_su_summary">临时禁止任何应用通过 su 命令获取 root 权限（已运行的 root 进程不受影响）</string>
 </resources>
