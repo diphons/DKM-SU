@@ -122,6 +122,7 @@
     <string name="force_stop_app">Paksa berhenti</string>
     <string name="restart_app">Mulai ulang</string>
     <string name="failed_to_update_sepolicy">Gagal membarui aturan SELinux pada: %s</string>
+    <string name="su_not_allowed">Pemberian superuser ke %s tidak diperbolehkan</string>
     <string name="module_changelog">Catatan Perubahan</string>
     <string name="settings_profile_template">Templat Profil Aplikasi</string>
     <string name="settings_profile_template_summary">Atur templat Profil yang lokal dan daring</string>

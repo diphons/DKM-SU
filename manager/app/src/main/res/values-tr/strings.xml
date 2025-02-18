@@ -122,6 +122,7 @@
     <string name="force_stop_app">Zorla durdur</string>
     <string name="restart_app">Tekrar başlat</string>
     <string name="failed_to_update_sepolicy">SELinux kurallarını güncelleme başarısız oldu: %s</string>
+    <string name="su_not_allowed">%s\'e süper kullanıcı yetkisi verilmesine izin verilmiyor</string>
     <string name="module_changelog">Notları Değiştir</string>
     <string name="settings_profile_template">Uygulama Profili Şablonu</string>
     <string name="settings_profile_template_summary">Yerel ve çevrimiçi Profil şablonlarını ayarlayın</string>

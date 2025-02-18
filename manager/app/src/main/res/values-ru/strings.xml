@@ -122,6 +122,7 @@
     <string name="force_stop_app">Принудительная остановка</string>
     <string name="restart_app">Перезапуск</string>
     <string name="failed_to_update_sepolicy">Не удалось обновить правила SELinux для: %s</string>
+    <string name="su_not_allowed">Предоставление прав суперпользователя %s не допускается.</string>
     <string name="module_changelog">Изменить заметки</string>
     <string name="settings_profile_template">Шаблон профиля приложения</string>
     <string name="settings_profile_template_summary">Установите локальные и онлайн-шаблоны профилей</string>
