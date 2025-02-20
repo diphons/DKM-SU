@@ -324,7 +324,7 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                 confirmButton = {
                     TextButton(onClick = {
                         showConfirmDialog = false
-                        navigator.navigate(FlashScreenDestination(FlashIt.FlashModule(zipUri!!)))
+                        navigator.navigate(FlashScreenDestination(FlashIt.FlashModules(listOf(zipUri!!))))
 
                         viewModel.markNeedRefresh()
                     }) {
@@ -366,7 +366,7 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                     modifier = Modifier.nestedScroll(nestedScrollConnection),
                     boxModifier = Modifier.padding(innerPadding),
                     onInstallModule = {
-                        navigator.navigate(FlashScreenDestination(FlashIt.FlashModule(it)))
+                        navigator.navigate(FlashScreenDestination(FlashIt.FlashModules(listOf(it))))
                     },
                     onClickModule = { id, name, hasWebUi ->
                         if (hasWebUi) {
