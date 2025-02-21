@@ -150,7 +150,7 @@ class BatteryReceiver : BroadcastReceiver() {
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
             "Battery Info Channel",
-            NotificationManager.IMPORTANCE_HIGH
+            NotificationManager.IMPORTANCE_LOW
         )
         notificationManager.createNotificationChannel(channel)
         val notificationIntent = Intent(context, MainActivity::class.java)
@@ -161,6 +161,7 @@ class BatteryReceiver : BroadcastReceiver() {
             .setContentText("")
             .setSmallIcon(R.drawable.ic_battery_full)
             .setContentIntent(pendingIntent)
+            .setSilent(true)
             .build()
 
         val managerA = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
