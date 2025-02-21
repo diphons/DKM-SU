@@ -31,7 +31,7 @@
     <string name="module_failed_to_disable">Modül devre dışı bırakılamadı: %s</string>
     <string name="module_empty">Modül yok</string>
     <string name="module">Modül</string>
-    <string name="module_install_prompt_with_name">%1$s modülünün kurulumuna devam etmek istiyor musunuz?</string>
+    <string name="module_install_prompt_with_name">Aşağıdaki modül(ler) kurulacak: %1$s</string>
     <string name="module_sort_a_to_z">Sıralama (A - Z)</string>
     <string name="module_sort_z_to_a">Sıralama (Z - A)</string>
     <string name="uninstall">Silip süpürmek</string>

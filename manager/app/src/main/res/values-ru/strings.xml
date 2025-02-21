@@ -31,7 +31,7 @@
     <string name="module_failed_to_disable">Не удалось отключить модуль: %s</string>
     <string name="module_empty">Нет модуля</string>
     <string name="module">Модуль</string>
-    <string name="module_install_prompt_with_name">Хотите продолжить установку модуля %1$s?</string>
+    <string name="module_install_prompt_with_name">Будут установлены следующие модули: %1$s</string>
     <string name="module_sort_a_to_z">Сортировка (А - Я)</string>
     <string name="module_sort_z_to_a">Сортировка (Я - А)</string>
     <string name="uninstall">Вытирать</string>

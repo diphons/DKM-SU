@@ -31,7 +31,7 @@
     <string name="module_failed_to_disable">Gagal menonaktifkan modul: %s</string>
     <string name="module_empty">Tidak ada modul</string>
     <string name="module">Modul</string>
-    <string name="module_install_prompt_with_name">Anda ingin melanjutkan pemasangan modul %1$s?</string>
+    <string name="module_install_prompt_with_name">Modul berikut akan diinstal: %1$s</string>
     <string name="module_sort_a_to_z">Menyortir (A - Z)</string>
     <string name="module_sort_z_to_a">Menyortir (Z - A)</string>
     <string name="uninstall">Hapus</string>

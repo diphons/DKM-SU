@@ -31,7 +31,7 @@
     <string name="module_failed_to_disable">无法禁用模块: %s</string>
     <string name="module_empty">没有安装模块</string>
     <string name="module">模块</string>
-    <string name="module_install_prompt_with_name">是否要继续安装模块 %1$s ？</string>
+    <string name="module_install_prompt_with_name">将安装以下模块： %1$s</string>
     <string name="module_sort_a_to_z">种类 (A - Z)</string>
     <string name="module_sort_z_to_a">种类 (Z - A)</string>
     <string name="uninstall">卸载</string>
