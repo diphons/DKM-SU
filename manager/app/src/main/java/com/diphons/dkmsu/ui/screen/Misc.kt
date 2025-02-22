@@ -70,6 +70,7 @@ import com.diphons.dkmsu.ui.uibench.RenderingJitter
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.util.RootUtils
 import com.diphons.dkmsu.ui.store.*
+import com.diphons.dkmsu.ui.util.Utils
 import com.diphons.dkmsu.ui.util.Utils.*
 import com.diphons.dkmsu.ui.util.getKnVersion
 import com.diphons.dkmsu.ui.util.getSpoofKnVersion
@@ -164,6 +165,46 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                                 setKernel("0", BLOCK_JOYOSE)
                             globalConfig.edit().putBoolean(SpfConfig.BLOCK_JOYOSE, it).apply()
                             block_joyose = it
+                        }
+                    }
+                }
+            }
+
+            val spoofDefault by rememberSaveable {
+                mutableStateOf(globalConfig.getString(SpfConfig.SPOOF_DEFAULT, spoof_default()))
+            }
+            if (!spoofDefault!!.contains("encrypted")) {
+                if (globalConfig.getString(SpfConfig.SPOOF_DEFAULT, "")!!.isEmpty())
+                    globalConfig.edit().putString(SpfConfig.SPOOF_DEFAULT, spoofDefault).apply()
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    var spoofEncrypt by rememberSaveable {
+                        mutableStateOf(globalConfig.getBoolean(SpfConfig.SPOOF_ENCRYPT, false))
+                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                    ) {
+                        SwitchItem(
+                            title = stringResource(id = R.string.spoof_encrypt),
+                            checked = spoofEncrypt,
+                            summary = stringResource(id = R.string.spoof_encrypt_sum),
+                            fontSize = 15.sp,
+                            fontSizeSum = 13.sp
+                        ) {
+                            if (it)
+                                RootUtils.runCommand("resetprop ro.crypto.state encrypted")
+                            else {
+                                if (spoofDefault!!.contains("null"))
+                                    RootUtils.runCommand("resetprop ro.crypto.state ''")
+                                else
+                                    RootUtils.runCommand("resetprop ro.crypto.state $spoofDefault")
+                            }
+                            globalConfig.edit().putBoolean(SpfConfig.SPOOF_ENCRYPT, it).apply()
+                            spoofEncrypt = it
                         }
                     }
                 }
