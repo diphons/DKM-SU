@@ -340,4 +340,6 @@
     <string name="unknown">Unknown</string>
     <string name="settings_disable_su">Disable su compatibility</string>
     <string name="settings_disable_su_summary">Temporarily disable any applications from obtaining root privileges via the ⁠su command (existing root processes will not be affected).</string>
+    <string name="spoof_encrypt">Spoof Encryption</string>
+    <string name="spoof_encrypt_sum">Enable to use fake encryption</string>
 </resources>

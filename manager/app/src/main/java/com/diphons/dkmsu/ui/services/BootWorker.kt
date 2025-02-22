@@ -55,6 +55,9 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
 
         KeepShellPublic.doCmdSync("dumpsys deviceidle whitelist +${applicationContext.packageName}")
 
+        if (globalConfig.getBoolean(SpfConfig.SPOOF_ENCRYPT, false))
+            RootUtils.runCommand("resetprop ro.crypto.state encrypted")
+
         globalConfig.edit().putBoolean(SpfConfig.GKI_MODE, getKNVersion()).apply()
         if (hasModule(GAME_AI)) {
             var listDefault = gameai_prefs.getString("game_ai_default", "")

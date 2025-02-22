@@ -375,4 +375,11 @@ public class Utils {
         }
         return false;
     }
+
+    public static String spoof_default(){
+        String getState = RootUtils.runAndGetOutput("getprop ro.crypto.state");
+        if (getState.isEmpty())
+            return "null";
+        return getState;
+    }
 }

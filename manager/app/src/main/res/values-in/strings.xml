@@ -317,4 +317,6 @@
     <string name="unknown">Tidak dikenal</string>
     <string name="settings_disable_su">Nonaktifkan kompatibilitas su</string>
     <string name="settings_disable_su_summary">Nonaktifkan sementara semua aplikasi agar tidak memperoleh hak akses root melalui perintah ⁠su (proses root yang ada tidak akan terpengaruh).</string>
+    <string name="spoof_encrypt">Spoof Enkripsi</string>
+    <string name="spoof_encrypt_sum">Aktifkan untuk menggunakan enkripsi palsu</string>
 </resources>

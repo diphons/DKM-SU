@@ -317,4 +317,6 @@
     <string name="unknown">Неизвестный</string>
     <string name="settings_disable_su">Отключить совместимость с su</string>
     <string name="settings_disable_su_summary">Временно запретите всем приложениям получать привилегии root с помощью команды ⁠su (существующие процессы root не будут затронуты).</string>
+    <string name="spoof_encrypt">Поддельное шифрование</string>
+    <string name="spoof_encrypt_sum">Разрешить использовать поддельное шифрование</string>
 </resources>

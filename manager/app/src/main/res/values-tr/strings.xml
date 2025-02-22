@@ -317,4 +317,6 @@
     <string name="unknown">Bilinmeyen</string>
     <string name="settings_disable_su">Su uyumluluğunu devre dışı bırak</string>
     <string name="settings_disable_su_summary">⁠su komutu aracılığıyla herhangi bir uygulamanın kök ayrıcalıkları elde etmesini geçici olarak devre dışı bırakın (mevcut kök süreçleri etkilenmeyecektir).</string>
+    <string name="spoof_encrypt">Sahte Şifreleme</string>
+    <string name="spoof_encrypt_sum">Sahte şifrelemeyi kullanmayı etkinleştir</string>
 </resources>
