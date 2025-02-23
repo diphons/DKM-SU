@@ -139,6 +139,169 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                 .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            ElevatedCard {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        context.startActivity(Intent(context, RenderingJitter::class.java))
+                    }
+                    .padding(23.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column (modifier = Modifier
+                        .weight(3f)
+                    ){
+                        Text(
+                            text = stringResource(R.string.jitter_rendering),
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.jitter_rendering_sum),
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null
+                    )
+                }
+            }
+            var dkm_service by rememberSaveable { mutableStateOf(
+                if (getStartedSVC())
+                    "Started"
+                else
+                    "Not Started"
+            ) }
+            var count_finish by rememberSaveable { mutableStateOf(false) }
+            if (count_finish) {
+                LaunchedEffect(Unit) {
+                    for (i in 1..200) {
+                        delay(1000) // update once a second
+                        if (getStartedSVC()) {
+                            count_finish = false
+                            dkm_service = "Started"
+                            CMD_MSG = "DKM Service Started"
+                            runDialog.hide()
+                        }
+                    }
+                }
+            }
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(23.dp)
+                ){
+                    Column (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterStart)
+                    ){
+                        Text(
+                            text = "DKM Service",
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Text(
+                            modifier = Modifier
+                                .padding(top = 5.dp),
+                            text = "${stringResource(R.string.status)} : $dkm_service",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    ElevatedCard(
+                        colors = CardDefaults.elevatedCardColors(containerColor = run {
+                            MaterialTheme.colorScheme.primary
+                        }),
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .clickable {
+                                DIALOG_MODE = 1
+                                if (dkm_service.contains("Not"))
+                                    CMD_MSG = "Starting DKM Service"
+                                else
+                                    CMD_MSG = "Restarting DKM Service"
+                                runDialog.show()
+                                RootUtils.runCommand("setprop init.dkmsvc.exit 1")
+                                dkm_service = "Restarting"
+                                install_dkmsvc()
+                                RootUtils.runCommand("setprop init.dkmsvc.exit 0; setprop init.susfs \"0\"")
+                                count_finish = true
+                                startSVC()
+                            },
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(vertical = 6.dp, horizontal = 15.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = if (dkm_service.contains("Not")) "Start" else "Restart",
+                                style = MaterialTheme.typography.titleSmall,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            }
+            if (hasModule(PIF_UPDATER)) {
+                var pif_finish by rememberSaveable { mutableStateOf(false) }
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(23.dp)
+                    ){
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterStart),
+                            text = "PIF Updater",
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        ElevatedCard(
+                            colors = CardDefaults.elevatedCardColors(containerColor = run {
+                                MaterialTheme.colorScheme.primary
+                            }),
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .clickable {
+                                    CMD_MSG = ""
+                                    DIALOG_MODE = 0
+                                    pif_finish = true
+                                    runDialog.show()
+                                    if (isInternetAvailable(context))
+                                        startPIFWorker(context)
+                                    else
+                                        AV_INTERNET = false
+                                },
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(vertical = 6.dp, horizontal = 15.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.start),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                }
+            }
             if (hasModule(BLOCK_JOYOSE)) {
                 ElevatedCard(
                     modifier = Modifier
@@ -232,169 +395,6 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                         selinuxSwitch = it
                         activateSELinux(!it, context)
                     }
-                }
-            }
-            if (hasModule(PIF_UPDATER)) {
-                var pif_finish by rememberSaveable { mutableStateOf(false) }
-                ElevatedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(23.dp)
-                    ){
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.CenterStart),
-                            text = "PIF Updater",
-                            fontSize = 15.sp,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        ElevatedCard(
-                            colors = CardDefaults.elevatedCardColors(containerColor = run {
-                                MaterialTheme.colorScheme.primary
-                            }),
-                            modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .clickable {
-                                    CMD_MSG = ""
-                                    DIALOG_MODE = 0
-                                    pif_finish = true
-                                    runDialog.show()
-                                    if (isInternetAvailable(context))
-                                        startPIFWorker(context)
-                                    else
-                                        AV_INTERNET = false
-                                },
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .padding(vertical = 6.dp, horizontal = 15.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.start),
-                                    style = MaterialTheme.typography.titleSmall,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            var dkm_service by rememberSaveable { mutableStateOf(
-                if (getStartedSVC())
-                    "Started"
-                else
-                    "Not Started"
-            ) }
-            var count_finish by rememberSaveable { mutableStateOf(false) }
-            if (count_finish) {
-                LaunchedEffect(Unit) {
-                    for (i in 1..200) {
-                        delay(1000) // update once a second
-                        if (getStartedSVC()) {
-                            count_finish = false
-                            dkm_service = "Started"
-                            CMD_MSG = "DKM Service Started"
-                            runDialog.hide()
-                        }
-                    }
-                }
-            }
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(23.dp)
-                ){
-                    Column (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.CenterStart)
-                    ){
-                        Text(
-                            text = "DKM Service",
-                            fontSize = 15.sp,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        Text(
-                            modifier = Modifier
-                                .padding(top = 5.dp),
-                            text = "${stringResource(R.string.status)} : $dkm_service",
-                            fontSize = 13.sp,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
-                    ElevatedCard(
-                        colors = CardDefaults.elevatedCardColors(containerColor = run {
-                            MaterialTheme.colorScheme.primary
-                        }),
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .clickable {
-                                DIALOG_MODE = 1
-                                if (dkm_service.contains("Not"))
-                                    CMD_MSG = "Starting DKM Service"
-                                else
-                                    CMD_MSG = "Restarting DKM Service"
-                                runDialog.show()
-                                RootUtils.runCommand("setprop init.dkmsvc.exit 1")
-                                dkm_service = "Restarting"
-                                install_dkmsvc()
-                                RootUtils.runCommand("setprop init.dkmsvc.exit 0; setprop init.susfs \"0\"")
-                                count_finish = true
-                                startSVC()
-                            },
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(vertical = 6.dp, horizontal = 15.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = if (dkm_service.contains("Not")) "Start" else "Restart",
-                                style = MaterialTheme.typography.titleSmall,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                }
-            }
-            ElevatedCard {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        context.startActivity(Intent(context, RenderingJitter::class.java))
-                    }
-                    .padding(23.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column (modifier = Modifier
-                        .weight(3f)
-                    ){
-                        Text(
-                            text = stringResource(R.string.jitter_rendering),
-                            fontSize = 15.sp,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.jitter_rendering_sum),
-                            fontSize = 13.sp,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null
-                    )
                 }
             }
             if (getSuSFS() == "Supported") {
