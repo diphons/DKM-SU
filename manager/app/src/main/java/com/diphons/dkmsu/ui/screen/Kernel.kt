@@ -1,6 +1,9 @@
 package com.diphons.dkmsu.ui.screen
 
 import android.content.Context
+import android.os.Build
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,9 +29,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -59,13 +66,16 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
+import com.diphons.dkmsu.Natives
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.diphons.dkmsu.R
+import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.component.rememberCustomDialog
 import com.diphons.dkmsu.ui.component.runDialog
+import com.diphons.dkmsu.ui.popup.PowerMenu
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.util.*
 import com.diphons.dkmsu.ui.store.*
@@ -76,6 +86,7 @@ import com.ramcosta.composedestinations.generated.destinations.DisplayScreenDest
 import com.ramcosta.composedestinations.generated.destinations.PowerScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.PerfmodeScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MiscScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WakelocksScreenDestination
 
 /**
@@ -190,6 +201,9 @@ fun KernelScreen(navigator: DestinationsNavigator) {
     Scaffold(
         topBar = {
             TopBar(
+                onSettingsClick = {
+                    navigator.navigate(SettingScreenDestination)
+                },
                 scrollBehavior = scrollBehavior,
                 borderVisible = if (scrollPos > 0.1f) true else false
             )
@@ -547,8 +561,10 @@ fun KernelScreen(navigator: DestinationsNavigator) {
 @Composable
 private fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    onSettingsClick: () -> Unit,
     borderVisible: Boolean
 ) {
+    val context = LocalContext.current
     Box(modifier = Modifier
         .fillMaxWidth()
     ){
@@ -572,6 +588,54 @@ private fun TopBar(
         }
         TopAppBar(
             title = { Text(stringResource(R.string.home_kernel_tittle)) },
+            actions = {
+                val isManager = Natives.becomeManager(ksuApp.packageName)
+                var showDropdown by remember { mutableStateOf(false) }
+                if (isManager) {
+                    IconButton(onClick = {
+                        if (Settings.canDrawOverlays(context))
+                            PowerMenu(context).open()
+                        else
+                            showDropdown = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = stringResource(id = R.string.reboot)
+                        )
+
+                        DropdownMenu(expanded = showDropdown, onDismissRequest = {
+                            showDropdown = false
+                        }) {
+
+                            RebootDropdownItem(id = R.string.shutdown, reason = "shutdown")
+                            RebootDropdownItem(id = R.string.reboot)
+
+                            val pm =
+                                LocalContext.current.getSystemService(Context.POWER_SERVICE) as PowerManager?
+                            @Suppress("DEPRECATION")
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && pm?.isRebootingUserspaceSupported == true) {
+                                RebootDropdownItem(
+                                    id = R.string.reboot_userspace,
+                                    reason = "userspace"
+                                )
+                            }
+                            RebootDropdownItem(id = R.string.reboot_recovery, reason = "recovery")
+                            RebootDropdownItem(
+                                id = R.string.reboot_bootloader,
+                                reason = "bootloader"
+                            )
+                            RebootDropdownItem(id = R.string.reboot_download, reason = "download")
+                            RebootDropdownItem(id = R.string.reboot_edl, reason = "edl")
+                        }
+                    }
+                }
+                IconButton(onClick = onSettingsClick) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = stringResource(id = R.string.settings)
+                    )
+                }
+            },
             windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
             scrollBehavior = scrollBehavior,
             colors = TopAppBarDefaults.topAppBarColors(if (borderVisible) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.background),
