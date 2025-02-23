@@ -324,4 +324,6 @@
     <string name="settings_disable_su_summary">Nonaktifkan sementara semua aplikasi agar tidak memperoleh hak akses root melalui perintah ⁠su (proses root yang ada tidak akan terpengaruh).</string>
     <string name="spoof_encrypt">Spoof Enkripsi</string>
     <string name="spoof_encrypt_sum">Aktifkan untuk menggunakan enkripsi palsu</string>
+    <string name="selinux_permissive">Mode toleransi SeLinux</string>
+    <string name="selinux_permissive_sum">Alihkan SELinux ke mode permisif (beberapa perangkat lunak disebut [Tutup Selinux]), status SeLinux tidak berpengaruh pada DKM SU, dan mengaktifkan mode permisif dapat menyebabkan crash dan restart!</string>
 </resources>

@@ -81,4 +81,5 @@ public class SpfConfig {
     public static String BATTERY_NOTIF_STATUS = "battery_notif_status";
     public static String SPOOF_DEFAULT = "spoof_default";
     public static String SPOOF_ENCRYPT = "spoof_encrypt";
+    public static String SELINUX_MODE = "selinux_mode";
 }

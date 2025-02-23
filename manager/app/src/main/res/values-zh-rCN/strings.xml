@@ -324,4 +324,6 @@
     <string name="settings_disable_su_summary">临时禁止任何应用通过 su 命令获取 root 权限（已运行的 root 进程不受影响）</string>
     <string name="spoof_encrypt">欺骗加密</string>
     <string name="spoof_encrypt_sum">启用使用假加密</string>
+    <string name="selinux_permissive">SeLinux 容忍模式</string>
+    <string name="selinux_permissive_sum">将SELinux切换到宽容模式（有些软件叫【关闭Selinux】），SeLinux的状态对DKM SU没有影响，而且启用宽容模式可能会导致崩溃重启！</string>
 </resources>

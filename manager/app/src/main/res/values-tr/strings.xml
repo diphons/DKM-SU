@@ -324,4 +324,6 @@
     <string name="settings_disable_su_summary">⁠su komutu aracılığıyla herhangi bir uygulamanın kök ayrıcalıkları elde etmesini geçici olarak devre dışı bırakın (mevcut kök süreçleri etkilenmeyecektir).</string>
     <string name="spoof_encrypt">Sahte Şifreleme</string>
     <string name="spoof_encrypt_sum">Sahte şifrelemeyi kullanmayı etkinleştir</string>
+    <string name="selinux_permissive">SeLinux tolerans modu</string>
+    <string name="selinux_permissive_sum">SELinux\'u izin verici moda geçirin (bazı yazılımlara [Selinux\'u Kapat] denir), SeLinux\'un durumu DKM SU üzerinde hiçbir etkiye sahip değildir ve izin verici modun etkinleştirilmesi çökebilir ve yeniden başlatılabilir!</string>
 </resources>

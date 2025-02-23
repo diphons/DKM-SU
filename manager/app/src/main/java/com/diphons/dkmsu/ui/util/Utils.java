@@ -21,6 +21,7 @@ import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 
@@ -37,6 +38,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Utils {
+    public static final String TAG = Utils.class.getSimpleName();
     public static String D8G_PATH = "/sys/module/d8g_helper/parameters/";
     public static String OPROFILE = D8G_PATH + "oprofile";
     public static String GAME_AI = D8G_PATH + "game_ai_enable";
@@ -140,6 +142,23 @@ public class Utils {
         result = result.replaceAll(replace, "");
         return result;
     }
+
+    public static int stringToInt(String number) {
+        if (TextUtils.isEmpty(number)) {
+            return 0;
+        }
+        if (number.contains(".")) {
+            try {
+                return Math.round(Float.parseFloat(number));
+            } catch (Exception ignored) {}
+        } else {
+            try {
+                return Integer.parseInt(number);
+            } catch (Exception ignored) {}
+        }
+        return 0;
+    }
+
     public static void writeFile(String path, String text, boolean append, boolean asRoot) {
         if (asRoot) {
             new RootFile(path).write(text, append);
@@ -381,5 +400,15 @@ public class Utils {
         if (getState.isEmpty())
             return "null";
         return getState;
+    }
+
+    private static final String GETENFORCE = "getenforce";
+    private static final String SETENFORCE = "setenforce";
+    public static boolean isSELinuxActive() {
+        String result = RootSelinux.runCommand_se(GETENFORCE);
+        return result.equals("Enforcing");
+    }
+    public static void activateSELinux(boolean active, Context context) {
+        ControlSelinux.runCommand_se(active ? "1" : "0", SETENFORCE, ControlSelinux.CommandType.SHELL, context);
     }
 }

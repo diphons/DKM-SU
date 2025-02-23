@@ -347,4 +347,6 @@
     <string name="settings_disable_su_summary">Temporarily disable any applications from obtaining root privileges via the ⁠su command (existing root processes will not be affected).</string>
     <string name="spoof_encrypt">Spoof Encryption</string>
     <string name="spoof_encrypt_sum">Enable to use fake encryption</string>
+    <string name="selinux_permissive">SeLinux tolerance mode</string>
+    <string name="selinux_permissive_sum">Switch SELinux to permissive mode (some software is called [Close Selinux]), the state of SeLinux has no effect on DKM, and enabling permissive mode may crash and restart!</string>
 </resources>

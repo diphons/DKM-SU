@@ -209,6 +209,31 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                     }
                 }
             }
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                var selinuxSwitch by rememberSaveable {
+                    mutableStateOf(globalConfig.getBoolean(SpfConfig.SELINUX_MODE, !isSELinuxActive()))
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                ) {
+                    SwitchItem(
+                        title = stringResource(id = R.string.selinux_permissive),
+                        checked = selinuxSwitch,
+                        summary = stringResource(id = R.string.selinux_permissive_sum),
+                        fontSize = 15.sp,
+                        fontSizeSum = 13.sp
+                    ) {
+                        globalConfig.edit().putBoolean(SpfConfig.SELINUX_MODE, it).apply()
+                        selinuxSwitch = it
+                        activateSELinux(!it, context)
+                    }
+                }
+            }
             if (hasModule(PIF_UPDATER)) {
                 var pif_finish by rememberSaveable { mutableStateOf(false) }
                 ElevatedCard(
