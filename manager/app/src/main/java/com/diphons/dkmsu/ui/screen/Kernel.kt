@@ -1,10 +1,13 @@
 package com.diphons.dkmsu.ui.screen
 
+import android.app.ActivityManager
 import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -47,14 +50,21 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -73,6 +83,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ksuApp
+import com.diphons.dkmsu.ui.component.KeepShellPublic
 import com.diphons.dkmsu.ui.component.rememberCustomDialog
 import com.diphons.dkmsu.ui.component.runDialog
 import com.diphons.dkmsu.ui.popup.PowerMenu
@@ -99,6 +110,7 @@ import com.ramcosta.composedestinations.generated.destinations.WakelocksScreenDe
 fun KernelScreen(navigator: DestinationsNavigator) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val snackBarHost = LocalSnackbarHost.current
+    lateinit var activityManager: ActivityManager
 
     val context = LocalContext.current
     val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
@@ -115,6 +127,7 @@ fun KernelScreen(navigator: DestinationsNavigator) {
         }
     }
 
+    activityManager = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
     val gameai = MutableLiveData<Boolean>(prefs.getBoolean(SpfConfig.GAME_AI, true))
     val perf_potition = MutableLiveData<Int>(prefs.getInt(SpfConfig.PROFILE_MODE, 0))
     val perf_mode = MutableLiveData<Boolean>(prefs.getBoolean(SpfConfig.PERF_MODE, true))
@@ -130,6 +143,8 @@ fun KernelScreen(navigator: DestinationsNavigator) {
     val chg_profile_name = MutableLiveData<String>(prefs.getString(SpfConfig.CHG_MAX_NAME, "Default"))
     val chg_profile = MutableLiveData<String>("")
     val ufs_healt_info = MutableLiveData<Float>(1f)
+    val ramSlider = MutableLiveData<Float>(1f)
+    val swapSlider = MutableLiveData<Float>(1f)
     val batt_healt_info = MutableLiveData<Int>(getBattHealth())
     var ufs_popup by rememberSaveable { mutableStateOf(false) }
 
@@ -331,67 +346,165 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                     }
                 }
             }
-            if (hasModule(UFS_HEALTH)) {
-                ufs_healt_info.value = (getUFSHelat().toFloat() / 100)
-                if (getUFSHelat() < 10 && !ufs_popup) {
-                    ufs_popup = true
-                    DIALOG_MODE = 2
-                    runDialog.show()
+            ElevatedCard {
+                var totalMem by rememberSaveable { mutableIntStateOf(0) }
+                var availMem by rememberSaveable { mutableIntStateOf(0) }
+                var usedMem by rememberSaveable { mutableIntStateOf(0) }
+                var swapInfo by rememberSaveable { mutableStateOf("") }
+                var swapTotal by rememberSaveable { mutableIntStateOf(0) }
+                var swapUsed by rememberSaveable { mutableIntStateOf(0) }
+
+                LaunchedEffect(true) {
+                    val info = ActivityManager.MemoryInfo().apply {
+                        activityManager.getMemoryInfo(this)
+                    }
+                    totalMem = (info.totalMem / 1024 / 1024f).toInt()
+                    availMem = (info.availMem / 1024 / 1024f).toInt()
+                    usedMem = totalMem - availMem
+                    swapInfo = KeepShellPublic.doCmdSync("free -m | grep Swap")
+                    if (swapInfo.contains("Swap")) {
+                        try {
+                            val swapInfoStr = swapInfo.substring(swapInfo.indexOf(" "), swapInfo.lastIndexOf(" ")).trim()
+                            if (Regex("[\\d]+[\\s]+[\\d]+").matches(swapInfoStr)) {
+                                swapTotal = swapInfoStr.substring(0, swapInfoStr.indexOf(" ")).trim().toInt()
+                                swapUsed = swapInfoStr.substring(swapInfoStr.indexOf(" ")).trim().toInt()
+                            }
+                        } catch (_: java.lang.Exception) {
+                        }
+                    }
+                    ramSlider.value = usedMem.toFloat() / totalMem.toFloat()
+                    swapSlider.value = swapUsed.toFloat() / swapTotal.toFloat()
                 }
-                ElevatedCard {
-                    Column (modifier = Modifier
+                Column(
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
-                    ) {
+                        .padding(24.dp)
+                ) {
+                    if (hasModule(UFS_HEALTH)) {
+                        ufs_healt_info.value = (getUFSHelat().toFloat() / 100)
+                        if (getUFSHelat() < 10 && !ufs_popup) {
+                            ufs_popup = true
+                            DIALOG_MODE = 2
+                            runDialog.show()
+                        }
                         Text(
-                            modifier = Modifier
-                                .padding(start = 18.dp, top = 13.dp),
                             text = stringResource(R.string.storage),
                             fontSize = 15.sp,
                             style = MaterialTheme.typography.titleSmall
                         )
                         Spacer(Modifier.height(4.dp))
                         Box(
-                            modifier = Modifier.fillMaxWidth()
-                                .padding(start = 7.dp, end = 18.dp),
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
                                 modifier = Modifier
-                                    .padding(start = 11.dp),
+                                    .align(Alignment.TopStart),
                                 text = stringResource(R.string.ufs_health_info),
                                 fontSize = 13.sp,
                                 style = MaterialTheme.typography.bodyMedium
                             )
-                            Slider(
+                            Text(
                                 modifier = Modifier
-                                    .padding(top = 10.dp, end = 40.dp),
-                                value = ufs_healt_info.value!!,
-                                onValueChange = {},
-                                colors = SliderDefaults.colors(
-                                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                                    inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
-                                        alpha = 0.4f
-                                    )
-                                ),
-                                thumb = {
-                                    SliderDefaults.Thumb(
-                                        interactionSource = remember {
-                                            MutableInteractionSource()
-                                        },
-                                        thumbSize = DpSize(20.dp, 20.dp),
-                                        colors = SliderDefaults.colors(
-                                            thumbColor = MaterialTheme.colorScheme.primary
-                                        )
-                                    )
-                                }
+                                    .align(Alignment.TopEnd),
+                                text = "${getUFSHelat()}%",
+                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        ProgressIndicator(
+                            modifier = Modifier
+                                .padding(top = 4.dp),
+                            progress = ufs_healt_info.value!!
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(14.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ){
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.TopStart),
+                            text = stringResource(R.string.ram_info),
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd),
+                            text = "$totalMem MB",
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.TopStart),
+                            text = "$usedMem MB ${stringResource(R.string.used)}",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd),
+                            text = "$availMem MB ${stringResource(R.string.free)}",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    ProgressIndicator(
+                        modifier = Modifier
+                            .padding(top = 4.dp),
+                        progress = ramSlider.value!!
+                    )
+                    if (swapTotal > 0) {
+                        Spacer(modifier = Modifier.height(14.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ){
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.TopStart),
+                                text = stringResource(R.string.swap_info),
+                                fontSize = 15.sp,
+                                style = MaterialTheme.typography.titleSmall
                             )
                             Text(
                                 modifier = Modifier
-                                    .align(Alignment.CenterEnd)
-                                    .padding(top = 10.dp, bottom = 1.dp),
-                                text = "${getUFSHelat()}%"
+                                    .align(Alignment.TopEnd),
+                                text = "$swapTotal MB",
+                                fontSize = 15.sp,
+                                style = MaterialTheme.typography.titleSmall
                             )
                         }
+                        Spacer(Modifier.height(4.dp))
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.TopStart),
+                                text = "$swapUsed MB ${stringResource(R.string.used)}",
+                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd),
+                                text = "${swapTotal - swapUsed} MB ${stringResource(R.string.free)}",
+                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                        ProgressIndicator(
+                            modifier = Modifier
+                                .padding(top = 4.dp),
+                            progress = swapSlider.value!!
+                        )
                     }
                 }
             }
@@ -648,6 +761,32 @@ private fun TopBar(
                     )
                     clip = true
                 }
+        )
+    }
+}
+
+@Composable
+fun ProgressIndicator(
+    modifier: Modifier = Modifier,
+    progress: Float,
+    clipShape: Shape = RoundedCornerShape(16.dp)
+) {
+    Box(
+        modifier = modifier
+            .clip(clipShape)
+            .height(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.4f))
+                .fillMaxHeight()
+                .fillMaxWidth()
+        )
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primary)
+                .fillMaxHeight()
+                .fillMaxWidth(progress)
         )
     }
 }

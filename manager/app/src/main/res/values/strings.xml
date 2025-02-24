@@ -351,4 +351,8 @@
     <string name="selinux_permissive_sum">Switch SELinux to permissive mode (some software is called [Close Selinux]), the state of SeLinux has no effect on DKM, and enabling permissive mode may crash and restart!</string>
     <string name="apply_onboot">Apply on boot</string>
     <string name="selinux_onboot">Changing selinux status at boot is not recommended, use the rom\'s built-in selinux if you get system failures.</string>
+    <string name="ram_info">RAM Info</string>
+    <string name="swap_info">SWAP Info</string>
+    <string name="used">used</string>
+    <string name="free">free</string>
 </resources>

@@ -328,4 +328,8 @@
     <string name="selinux_permissive_sum">将SELinux切换到宽容模式（有些软件叫【关闭Selinux】），SeLinux的状态对DKM SU没有影响，而且启用宽容模式可能会导致崩溃重启！</string>
     <string name="apply_onboot">启动时应用</string>
     <string name="selinux_onboot">不建议在启动时更改 selinux 状态，如果系统出现故障，请使用 rom 的内置 selinux。</string>
+    <string name="ram_info">RAM信息</string>
+    <string name="swap_info">SWAP信息</string>
+    <string name="used">用过的</string>
+    <string name="free">自由的</string>
 </resources>

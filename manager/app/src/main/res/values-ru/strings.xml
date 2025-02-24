@@ -328,4 +328,8 @@
     <string name="selinux_permissive_sum">Переключите SELinux в разрешающий режим (некоторые программы называют это [Close Selinux]), состояние SeLinux не повлияет на DKM SU, а включение разрешающего режима может привести к сбою и перезапуску!</string>
     <string name="apply_onboot">Применить при загрузке</string>
     <string name="selinux_onboot">Не рекомендуется изменять статус selinux при загрузке. Если у вас возникнут системные сбои, используйте встроенный в ПЗУ selinux.</string>
+    <string name="ram_info">Информация о ОЗУ</string>
+    <string name="swap_info">Информация о свопе</string>
+    <string name="used">использовал</string>
+    <string name="free">бесплатно</string>
 </resources>
