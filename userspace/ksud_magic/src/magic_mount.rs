@@ -4,7 +4,7 @@ use crate::defs::{
 use crate::magic_mount::NodeFileType::{Directory, RegularFile, Symlink, Whiteout};
 use crate::restorecon::{lgetfilecon, lsetfilecon};
 use crate::utils::ensure_dir_exists;
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use extattr::lgetxattr;
 use rustix::fs::{
     bind_mount, chmod, chown, mount, move_mount, unmount, Gid, MetadataExt, Mode, MountFlags,
