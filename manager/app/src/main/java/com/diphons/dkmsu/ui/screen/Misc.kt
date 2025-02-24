@@ -379,10 +379,13 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                 var selinuxSwitch by rememberSaveable {
                     mutableStateOf(globalConfig.getBoolean(SpfConfig.SELINUX_MODE, !isSELinuxActive()))
                 }
+                var selinuxOnBoot by rememberSaveable {
+                    mutableStateOf(globalConfig.getBoolean(SpfConfig.SELINUX_ONBOOT, false))
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                        .padding(start = 5.dp, end = 5.dp, top = 10.dp)
                 ) {
                     SwitchItem(
                         title = stringResource(id = R.string.selinux_permissive),
@@ -394,6 +397,22 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                         globalConfig.edit().putBoolean(SpfConfig.SELINUX_MODE, it).apply()
                         selinuxSwitch = it
                         activateSELinux(!it, context)
+                    }
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 5.dp, end = 5.dp, bottom = 10.dp)
+                ) {
+                    SwitchItem(
+                        title = stringResource(id = R.string.apply_onboot),
+                        checked = selinuxOnBoot,
+                        summary = stringResource(id = R.string.selinux_onboot),
+                        fontSize = 15.sp,
+                        fontSizeSum = 13.sp
+                    ) {
+                        globalConfig.edit().putBoolean(SpfConfig.SELINUX_ONBOOT, it).apply()
+                        selinuxOnBoot = it
                     }
                 }
             }

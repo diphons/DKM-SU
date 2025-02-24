@@ -82,4 +82,5 @@ public class SpfConfig {
     public static String SPOOF_DEFAULT = "spoof_default";
     public static String SPOOF_ENCRYPT = "spoof_encrypt";
     public static String SELINUX_MODE = "selinux_mode";
+    public static String SELINUX_ONBOOT = "selinux_onboot";
 }

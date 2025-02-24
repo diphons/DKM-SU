@@ -349,4 +349,6 @@
     <string name="spoof_encrypt_sum">Enable to use fake encryption</string>
     <string name="selinux_permissive">SeLinux tolerance mode</string>
     <string name="selinux_permissive_sum">Switch SELinux to permissive mode (some software is called [Close Selinux]), the state of SeLinux has no effect on DKM, and enabling permissive mode may crash and restart!</string>
+    <string name="apply_onboot">Apply on boot</string>
+    <string name="selinux_onboot">Changing selinux status at boot is not recommended, use the rom\'s built-in selinux if you get system failures.</string>
 </resources>

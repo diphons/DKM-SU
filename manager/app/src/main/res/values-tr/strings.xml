@@ -326,4 +326,6 @@
     <string name="spoof_encrypt_sum">Sahte şifrelemeyi kullanmayı etkinleştir</string>
     <string name="selinux_permissive">SeLinux tolerans modu</string>
     <string name="selinux_permissive_sum">SELinux\'u izin verici moda geçirin (bazı yazılımlara [Selinux\'u Kapat] denir), SeLinux\'un durumu DKM SU üzerinde hiçbir etkiye sahip değildir ve izin verici modun etkinleştirilmesi çökebilir ve yeniden başlatılabilir!</string>
+    <string name="apply_onboot">Önyüklemede uygula</string>
+    <string name="selinux_onboot">Selinux durumunu boot sırasında değiştirmeniz önerilmez, sistem hataları alırsanız rom\'un içindeki selinux\'u kullanın.</string>
 </resources>

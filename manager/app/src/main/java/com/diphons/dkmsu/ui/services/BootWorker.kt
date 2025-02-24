@@ -32,6 +32,8 @@ import com.diphons.dkmsu.ui.util.Utils.SKIP_THERMAL
 import com.diphons.dkmsu.ui.util.Utils.SOUND_CONTROL
 import com.diphons.dkmsu.ui.util.Utils.STEP_CHARGING
 import com.diphons.dkmsu.ui.util.Utils.TOUCH_SAMPLE
+import com.diphons.dkmsu.ui.util.Utils.activateSELinux
+import com.diphons.dkmsu.ui.util.Utils.isSELinuxActive
 import com.diphons.dkmsu.ui.util.getCurrentCharger
 import com.diphons.dkmsu.ui.util.getDefDT2W
 import com.diphons.dkmsu.ui.util.getKNVersion
@@ -57,6 +59,11 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
 
         if (globalConfig.getBoolean(SpfConfig.SPOOF_ENCRYPT, false))
             RootUtils.runCommand("resetprop ro.crypto.state encrypted")
+
+        if (globalConfig.getBoolean(SpfConfig.SELINUX_ONBOOT, false)) {
+            val selinuxState = globalConfig.getBoolean(SpfConfig.SELINUX_MODE, !isSELinuxActive())
+            activateSELinux(selinuxState, applicationContext)
+        }
 
         globalConfig.edit().putBoolean(SpfConfig.GKI_MODE, getKNVersion()).apply()
         if (hasModule(GAME_AI)) {

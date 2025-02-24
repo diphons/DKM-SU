@@ -326,4 +326,6 @@
     <string name="spoof_encrypt_sum">Разрешить использовать поддельное шифрование</string>
     <string name="selinux_permissive">Режим толерантности SeLinux</string>
     <string name="selinux_permissive_sum">Переключите SELinux в разрешающий режим (некоторые программы называют это [Close Selinux]), состояние SeLinux не повлияет на DKM SU, а включение разрешающего режима может привести к сбою и перезапуску!</string>
+    <string name="apply_onboot">Применить при загрузке</string>
+    <string name="selinux_onboot">Не рекомендуется изменять статус selinux при загрузке. Если у вас возникнут системные сбои, используйте встроенный в ПЗУ selinux.</string>
 </resources>
