@@ -26,6 +26,7 @@ class SelinuxTile : TileService() {
         val tile = this.qsTile
         val newState: Int
         val newLabel: String
+        val newIcon: Icon
 
         state = prefs.getBoolean(SpfConfig.SELINUX_MODE, !Utils.isSELinuxActive())
         prefs.edit().putBoolean(SpfConfig.SELINUX_MODE, !state).apply()
@@ -33,11 +34,12 @@ class SelinuxTile : TileService() {
         if (state) {
             newState = Tile.STATE_INACTIVE
             newLabel = "Enforcing"
+            newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_selinux)
         } else {
             newState = Tile.STATE_ACTIVE
             newLabel = "Permissive"
+            newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_selinux_permissive)
         }
-        val newIcon: Icon = Icon.createWithResource(applicationContext, R.drawable.ic_selinux)
         tile.label = newLabel
         tile.icon = newIcon
         tile.state = newState
@@ -55,19 +57,22 @@ class SelinuxTile : TileService() {
         val tile = this.qsTile
         val newState: Int
         val newLabel: String
+        val newIcon: Icon
         if (isManager) {
             if (state) {
                 newState = Tile.STATE_ACTIVE
                 newLabel = "Permissive"
+                newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_selinux_permissive)
             } else {
                 newState = Tile.STATE_INACTIVE
                 newLabel = "Enforcing"
+                newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_selinux)
             }
         } else {
             newState = Tile.STATE_UNAVAILABLE
             newLabel = "Selinux"
+            newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_selinux)
         }
-        val newIcon: Icon = Icon.createWithResource(applicationContext, R.drawable.ic_selinux)
         tile.label = newLabel
         tile.icon = newIcon
         tile.state = newState
