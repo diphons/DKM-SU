@@ -30,15 +30,16 @@ class SelinuxTile : TileService() {
 
         state = prefs.getBoolean(SpfConfig.SELINUX_MODE, !Utils.isSELinuxActive())
         prefs.edit().putBoolean(SpfConfig.SELINUX_MODE, !state).apply()
-        Utils.activateSELinux(!state, this)
         if (state) {
             newState = Tile.STATE_INACTIVE
             newLabel = "Enforcing"
             newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_selinux)
+            Utils.activateSELinux(true, this)
         } else {
             newState = Tile.STATE_ACTIVE
             newLabel = "Permissive"
             newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_selinux_permissive)
+            Utils.activateSELinux(false, this)
         }
         tile.label = newLabel
         tile.icon = newIcon
