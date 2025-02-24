@@ -76,6 +76,7 @@ import com.diphons.dkmsu.ui.util.getKnVersion
 import com.diphons.dkmsu.ui.util.getSpoofKnVersion
 import com.diphons.dkmsu.ui.util.getSuSFS
 import com.diphons.dkmsu.ui.util.getStartedSVC
+import com.diphons.dkmsu.ui.util.hasJoyose
 import com.diphons.dkmsu.ui.util.hasModule
 import com.diphons.dkmsu.ui.util.install_dkmsvc
 import com.diphons.dkmsu.ui.util.isInternetAvailable
@@ -302,7 +303,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                     }
                 }
             }
-            if (hasModule(BLOCK_JOYOSE)) {
+            if (hasModule(BLOCK_JOYOSE) && hasJoyose()) {
                 ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()

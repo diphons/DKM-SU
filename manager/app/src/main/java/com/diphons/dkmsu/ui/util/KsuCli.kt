@@ -1871,3 +1871,8 @@ fun getWakelockBlockDef(): String{
         getWLBlocker = RootUtils.runAndGetOutput("cat $BOEFFLA_WL_BLOCKER")
     return getWLBlocker
 }
+
+fun hasJoyose(): Boolean{
+    val result = RootUtils.runAndGetOutput("pm list packages | grep 'joyose'")
+    return result.isNotEmpty()
+}
