@@ -53,7 +53,9 @@ fun DialogCard() {
 }
 
 @Composable
-fun runDialog(dismiss: () -> Unit) {
+fun runDialog(
+        dismiss: () -> Unit
+    ) {
     Dialog(
         onDismissRequest = { dismiss() }
     ) {

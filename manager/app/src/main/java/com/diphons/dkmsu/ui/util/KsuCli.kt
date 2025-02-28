@@ -32,6 +32,7 @@ import com.diphons.dkmsu.R
 import com.diphons.dkmsu.getKernelVersion
 import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.component.KeepShellPublic
+import com.diphons.dkmsu.ui.component.SwapUtils
 import com.diphons.dkmsu.ui.services.ExtractAssetsWorker
 import com.diphons.dkmsu.ui.services.PIFWorker
 import com.diphons.dkmsu.ui.services.PermWorker
@@ -48,8 +49,11 @@ import kotlinx.parcelize.Parcelize
 import org.json.JSONArray
 import java.io.File
 import java.time.Duration
+import java.util.Timer
+import java.util.TimerTask
 import java.util.TreeMap
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 /**
  * @author weishu
@@ -1875,4 +1879,110 @@ fun getWakelockBlockDef(): String{
 fun hasJoyose(): Boolean{
     val result = RootUtils.runAndGetOutput("pm list packages | grep 'joyose'")
     return result.isNotEmpty()
+}
+
+fun getSwapPosition(value: Int, ram: Int): Float{
+    if (ram < 4000) {
+        if (value <= 1024)
+            return 0.0f
+        else if (value <= 2048)
+            return 0.1f
+        else if (value <= 3072)
+            return 0.2f
+        else
+            return 0.3f
+    } else if (ram < 6000) {
+        if (value <= 1024)
+            return 0.0f
+        else if (value <= 2048)
+            return 0.1f
+        else if (value <= 4096)
+            return 0.2f
+        else
+            return 0.3f
+    } else if (ram < 8000) {
+        if (value <= 2048)
+            return 0.0f
+        else if (value <= 4096)
+            return 0.1f
+        else if (value <= 6144)
+            return 0.2f
+        else
+            return 0.3f
+    } else if (ram < 12000) {
+        if (value <= 4096)
+            return 0.0f
+        else if (value <= 6144)
+            return 0.1f
+        else if (value <= 8192)
+            return 0.2f
+        else
+            return 0.3f
+    } else if (ram < 16000) {
+        if (value <= 6144)
+            return 0.0f
+        else if (value <= 8192)
+            return 0.1f
+        else if (value <= 12288)
+            return 0.2f
+        else
+            return 0.3f
+    } else {
+        if (value <= 8192)
+            return 0.0f
+        else if (value <= 12288)
+            return 0.1f
+        else if (value <= 16384)
+            return 0.2f
+        else
+            return 0.3f
+    }
+}
+
+fun getSwapSize(value: Float, ram: Int): Int{
+    val valRam: Int
+    val swapSet: Int = ((value * 10) + 1).toInt()
+    if (ram < 4000) {
+        valRam = swapSet
+    } else if (ram < 6000) {
+        valRam = when (swapSet) {
+            4 -> 6
+            3 -> 4
+            else -> swapSet
+        }
+    } else if (ram < 8000) {
+        valRam = when (swapSet) {
+            4 -> 8
+            3 -> 6
+            2 -> 4
+            else -> 2
+        }
+    } else if (ram < 12000) {
+        valRam = when (swapSet) {
+            4 -> 12
+            3 -> 8
+            2 -> 6
+            else -> 4
+        }
+    } else if (ram < 16000) {
+        valRam = when (swapSet) {
+            4 -> 16
+            3 -> 12
+            2 -> 8
+            else -> 6
+        }
+    } else {
+        valRam = when (swapSet) {
+            4 -> 24
+            3 -> 16
+            2 -> 12
+            else -> 8
+        }
+    }
+    return valRam * 1024
+}
+
+fun mbToGB(value: Int): Int {
+    val result = (value / 1000).toFloat()
+    return result.roundToInt()
 }

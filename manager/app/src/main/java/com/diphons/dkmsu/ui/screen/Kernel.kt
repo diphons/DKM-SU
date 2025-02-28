@@ -98,6 +98,7 @@ import com.ramcosta.composedestinations.generated.destinations.PowerScreenDestin
 import com.ramcosta.composedestinations.generated.destinations.PerfmodeScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.MiscScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.SwapScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.WakelocksScreenDestination
 
 /**
@@ -346,15 +347,20 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                     }
                 }
             }
-            ElevatedCard {
+            ElevatedCard (
+                modifier = Modifier
+                    .clickable {
+                        navigator.navigate(SwapScreenDestination)
+                    }
+            ){
                 var totalMem by rememberSaveable { mutableIntStateOf(0) }
                 var availMem by rememberSaveable { mutableIntStateOf(0) }
                 var usedMem by rememberSaveable { mutableIntStateOf(0) }
                 var swapInfo by rememberSaveable { mutableStateOf("") }
-                var swapTotal by rememberSaveable { mutableIntStateOf(0) }
+                var swapTotal by rememberSaveable { mutableIntStateOf(prefs.getInt(SpfConfig.SWAP_SIZE, 0)) }
                 var swapUsed by rememberSaveable { mutableIntStateOf(0) }
 
-                LaunchedEffect(true) {
+                fun reloadSwap(){
                     val info = ActivityManager.MemoryInfo().apply {
                         activityManager.getMemoryInfo(this)
                     }
@@ -375,10 +381,14 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                     ramSlider.value = usedMem.toFloat() / totalMem.toFloat()
                     swapSlider.value = swapUsed.toFloat() / swapTotal.toFloat()
                 }
+
+                LaunchedEffect(Unit) {
+                    reloadSwap()
+                }
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp)
+                        .padding(start = 24.dp, top = 24.dp, bottom = 5.dp, end = 24.dp)
                 ) {
                     if (hasModule(UFS_HEALTH)) {
                         ufs_healt_info.value = (getUFSHelat().toFloat() / 100)
@@ -425,14 +435,14 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                         Text(
                             modifier = Modifier
                                 .align(Alignment.TopStart),
-                            text = stringResource(R.string.ram_info),
+                            text = stringResource(R.string.device_memory),
                             fontSize = 15.sp,
                             style = MaterialTheme.typography.titleSmall
                         )
                         Text(
                             modifier = Modifier
                                 .align(Alignment.TopEnd),
-                            text = "$totalMem MB",
+                            text = "${mbToGB(totalMem) + 1} GB",
                             fontSize = 15.sp,
                             style = MaterialTheme.typography.titleSmall
                         )
@@ -469,41 +479,54 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                             Text(
                                 modifier = Modifier
                                     .align(Alignment.TopStart),
-                                text = stringResource(R.string.swap_info),
+                                text = stringResource(R.string.zram_memory),
                                 fontSize = 15.sp,
                                 style = MaterialTheme.typography.titleSmall
                             )
                             Text(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd),
-                                text = "$swapTotal MB",
+                                text = if (!swapRun) "${mbToGB(swapTotal)} GB" else stringResource(R.string.ram_recycle),
                                 fontSize = 15.sp,
                                 style = MaterialTheme.typography.titleSmall
                             )
                         }
-                        Spacer(Modifier.height(4.dp))
-                        Box(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
+                        if (!swapRun) {
+                            Spacer(Modifier.height(4.dp))
+                            Box(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.TopStart),
+                                    text = "$swapUsed MB ${stringResource(R.string.used)}",
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd),
+                                    text = "${swapTotal - swapUsed} MB ${stringResource(R.string.free)}",
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                            ProgressIndicator(
                                 modifier = Modifier
-                                    .align(Alignment.TopStart),
-                                text = "$swapUsed MB ${stringResource(R.string.used)}",
-                                fontSize = 13.sp,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd),
-                                text = "${swapTotal - swapUsed} MB ${stringResource(R.string.free)}",
-                                fontSize = 13.sp,
-                                style = MaterialTheme.typography.bodyMedium
+                                    .padding(top = 4.dp),
+                                progress = swapSlider.value!!
                             )
                         }
-                        ProgressIndicator(
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Box (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ){
+                        Icon(
+                            Icons.Filled.KeyboardArrowDown, "",
                             modifier = Modifier
-                                .padding(top = 4.dp),
-                            progress = swapSlider.value!!
+                                .align(Alignment.BottomCenter)
                         )
                     }
                 }

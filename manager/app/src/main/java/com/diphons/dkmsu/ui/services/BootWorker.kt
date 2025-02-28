@@ -4,48 +4,27 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.KeepShellPublic
+import com.diphons.dkmsu.ui.component.SwapUtils
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.RootUtils
-import com.diphons.dkmsu.ui.util.Utils.BOEFFLA_WL_BLOCKER
-import com.diphons.dkmsu.ui.util.Utils.CHG_CUR_MAX
-import com.diphons.dkmsu.ui.util.Utils.DISPLAY_BLUE
-import com.diphons.dkmsu.ui.util.Utils.DISPLAY_CONTRAST
-import com.diphons.dkmsu.ui.util.Utils.DISPLAY_GREEN
-import com.diphons.dkmsu.ui.util.Utils.DISPLAY_HUE
-import com.diphons.dkmsu.ui.util.Utils.DISPLAY_RED
-import com.diphons.dkmsu.ui.util.Utils.DISPLAY_SATURATED
-import com.diphons.dkmsu.ui.util.Utils.DISPLAY_VALUE
-import com.diphons.dkmsu.ui.util.Utils.DT2W
-import com.diphons.dkmsu.ui.util.Utils.DT2W_LEGACY
-import com.diphons.dkmsu.ui.util.Utils.DYNAMIC_CHARGING
-import com.diphons.dkmsu.ui.util.Utils.EARPIECE_GAIN
-import com.diphons.dkmsu.ui.util.Utils.FCHG_SYS
-import com.diphons.dkmsu.ui.util.Utils.GAME_AI
-import com.diphons.dkmsu.ui.util.Utils.GAME_AI_LIST_DEFAULT
-import com.diphons.dkmsu.ui.util.Utils.GAME_AI_LOG
-import com.diphons.dkmsu.ui.util.Utils.HAPTIC_LEVEL
-import com.diphons.dkmsu.ui.util.Utils.HEADPHONE_GAIN
-import com.diphons.dkmsu.ui.util.Utils.MICROPHONE_GAIN
-import com.diphons.dkmsu.ui.util.Utils.NIGHT_CHARGING
-import com.diphons.dkmsu.ui.util.Utils.SKIP_THERMAL
-import com.diphons.dkmsu.ui.util.Utils.SOUND_CONTROL
-import com.diphons.dkmsu.ui.util.Utils.STEP_CHARGING
-import com.diphons.dkmsu.ui.util.Utils.TOUCH_SAMPLE
-import com.diphons.dkmsu.ui.util.Utils.activateSELinux
-import com.diphons.dkmsu.ui.util.Utils.isSELinuxActive
+import com.diphons.dkmsu.ui.util.Utils.*
 import com.diphons.dkmsu.ui.util.getCurrentCharger
 import com.diphons.dkmsu.ui.util.getDefDT2W
 import com.diphons.dkmsu.ui.util.getKNVersion
 import com.diphons.dkmsu.ui.util.getXMPath
 import com.diphons.dkmsu.ui.util.hasModule
 import com.diphons.dkmsu.ui.util.hasXiaomiDevice
+import com.diphons.dkmsu.ui.util.mbToGB
 import com.diphons.dkmsu.ui.util.runSVCWorker
 import com.diphons.dkmsu.ui.util.setGameList
 import com.diphons.dkmsu.ui.util.setKernel
 import com.diphons.dkmsu.ui.util.setProfile
 import com.diphons.dkmsu.ui.util.setWLBlocker
 import com.diphons.dkmsu.ui.util.setXiaomiTouch
+import java.util.Timer
+import java.util.TimerTask
 
 class BootWorker(context : Context, params : WorkerParameters) : Worker(context,params) {
     private lateinit var globalConfig: SharedPreferences
@@ -163,9 +142,86 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
             setWLBlocker(applicationContext)
         if (globalConfig.getBoolean(SpfConfig.BATTERY_NOTIF, false))
             RootUtils.runCommand("setprop init.dkmsvc.cmd battery")
+
+        // Memory
+        val swappiness = globalConfig.getString(SpfConfig.SWAPPINESS, "")
+        val dirtyRatio = globalConfig.getString(SpfConfig.DIRTY_RATIO, "")
+        val dirtyBackgroundRatio = globalConfig.getString(SpfConfig.DIRTY_BACK_RATIO, "")
+        val dirtyWritebackCentisecs = globalConfig.getString(SpfConfig.DIRTY_WRITE_CENTISECS, "")
+        val dirtyExpireCentisecs = globalConfig.getString(SpfConfig.DIRTY_EXPIRE_CENTISECS, "")
+        if (swappiness!!.isNotEmpty())
+            setKernel(swappiness, VM_SWAPPINESS)
+        if (dirtyRatio!!.isNotEmpty())
+            setKernel(dirtyRatio, VM_DIRTY_RATIO)
+        if (dirtyBackgroundRatio!!.isNotEmpty())
+            setKernel(dirtyBackgroundRatio, VM_DIRTY_BACK_RATIO)
+        if (dirtyWritebackCentisecs!!.isNotEmpty())
+            setKernel(dirtyWritebackCentisecs, VM_DIRTY_WRITE_CENTISECS)
+        if (dirtyExpireCentisecs!!.isNotEmpty())
+            setKernel(dirtyExpireCentisecs, VM_DIRTY_EXPIRE_CENTISECS)
+
         // Start DKM Service
         runSVCWorker(applicationContext, "")
 
+        val swapSize = globalConfig.getInt(SpfConfig.SWAP_SIZE, 0)
+        val swapInfo = KeepShellPublic.doCmdSync("free -m | grep Swap")
+        var swapTotal = 0
+        if (swapInfo.contains("Swap")) {
+            try {
+                val swapInfoStr = swapInfo.substring(swapInfo.indexOf(" "), swapInfo.lastIndexOf(" ")).trim()
+                if (Regex("[\\d]+[\\s]+[\\d]+").matches(swapInfoStr)) {
+                    swapTotal = swapInfoStr.substring(0, swapInfoStr.indexOf(" ")).trim().toInt()
+                }
+            } catch (_: java.lang.Exception) {
+            }
+        }
+        val stop = Thread {
+            if (swapTotal > 0) {
+                val timer = zramOffAwait(applicationContext)
+                SwapUtils().zramOff()
+                timer.cancel()
+                swapTotal = 0
+                swapRun = false
+            }
+        }
+        val run = Thread {
+            val timer: Timer
+            if (swapTotal > 0) {
+                swapRun = true
+                timer = zramOffAwait(applicationContext)
+                SwapUtils().zramOff()
+                timer.cancel()
+            }
+            SwapUtils().resizeZram(swapSize, globalConfig.getString(SpfConfig.SWAP_ALGORITHM, SwapUtils().compAlgorithm)!!)
+            swapRun = false
+        }
+        if (globalConfig.getBoolean(SpfConfig.SWAP_ENABLE, false) && swapSize > 0 && mbToGB(swapSize) != mbToGB(swapTotal))
+            Thread(run).start()
+        else if (!globalConfig.getBoolean(SpfConfig.SWAP_ENABLE, false) && swapTotal > 0)
+            Thread(stop).start()
+
         return Result.success()
+    }
+
+    private fun zramOffAwait(context: Context): Timer {
+        val timer = Timer()
+        val totalUsed = SwapUtils().zramUsedSize
+        val startTime = System.currentTimeMillis()
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                val currentUsed = SwapUtils().zramUsedSize
+                val avgSpeed = (totalUsed - currentUsed).toFloat() / (System.currentTimeMillis() - startTime) * 1000
+                val tipStr = StringBuilder()
+                tipStr.append(
+                    String.format("${context.getString(R.string.ram_recycle)} ${currentUsed}/${totalUsed}MB (%.1fMB/s).", avgSpeed) +
+                            if (avgSpeed > 0)
+                                " ${context.getString(R.string.ram_approximately)} " + (currentUsed / avgSpeed).toInt() + context.getString(R.string.second)
+                            else
+                                " ${context.getString(R.string.please_wait)}~"
+                )
+                CMD_MSG = tipStr.toString()
+            }
+        }, 0, 1000)
+        return timer
     }
 }

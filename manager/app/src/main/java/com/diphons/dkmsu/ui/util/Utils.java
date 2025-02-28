@@ -119,6 +119,12 @@ public class Utils {
     public static String UFS_HEALTH = "/sys/devices/platform/soc/1d84000.ufshc/health_descriptor/life_time_estimation_a";
 
     public static Integer DIALOG_MODE = 0;
+    public static String PROC_VM = "/proc/sys/vm";
+    public static String VM_SWAPPINESS = PROC_VM + "/swappiness";
+    public static String VM_DIRTY_RATIO = PROC_VM + "/dirty_ratio";
+    public static String VM_DIRTY_BACK_RATIO = PROC_VM + "/dirty_background_ratio";
+    public static String VM_DIRTY_WRITE_CENTISECS = PROC_VM + "/dirty_writeback_centisecs";
+    public static String VM_DIRTY_EXPIRE_CENTISECS = PROC_VM + "/dirty_expire_centisecs";
     public static String SUS_MOUNT() {
         return "# example\n# /system\n# /system_ext\n/data/adb/modules\n/debug_ramdisk\n" ;
     }
@@ -411,4 +417,5 @@ public class Utils {
     public static void activateSELinux(boolean active, Context context) {
         ControlSelinux.runCommand_se(active ? "1" : "0", SETENFORCE, ControlSelinux.CommandType.SHELL, context);
     }
+    public static boolean swapRun = false;
 }

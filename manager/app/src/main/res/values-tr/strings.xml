@@ -328,8 +328,19 @@
     <string name="selinux_permissive_sum">SELinux\'u izin verici moda geçirin (bazı yazılımlara [Selinux\'u Kapat] denir), SeLinux\'un durumu DKM SU üzerinde hiçbir etkiye sahip değildir ve izin verici modun etkinleştirilmesi çökebilir ve yeniden başlatılabilir!</string>
     <string name="apply_onboot">Önyüklemede uygula</string>
     <string name="selinux_onboot">Selinux durumunu boot sırasında değiştirmeniz önerilmez, sistem hataları alırsanız rom\'un içindeki selinux\'u kullanın.</string>
-    <string name="ram_info">RAM Bilgisi</string>
-    <string name="swap_info">SWAP Bilgisi</string>
+    <string name="device_memory">Cihaz hafızası</string>
+    <string name="zram_memory">ZRAM belleği</string>
     <string name="used">kullanılmış</string>
     <string name="free">özgür</string>
+    <string name="choose">Seçmek</string>
+    <string name="ram_algorithm">Sıkıştırma algoritması</string>
+    <string name="memory">Hafıza</string>
+    <string name="size">Boyutu</string>
+    <string name="finish">Bitiş</string>
+    <string name="to">-e</string>
+    <string name="set">Set</string>
+    <string name="second">ikinci</string>
+    <string name="please_wait">lütfen bekle</string>
+    <string name="ram_approximately">Yaklaşık</string>
+    <string name="ram_recycle">ZRAM\'ı geri dönüştürün</string>
 </resources>

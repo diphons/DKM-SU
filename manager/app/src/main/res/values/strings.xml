@@ -351,8 +351,19 @@
     <string name="selinux_permissive_sum">Switch SELinux to permissive mode (some software is called [Close Selinux]), the state of SeLinux has no effect on DKM, and enabling permissive mode may crash and restart!</string>
     <string name="apply_onboot">Apply on boot</string>
     <string name="selinux_onboot">Changing selinux status at boot is not recommended, use the rom\'s built-in selinux if you get system failures.</string>
-    <string name="ram_info">RAM Info</string>
-    <string name="swap_info">SWAP Info</string>
+    <string name="device_memory">Device memory</string>
+    <string name="zram_memory">ZRAM memory</string>
     <string name="used">used</string>
     <string name="free">free</string>
+    <string name="choose">Choose</string>
+    <string name="ram_algorithm">Compressions algorithm</string>
+    <string name="memory">Memory</string>
+    <string name="size">Size</string>
+    <string name="finish">Finish</string>
+    <string name="to">to</string>
+    <string name="set">Set</string>
+    <string name="second">second</string>
+    <string name="please_wait">Please wait</string>
+    <string name="ram_approximately">Approximately</string>
+    <string name="ram_recycle">Recycle ZRAM</string>
 </resources>

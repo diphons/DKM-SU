@@ -328,8 +328,19 @@
     <string name="selinux_permissive_sum">Alihkan SELinux ke mode permisif (beberapa perangkat lunak disebut [Tutup Selinux]), status SeLinux tidak berpengaruh pada DKM SU, dan mengaktifkan mode permisif dapat menyebabkan crash dan restart!</string>
     <string name="apply_onboot">Terapkan saat boot</string>
     <string name="selinux_onboot">Mengubah status selinux saat boot tidak disarankan, gunakan selinux bawaan rom jika Anda mengalami kegagalan sistem.</string>
-    <string name="ram_info">Info RAM</string>
-    <string name="swap_info">Info SWAP</string>
+    <string name="device_memory">Memori perangkat</string>
+    <string name="zram_memory">Memori ZRAM</string>
     <string name="used">digunakan</string>
     <string name="free">bebas</string>
+    <string name="choose">Pilih</string>
+    <string name="ram_algorithm">Algoritma kompresi</string>
+    <string name="memory">Memori</string>
+    <string name="size">Ukuran</string>
+    <string name="finish">Selesai</string>
+    <string name="to">ke</string>
+    <string name="set">Atur</string>
+    <string name="second">detik</string>
+    <string name="please_wait">Mohon tunggu</string>
+    <string name="ram_approximately">Sekitar</string>
+    <string name="ram_recycle">Mendaur ulang ZRAM</string>
 </resources>

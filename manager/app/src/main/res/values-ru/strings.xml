@@ -328,8 +328,19 @@
     <string name="selinux_permissive_sum">Переключите SELinux в разрешающий режим (некоторые программы называют это [Close Selinux]), состояние SeLinux не повлияет на DKM SU, а включение разрешающего режима может привести к сбою и перезапуску!</string>
     <string name="apply_onboot">Применить при загрузке</string>
     <string name="selinux_onboot">Не рекомендуется изменять статус selinux при загрузке. Если у вас возникнут системные сбои, используйте встроенный в ПЗУ selinux.</string>
-    <string name="ram_info">Информация о ОЗУ</string>
-    <string name="swap_info">Информация о свопе</string>
+    <string name="device_memory">Память прибора</string>
+    <string name="zram_memory">ZRAM-память</string>
     <string name="used">использовал</string>
     <string name="free">бесплатно</string>
+    <string name="choose">Выбирать</string>
+    <string name="ram_algorithm">Алгоритм сжатия</string>
+    <string name="memory">Память</string>
+    <string name="size">Размер</string>
+    <string name="finish">Завершить</string>
+    <string name="to">к</string>
+    <string name="set">Набор</string>
+    <string name="second">второй</string>
+    <string name="please_wait">пожалуйста, подождите</string>
+    <string name="ram_approximately">Примерно</string>
+    <string name="ram_recycle">Переработка ZRAM</string>
 </resources>
