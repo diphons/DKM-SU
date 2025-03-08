@@ -280,6 +280,6 @@ fn add_path_to_env(path: &str) -> Result<()> {
     let new_path = PathBuf::from(path.trim_end_matches('/'));
     paths.push(new_path);
     let new_path_env = env::join_paths(paths)?;
-    env::set_var("PATH", new_path_env);
+    unsafe { env::set_var("PATH", new_path_env) };
     Ok(())
 }
