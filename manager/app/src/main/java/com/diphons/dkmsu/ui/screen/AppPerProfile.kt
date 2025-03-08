@@ -204,6 +204,9 @@ fun AppPerProfileScreen(
     var io_sched by rememberSaveable {
         mutableStateOf(prefs.getString("io_sched", getDefIOSched()))
     }
+    var tcp_congs by rememberSaveable {
+        mutableStateOf(prefs.getString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))))
+    }
     var fps_monitor by rememberSaveable {
         mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI, false))
     }
@@ -456,6 +459,22 @@ fun AppPerProfileScreen(
                     getModeSelect = 0
                 }
             }
+            DialogType.Tcp -> {
+                listDialog(
+                    text = event.title,
+                    value = event.value,
+                    selected = event.selected
+                ) {
+                    if (getValueDialog.isNotEmpty()) {
+                        tcp_congs = getValueDialog
+                        prefs.edit().putString("tcp", getValueDialog).apply()
+                        updateVisible()
+                    }
+                    dialogEvent = null
+                    getValueDialog = ""
+                    getModeSelect = 0
+                }
+            }
         }
     }
 
@@ -571,6 +590,7 @@ fun AppPerProfileScreen(
         prefs.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
         prefs.edit().putInt("thermal", getDefThermalProfile(profile, gki_mode)).apply()
         prefs.edit().putString("io_sched", getDefIOSched()).apply()
+        prefs.edit().putString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))).apply()
         prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, false).apply()
     }
     Scaffold(
@@ -1406,6 +1426,50 @@ fun AppPerProfileScreen(
                     }
                 }
 
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp, horizontal = 22.dp),
+                        text = "TCP Congestion",
+                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                getModeSelect = 2
+                                dialogEvent = DialogEvent(
+                                    DialogType.Tcp,
+                                    0, getModeSelect,
+                                    "Choose TCP Congestion",
+                                    readKernel(TCP_CONGS_AV),
+                                    "$tcp_congs"
+                                )
+                            }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart),
+                            text = "Profile",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd),
+                            text = "$tcp_congs",
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
                 if (hasModule(SOUND_CONTROL)) {
                     ElevatedCard {
                         Column(

@@ -59,6 +59,8 @@ import com.diphons.dkmsu.ui.util.Utils.CPU_INFO_MAX
 import com.diphons.dkmsu.ui.util.Utils.GAME_AI
 import com.diphons.dkmsu.ui.util.Utils.GAME_AI_LOG
 import com.diphons.dkmsu.ui.util.Utils.GPU_GOV
+import com.diphons.dkmsu.ui.util.Utils.TCP_CONGS
+import com.diphons.dkmsu.ui.util.Utils.TCP_CONGS_AV
 import com.diphons.dkmsu.ui.util.Utils.THERMAL_PROFILE
 import com.diphons.dkmsu.ui.util.Utils.strToInt
 import com.diphons.dkmsu.ui.util.cpu_av_freq
@@ -201,6 +203,10 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
     var gpu_adreno_boost = MutableLiveData<String>(parseAdrenoBoost(context, profile_load.getInt("gpu_adreno_boost", getDefAdrenoBoost(profile))))
     var thermal_profile = MutableLiveData<String>(getThermalString(context, profile_load.getInt("thermal", getDefThermalProfile(profile, gki_mode)), gki_mode))
     var io_sched = MutableLiveData<String>(profile_load.getString("io_sched", getIOSelect()))
+    var tcp_congs = MutableLiveData<String>(profile_load.getString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))))
+
+    if (globalConfig.getString(SpfConfig.TCP_CONG_DEF, "")!!.isEmpty())
+        globalConfig.edit().putString(SpfConfig.TCP_CONG_DEF, tcp_congs.value).apply()
 
     fun reloadDataInfo(pref_profile: SharedPreferences){
         cpu1_max_freq.value = pref_profile.getInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1))
@@ -235,6 +241,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
             gpu_adreno_boost.value = parseAdrenoBoost(context, pref_profile.getInt("gpu_adreno_boost", getDefAdrenoBoost(profile)))
         thermal_profile.value = getThermalString(context, pref_profile.getInt("thermal", getDefThermalProfile(profile, gki_mode)), gki_mode)
         io_sched.value = pref_profile.getString("io_sched", getIOSelect())
+        tcp_congs.value = pref_profile.getString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS)))
     }
 
     fun resetProfile(){
@@ -290,6 +297,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
             gpu_adreno_boost.value = parseAdrenoBoost(context, getDefAdrenoBoost(profile))
         thermal_profile.value = getThermalString(context, getDefThermalProfile(profile, gki_mode), gki_mode)
         io_sched.value = getDefIOSched()
+        tcp_congs.value = globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))
 
         setProfile(context, profile)
     }
@@ -499,6 +507,22 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                         thermal_profile.value = getValueDialog
                         profile_none.edit().putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)).apply()
                         setKernel("${getThermalInt(context, getValueDialog, gki_mode)}", THERMAL_PROFILE, true)
+                    }
+                    dialogEvent = null
+                    getValueDialog = ""
+                    getModeSelect = 0
+                }
+            }
+            DialogType.Tcp -> {
+                listDialog(
+                    text = event.title,
+                    value = event.value,
+                    selected = event.selected
+                ) {
+                    if (getValueDialog.isNotEmpty()) {
+                        tcp_congs.value = getValueDialog
+                        profile_none.edit().putString("tcp", getValueDialog).apply()
+                        setKernel(getValueDialog, TCP_CONGS)
                     }
                     dialogEvent = null
                     getValueDialog = ""
@@ -1698,6 +1722,36 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                 }
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 5.dp),
+                                    text = "TCP Chong",
+                                    fontSize = 12.sp,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 5.dp)
+                                ) {
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterStart),
+                                        text = "Chongestion",
+                                        fontSize = 10.sp,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterEnd),
+                                        text = "${tcp_congs.value}",
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 10.sp,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
                             }
                         }
                     }
@@ -2400,6 +2454,50 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                     modifier = Modifier
                                         .align(Alignment.CenterEnd),
                                     text = "${io_sched.value}",
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                        ElevatedCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 10.dp, horizontal = 22.dp),
+                                text = "TCP Congestion",
+                                fontSize = 15.sp,
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        getModeSelect = 2
+                                        dialogEvent = DialogEvent(
+                                            DialogType.Tcp,
+                                            0, getModeSelect,
+                                            "Choose TCP Congestion",
+                                            readKernel(TCP_CONGS_AV),
+                                            "${tcp_congs.value}"
+                                        )
+                                    }
+                                    .padding(vertical = 10.dp, horizontal = 22.dp)
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterStart),
+                                    text = "Profile",
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd),
+                                    text = "${tcp_congs.value}",
                                     textAlign = TextAlign.Center,
                                     fontSize = 13.sp,
                                     style = MaterialTheme.typography.bodySmall

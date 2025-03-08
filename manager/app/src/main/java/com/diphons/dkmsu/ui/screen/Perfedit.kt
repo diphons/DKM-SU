@@ -189,7 +189,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
     var gpu_adreno_boost by rememberSaveable {
         mutableStateOf(parseAdrenoBoost(context, prefs.getInt("gpu_adreno_boost", getDefAdrenoBoost(profile))))
     }
-    var gki_mode by rememberSaveable {
+    val gki_mode by rememberSaveable {
         mutableStateOf(globalConfig.getBoolean(SpfConfig.GKI_MODE, false))
     }
     var thermal_profile by rememberSaveable {
@@ -198,10 +198,16 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
     var io_sched by rememberSaveable {
         mutableStateOf(prefs.getString("io_sched", getDefIOSched()))
     }
+    var tcp_congs by rememberSaveable {
+        mutableStateOf(prefs.getString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))))
+    }
 
     val hasAdrenoBoost by rememberSaveable {
         mutableStateOf(hasModule("${getGPUPath(context)}/$ADRENO_BOOST"))
     }
+
+    if (globalConfig.getString(SpfConfig.TCP_CONG_DEF, "")!!.isEmpty())
+        globalConfig.edit().putString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS)).apply()
 
     fun resetProfile(){
         prefs.edit().putInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1)).apply()
@@ -255,6 +261,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
         if (hasAdrenoBoost)
             gpu_adreno_boost = parseAdrenoBoost(context, getDefAdrenoBoost(profile))
         thermal_profile = getThermalString(context, getDefThermalProfile(profile, gki_mode), gki_mode)
+        tcp_congs = prefs.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))
         io_sched = getDefIOSched()
 
         setProfile(context, profile)
@@ -465,6 +472,22 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                         thermal_profile = getValueDialog
                         prefs.edit().putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)).apply()
                         setKernel("${getThermalInt(context, getValueDialog, gki_mode)}", THERMAL_PROFILE, true)
+                    }
+                    dialogEvent = null
+                    getValueDialog = ""
+                    getModeSelect = 0
+                }
+            }
+            DialogType.Tcp -> {
+                listDialog(
+                    text = event.title,
+                    value = event.value,
+                    selected = event.selected
+                ) {
+                    if (getValueDialog.isNotEmpty()) {
+                        tcp_congs = getValueDialog
+                        prefs.edit().putString("tcp", tcp_congs).apply()
+                        setKernel(tcp_congs!!, TCP_CONGS)
                     }
                     dialogEvent = null
                     getValueDialog = ""
@@ -1222,6 +1245,50 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                         )
                     }
                 }
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp, horizontal = 22.dp),
+                        text = "TCP Congestion",
+                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                getModeSelect = 2
+                                dialogEvent = DialogEvent(
+                                    DialogType.Tcp,
+                                    0, getModeSelect,
+                                    "Choose TCP Congestion",
+                                    readKernel(TCP_CONGS_AV),
+                                    "$tcp_congs"
+                                )
+                            }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart),
+                            text = "Profile",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd),
+                            text = "$tcp_congs",
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
             }
         }
     }
@@ -1335,6 +1402,7 @@ enum class DialogType {
     Gpu,
     Io,
     Thermal,
+    Tcp,
 }
 
 @Preview

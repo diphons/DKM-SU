@@ -296,6 +296,9 @@ fun AppGameAIScreen(
     var io_sched by rememberSaveable {
         mutableStateOf(perapp.getString("io_sched", getDefIOSched()))
     }
+    var tcp_congs by rememberSaveable {
+        mutableStateOf(perapp.getString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))))
+    }
     var gpu_max_freq by rememberSaveable {
         mutableStateOf(perapp.getInt("gpu_max_freq", getGPUMaxFreq(context)))
     }
@@ -508,6 +511,22 @@ fun AppGameAIScreen(
                     getdata = ""
                 }
             }
+            DialogType.Tcp -> {
+                listDialog(
+                    text = event.title,
+                    value = event.value,
+                    selected = event.selected
+                ) {
+                    if (getValueDialog.isNotEmpty()) {
+                        tcp_congs = getValueDialog
+                        perapp.edit().putString("tcp", getValueDialog).apply()
+                        updateVisible()
+                    }
+                    dialogEvent = null
+                    getValueDialog = ""
+                    getdata = ""
+                }
+            }
         }
     }
 
@@ -555,6 +574,7 @@ fun AppGameAIScreen(
         perapp.edit().putFloat(SpfConfig.SC_HEADFON, 0f).apply()
         perapp.edit().putFloat(SpfConfig.SC_HEADFON2, 0f).apply()
         perapp.edit().putString("io_sched", getDefIOSched()).apply()
+        perapp.edit().putString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))).apply()
         perapp.edit().putInt("gpu_max_freq", getGPUMaxFreq(context)).apply()
         perapp.edit().putInt("gpu_min_freq", getGPUMinFreq(context)).apply()
         perapp.edit().putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)).apply()
@@ -1029,6 +1049,49 @@ fun AppGameAIScreen(
                         modifier = Modifier
                             .align(Alignment.CenterEnd),
                         text = "$io_sched",
+                        textAlign = TextAlign.Center,
+                        fontSize = 13.sp,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
+
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp, horizontal = 22.dp),
+                    text = "TCP Congestion",
+                    fontSize = 15.sp,
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            dialogEvent = DialogEvent(
+                                DialogType.Io, 0, 0,
+                                "Choose TCP Congestion",
+                                readKernel(TCP_CONGS_AV),
+                                "$tcp_congs"
+                            )
+                        }
+                        .padding(vertical = 10.dp, horizontal = 22.dp)
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart),
+                        text = "Profile",
+                        fontSize = 13.sp,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd),
+                        text = "$tcp_congs",
                         textAlign = TextAlign.Center,
                         fontSize = 13.sp,
                         style = MaterialTheme.typography.bodySmall

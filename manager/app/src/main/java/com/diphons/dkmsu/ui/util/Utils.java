@@ -125,6 +125,8 @@ public class Utils {
     public static String VM_DIRTY_BACK_RATIO = PROC_VM + "/dirty_background_ratio";
     public static String VM_DIRTY_WRITE_CENTISECS = PROC_VM + "/dirty_writeback_centisecs";
     public static String VM_DIRTY_EXPIRE_CENTISECS = PROC_VM + "/dirty_expire_centisecs";
+    public static String TCP_CONGS = "/proc/sys/net/ipv4/tcp_congestion_control";
+    public static String TCP_CONGS_AV = "/proc/sys/net/ipv4/tcp_available_congestion_control";
     public static String SUS_MOUNT() {
         return "# example\n# /system\n# /system_ext\n/data/adb/modules\n/debug_ramdisk\n" ;
     }

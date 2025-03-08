@@ -24,6 +24,7 @@ import com.diphons.dkmsu.ui.util.Utils.HEADPHONE_GAIN
 import com.diphons.dkmsu.ui.util.Utils.MICROPHONE_GAIN
 import com.diphons.dkmsu.ui.util.Utils.OPROFILE
 import com.diphons.dkmsu.ui.util.Utils.SOUND_CONTROL
+import com.diphons.dkmsu.ui.util.Utils.TCP_CONGS
 import com.diphons.dkmsu.ui.util.Utils.THERMAL_PROFILE
 import com.diphons.dkmsu.ui.util.Utils.TOUCH_SAMPLE
 import com.diphons.dkmsu.ui.util.Utils.TOUCH_SAMPLE_GOODIX
@@ -63,14 +64,12 @@ class ProfileWorker(context : Context, params : WorkerParameters) : Worker(conte
         else {
             prefs = applicationContext.getSharedPreferences(
                 if (perf_mode) {
-                    if (profile == 1)
-                        SpfProfile.PERFORMANCE
-                    else if (profile == 2)
-                        SpfProfile.GAME
-                    else if (profile == 4)
-                        SpfProfile.BATTERY
-                    else
-                        SpfProfile.BALANCE
+                    when (profile) {
+                        1 -> SpfProfile.PERFORMANCE
+                        2 -> SpfProfile.GAME
+                        4 -> SpfProfile.BATTERY
+                        else -> SpfProfile.BALANCE
+                    }
                 } else
                     SpfProfile.NONE,
                 Context.MODE_PRIVATE
@@ -170,6 +169,12 @@ class ProfileWorker(context : Context, params : WorkerParameters) : Worker(conte
 
         //IO
         setIOSched("${prefs.getString("io_sched", getDefIOSched())}")
+
+        //TCP Congestion
+        var tcpDef = globalConfig.getString(SpfConfig.TCP_CONG_DEF, "")
+        if (tcpDef!!.isEmpty())
+            tcpDef = readKernel(TCP_CONGS)
+        setKernel("${prefs.getString("tcp", tcpDef)}", TCP_CONGS)
 
         if (list!!.isNotEmpty()) {
             val preferences: SharedPreferences

@@ -91,4 +91,5 @@ public class SpfConfig {
     public static String DIRTY_BACK_RATIO = "mem_dirty_background_ratio";
     public static String DIRTY_WRITE_CENTISECS = "mem_dirty_writeback_centisecs";
     public static String DIRTY_EXPIRE_CENTISECS= "mem_dirty_expire_centisecs";
+    public static String TCP_CONG_DEF= "tcp_default";
 }

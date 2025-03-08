@@ -17,6 +17,7 @@ import com.diphons.dkmsu.ui.util.getXMPath
 import com.diphons.dkmsu.ui.util.hasModule
 import com.diphons.dkmsu.ui.util.hasXiaomiDevice
 import com.diphons.dkmsu.ui.util.mbToGB
+import com.diphons.dkmsu.ui.util.readKernel
 import com.diphons.dkmsu.ui.util.runSVCWorker
 import com.diphons.dkmsu.ui.util.setGameList
 import com.diphons.dkmsu.ui.util.setKernel
@@ -142,6 +143,10 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
             setWLBlocker(applicationContext)
         if (globalConfig.getBoolean(SpfConfig.BATTERY_NOTIF, false))
             RootUtils.runCommand("setprop init.dkmsvc.cmd battery")
+
+        // TCP Cong Default
+        if (globalConfig.getString(SpfConfig.TCP_CONG_DEF, "")!!.isEmpty())
+            globalConfig.edit().putString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS)).apply()
 
         // Memory
         val swappiness = globalConfig.getString(SpfConfig.SWAPPINESS, "")
