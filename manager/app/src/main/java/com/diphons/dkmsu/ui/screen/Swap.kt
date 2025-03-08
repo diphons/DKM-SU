@@ -144,6 +144,7 @@ fun SwapScreen(navigator: DestinationsNavigator) {
     var swapSlider by rememberSaveable { mutableFloatStateOf(getSwapPosition(prefs.getInt(SpfConfig.SWAP_SIZE, getSwapSize(0f, totalMem)), totalMem)) }
     var swapAlgorithmCurr by rememberSaveable { mutableStateOf(swapUtils.compAlgorithm) }
     var swapAlgorithm by rememberSaveable { mutableStateOf(prefs.getString(SpfConfig.SWAP_ALGORITHM, swapAlgorithmCurr)) }
+    var swapBoot by rememberSaveable { mutableStateOf(prefs.getBoolean(SpfConfig.SWAP_BOOT, false)) }
 
     fun loadSwap(){
         totalMem = (info.totalMem / 1024 / 1024f).toInt()
@@ -523,6 +524,19 @@ fun SwapScreen(navigator: DestinationsNavigator) {
                         IconButton(
                             onClick = onBack
                         ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+                    },
+                    actions = {
+                        Switch(
+                            modifier = Modifier
+                                .padding(end = 10.dp),
+                            checked = swapBoot,
+                            onCheckedChange = {
+                                swapBoot = it
+                                prefs.edit().putBoolean(SpfConfig.SWAP_BOOT, it).apply()
+                                if (it && swapEnable && swapTotal <= 0)
+                                    applySwap()
+                            }
+                        )
                     },
                     windowInsets = WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal),
                     scrollBehavior = scrollBehavior,

@@ -168,42 +168,52 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
         // Start DKM Service
         runSVCWorker(applicationContext, "")
 
-        val swapSize = globalConfig.getInt(SpfConfig.SWAP_SIZE, 0)
-        val swapInfo = KeepShellPublic.doCmdSync("free -m | grep Swap")
-        var swapTotal = 0
-        if (swapInfo.contains("Swap")) {
-            try {
-                val swapInfoStr = swapInfo.substring(swapInfo.indexOf(" "), swapInfo.lastIndexOf(" ")).trim()
-                if (Regex("[\\d]+[\\s]+[\\d]+").matches(swapInfoStr)) {
-                    swapTotal = swapInfoStr.substring(0, swapInfoStr.indexOf(" ")).trim().toInt()
+        if (globalConfig.getBoolean(SpfConfig.SWAP_BOOT, false)) {
+            val swapSize = globalConfig.getInt(SpfConfig.SWAP_SIZE, 0)
+            val swapInfo = KeepShellPublic.doCmdSync("free -m | grep Swap")
+            var swapTotal = 0
+            if (swapInfo.contains("Swap")) {
+                try {
+                    val swapInfoStr =
+                        swapInfo.substring(swapInfo.indexOf(" "), swapInfo.lastIndexOf(" ")).trim()
+                    if (Regex("[\\d]+[\\s]+[\\d]+").matches(swapInfoStr)) {
+                        swapTotal =
+                            swapInfoStr.substring(0, swapInfoStr.indexOf(" ")).trim().toInt()
+                    }
+                } catch (_: java.lang.Exception) {
                 }
-            } catch (_: java.lang.Exception) {
             }
-        }
-        val stop = Thread {
-            if (swapTotal > 0) {
-                val timer = zramOffAwait(applicationContext)
-                SwapUtils().zramOff()
-                timer.cancel()
-                swapTotal = 0
+            val stop = Thread {
+                if (swapTotal > 0) {
+                    val timer = zramOffAwait(applicationContext)
+                    SwapUtils().zramOff()
+                    timer.cancel()
+                    swapTotal = 0
+                    swapRun = false
+                }
+            }
+            val run = Thread {
+                val timer: Timer
+                if (swapTotal > 0) {
+                    swapRun = true
+                    timer = zramOffAwait(applicationContext)
+                    SwapUtils().zramOff()
+                    timer.cancel()
+                }
+                SwapUtils().resizeZram(
+                    swapSize,
+                    globalConfig.getString(SpfConfig.SWAP_ALGORITHM, SwapUtils().compAlgorithm)!!
+                )
                 swapRun = false
             }
+            if (globalConfig.getBoolean(SpfConfig.SWAP_ENABLE, false) && swapSize > 0 && mbToGB(
+                    swapSize
+                ) != mbToGB(swapTotal)
+            )
+                Thread(run).start()
+            else if (!globalConfig.getBoolean(SpfConfig.SWAP_ENABLE, false) && swapTotal > 0)
+                Thread(stop).start()
         }
-        val run = Thread {
-            val timer: Timer
-            if (swapTotal > 0) {
-                swapRun = true
-                timer = zramOffAwait(applicationContext)
-                SwapUtils().zramOff()
-                timer.cancel()
-            }
-            SwapUtils().resizeZram(swapSize, globalConfig.getString(SpfConfig.SWAP_ALGORITHM, SwapUtils().compAlgorithm)!!)
-            swapRun = false
-        }
-        if (globalConfig.getBoolean(SpfConfig.SWAP_ENABLE, false) && swapSize > 0 && mbToGB(swapSize) != mbToGB(swapTotal))
-            Thread(run).start()
-        else if (!globalConfig.getBoolean(SpfConfig.SWAP_ENABLE, false) && swapTotal > 0)
-            Thread(stop).start()
 
         return Result.success()
     }
