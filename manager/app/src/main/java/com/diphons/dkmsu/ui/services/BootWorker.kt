@@ -113,13 +113,37 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
             }
         }
         if (hasModule(DISPLAY_RED)) {
-            setKernel("${(globalConfig.getFloat(SpfConfig.DISPLAY_RED, 1f) * 256).toInt()}", DISPLAY_RED)
-            setKernel("${(globalConfig.getFloat(SpfConfig.DISPLAY_GREEN, 1f) * 256).toInt()}", DISPLAY_GREEN)
-            setKernel("${(globalConfig.getFloat(SpfConfig.DISPLAY_BLUE, 1f) * 256).toInt()}", DISPLAY_BLUE)
-            setKernel("${(globalConfig.getFloat(SpfConfig.DISPLAY_SATURATED, 0.6662165f) * 383).toInt()}", DISPLAY_SATURATED)
-            setKernel("${(globalConfig.getFloat(SpfConfig.DISPLAY_VALUE, 0.6662165f) * 383).toInt()}", DISPLAY_VALUE)
-            setKernel("${(globalConfig.getFloat(SpfConfig.DISPLAY_CONTRAST, 0.6662165f) * 383).toInt()}", DISPLAY_CONTRAST)
-            setKernel("${(globalConfig.getFloat(SpfConfig.DISPLAY_HUE, 0f) * 1536).toInt()}", DISPLAY_HUE)
+            val colRed: Float
+            val colGreen: Float
+            val colBlue: Float
+            val colSat: Float
+            val colVal: Float
+            val colCont: Float
+            val colHue: Float
+            if (globalConfig.getBoolean(SpfConfig.DISPLAY_AMOLED, false)) {
+                colRed = 0.9040460f
+                colGreen = 0.9040460f
+                colBlue = 0.9040460f
+                colSat = 0.71083844f
+                colVal = 0.6662165f
+                colCont = 0.6870402f
+                colHue = 0f
+            } else {
+                colRed = globalConfig.getFloat(SpfConfig.DISPLAY_RED, 1f)
+                colGreen = globalConfig.getFloat(SpfConfig.DISPLAY_GREEN, 1f)
+                colBlue = globalConfig.getFloat(SpfConfig.DISPLAY_BLUE, 1f)
+                colSat = globalConfig.getFloat(SpfConfig.DISPLAY_SATURATED, 0.6662165f)
+                colVal = globalConfig.getFloat(SpfConfig.DISPLAY_VALUE, 0.6662165f)
+                colCont = globalConfig.getFloat(SpfConfig.DISPLAY_CONTRAST, 0.6662165f)
+                colHue = globalConfig.getFloat(SpfConfig.DISPLAY_HUE, 0f)
+            }
+            setKernel("${(colRed * 256).toInt()}", DISPLAY_RED)
+            setKernel("${(colGreen * 256).toInt()}", DISPLAY_GREEN)
+            setKernel("${(colBlue * 256).toInt()}", DISPLAY_BLUE)
+            setKernel("${(colSat * 383).toInt()}", DISPLAY_SATURATED)
+            setKernel("${(colVal * 383).toInt()}", DISPLAY_VALUE)
+            setKernel("${(colCont * 383).toInt()}", DISPLAY_CONTRAST)
+            setKernel("${(colHue * 1536).toInt()}", DISPLAY_HUE)
         }
         if (hasModule(DYNAMIC_CHARGING)) {
             if (globalConfig.getBoolean(SpfConfig.DYNAMIC_CHARGING, false)) {
