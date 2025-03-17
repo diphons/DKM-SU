@@ -147,6 +147,51 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
         mutableStateOf(prefs.getBoolean(SpfConfig.DISPLAY_AMOLED, false))
     }
 
+    fun amoledColor(enabled: Boolean){
+        if (enabled) {
+            db_red = seek_red
+            db_green = seek_green
+            db_blue = seek_blue
+            db_sat = seek_saturation
+            db_val = seek_value
+            db_cont = seek_contrast
+            db_hue = seek_hue
+
+            seek_red = 0.9040460f
+            seek_green = 0.9040460f
+            seek_blue = 0.9040460f
+            seek_saturation = 0.71083844f
+            seek_value = display_sat
+            seek_contrast = 0.6870402f
+            seek_hue = display_hue
+        } else {
+            seek_red = db_red
+            seek_green = db_green
+            seek_blue = db_blue
+            seek_saturation = db_sat
+            seek_value = db_val
+            seek_contrast = db_cont
+            seek_hue = db_hue
+        }
+        prefs.edit().putFloat(SpfConfig.DISPLAY_RED, display_rgb).apply()
+        prefs.edit().putFloat(SpfConfig.DISPLAY_GREEN, display_rgb).apply()
+        prefs.edit().putFloat(SpfConfig.DISPLAY_BLUE, display_rgb).apply()
+        prefs.edit().putFloat(SpfConfig.DISPLAY_SATURATED, display_sat).apply()
+        prefs.edit().putFloat(SpfConfig.DISPLAY_VALUE, display_sat).apply()
+        prefs.edit().putFloat(SpfConfig.DISPLAY_CONTRAST, display_sat).apply()
+        prefs.edit().putFloat(SpfConfig.DISPLAY_HUE, display_hue).apply()
+
+        setKernel("${(seek_red * 256).toInt()}", DISPLAY_RED)
+        setKernel("${(seek_green * 256).toInt()}", DISPLAY_GREEN)
+        setKernel("${(seek_blue * 256).toInt()}", DISPLAY_BLUE)
+        setKernel("${(seek_saturation * 383).toInt()}", DISPLAY_SATURATED)
+        setKernel("${(seek_value * 383).toInt()}", DISPLAY_VALUE)
+        setKernel("${(seek_contrast * 383).toInt()}", DISPLAY_CONTRAST)
+        setKernel("${(seek_hue * 1536).toInt()}", DISPLAY_HUE)
+    }
+    // Apply Amoled on load
+    amoledColor(display_amoled)
+    
     Scaffold(
         topBar = {
             TopBar(
@@ -210,48 +255,6 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                             .fillMaxWidth()
                             .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
                     ) {
-                        fun amoledColor(enabled: Boolean){
-                            if (enabled) {
-                                db_red = seek_red
-                                db_green = seek_green
-                                db_blue = seek_blue
-                                db_sat = seek_saturation
-                                db_val = seek_value
-                                db_cont = seek_contrast
-                                db_hue = seek_hue
-
-                                seek_red = 0.9040460f
-                                seek_green = 0.9040460f
-                                seek_blue = 0.9040460f
-                                seek_saturation = 0.71083844f
-                                seek_value = display_sat
-                                seek_contrast = 0.6870402f
-                                seek_hue = display_hue
-                            } else {
-                                seek_red = db_red
-                                seek_green = db_green
-                                seek_blue = db_blue
-                                seek_saturation = db_sat
-                                seek_value = db_val
-                                seek_contrast = db_cont
-                                seek_hue = db_hue
-                            }
-                            prefs.edit().putFloat(SpfConfig.DISPLAY_RED, display_rgb).apply()
-                            prefs.edit().putFloat(SpfConfig.DISPLAY_GREEN, display_rgb).apply()
-                            prefs.edit().putFloat(SpfConfig.DISPLAY_BLUE, display_rgb).apply()
-                            prefs.edit().putFloat(SpfConfig.DISPLAY_SATURATED, display_sat).apply()
-                            prefs.edit().putFloat(SpfConfig.DISPLAY_VALUE, display_sat).apply()
-                            prefs.edit().putFloat(SpfConfig.DISPLAY_CONTRAST, display_sat).apply()
-                            prefs.edit().putFloat(SpfConfig.DISPLAY_HUE, display_hue).apply()
-
-                            setKernel("${(seek_red * 256).toInt()}", DISPLAY_RED)
-                            setKernel("${(seek_green * 256).toInt()}", DISPLAY_GREEN)
-                            setKernel("${(seek_blue * 256).toInt()}", DISPLAY_BLUE)
-                            setKernel("${(seek_saturation * 383).toInt()}", DISPLAY_SATURATED)
-                            setKernel("${(seek_value * 383).toInt()}", DISPLAY_VALUE)
-                            setKernel("${(seek_contrast * 383).toInt()}", DISPLAY_CONTRAST)
-                            setKernel("${(seek_hue * 1536).toInt()}", DISPLAY_HUE)
-                        }
                         SwitchItem(
                             title = stringResource(R.string.amoled_color),
                             checked = display_amoled,
