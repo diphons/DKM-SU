@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.SwitchItem
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
@@ -153,7 +154,7 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                     val check_profile_name = "$chg_profile_name"
                     if (check_profile_name.contains("Default") || check_profile_name.isEmpty() || get_current_max == 0) {
                         get_current_max = getCurrentCharger()
-                        prefs.edit().putInt(SpfConfig.CHG_CUR_MAX, get_current_max).apply()
+                        prefs.edit { putInt(SpfConfig.CHG_CUR_MAX, get_current_max) }
                     }
                 }
                 // Get chg max by current max
@@ -184,12 +185,12 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                                 )
                             }, onClick = {
                                 chg_profile_name = title
-                                prefs.edit().putString(SpfConfig.CHG_MAX_NAME, chg_profile_name).apply()
+                                prefs.edit { putString(SpfConfig.CHG_MAX_NAME, chg_profile_name) }
                                 if (title.contains("Default")) {
                                     getCurChg()
                                 } else {
                                     get_current_max = reason
-                                    prefs.edit().putInt(SpfConfig.CHG_CUR_MAX, reason).apply()
+                                    prefs.edit { putInt(SpfConfig.CHG_CUR_MAX, reason) }
                                 }
                                 getChgValue()
                                 chg_potition = 0
@@ -276,7 +277,7 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                                 R.string.charger_dynamic_sum_off
                             )
                         ) {
-                            prefs.edit().putBoolean(SpfConfig.DYNAMIC_CHARGING, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.DYNAMIC_CHARGING, it) }
                             chg_dynamic = it
                             if (it) {
                                 setKernel("1", DYNAMIC_CHARGING)
@@ -509,7 +510,7 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                         checked = batteryNotif,
                         summary = stringResource(R.string.battery_status_sum)
                     ) {
-                        prefs.edit().putBoolean(SpfConfig.BATTERY_NOTIF, it).apply()
+                        prefs.edit { putBoolean(SpfConfig.BATTERY_NOTIF, it) }
                         batteryNotif = it
                         if (it)
                             RootUtils.runCommand("setprop init.dkmsvc.cmd battery")
@@ -532,7 +533,7 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                             checked = skip_thermal,
                             summary = stringResource(R.string.skip_thermal_summary)
                         ) {
-                            prefs.edit().putBoolean(SpfConfig.SKIP_THERMAL, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.SKIP_THERMAL, it) }
                             skip_thermal = it
                             if (it) {
                                 setKernel("1", SKIP_THERMAL)
@@ -558,7 +559,7 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                             checked = fast_chg,
                             summary = stringResource(R.string.fast_charging_sum)
                         ) {
-                            prefs.edit().putBoolean(SpfConfig.FAST_CHARGING, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.FAST_CHARGING, it) }
                             fast_chg = it
                             if (it) {
                                 setKernel("1", FCHG_SYS)
@@ -583,7 +584,7 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                             title = stringResource(R.string.night_charging),
                             checked = night_chg,
                         ) {
-                            prefs.edit().putBoolean(SpfConfig.NIGHT_CHARGING, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.NIGHT_CHARGING, it) }
                             night_chg = it
                             if (it) {
                                 setKernel("1", NIGHT_CHARGING)
@@ -611,7 +612,7 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                                 R.string.step_charging_sum
                             )
                         ) {
-                            prefs.edit().putBoolean(SpfConfig.STEP_CHARGING, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.STEP_CHARGING, it) }
                             step_chg = it
                             if (it) {
                                 setKernel("1", STEP_CHARGING)

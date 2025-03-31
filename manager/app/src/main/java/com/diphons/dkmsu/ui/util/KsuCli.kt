@@ -23,6 +23,7 @@ import android.provider.OpenableColumns
 import android.system.Os
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.core.content.edit
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.diphons.dkmsu.BuildConfig
@@ -368,7 +369,7 @@ fun getBoard(context: Context): String {
     var result = prefs.getString(SpfConfig.DEVICE_BOARD, "")
     if (result!!.isEmpty()) {
         result = RootUtils.runAndGetOutput("getprop ro.board.platform")
-        prefs.edit().putString(SpfConfig.DEVICE_BOARD, result).apply()
+        prefs.edit { putString(SpfConfig.DEVICE_BOARD, result) }
     }
     return result
 }
@@ -514,7 +515,7 @@ fun getMaxCluster(context: Context): Int {
         if (getCluster == 0) {
             getCluster =
                 strToInt(RootUtils.runAndGetOutput("cpu=\$(ls $CPUFREQ | grep 'policy'); echo \"\$cpu\" | wc -l"))
-            prefs.edit().putInt("cpu_cluster", getCluster).apply()
+            prefs.edit { putInt("cpu_cluster", getCluster) }
         }
         maxCluster = getCluster
     }
@@ -531,7 +532,7 @@ fun getGPUPath(context: Context): String {
                 GPU_MALI
             else
                 GPU_ADRENO
-            prefs.edit().putString("gpu_path", getPath).apply()
+            prefs.edit { putString("gpu_path", getPath) }
         }
         gpuPath = getPath.toString()
     }
@@ -807,7 +808,7 @@ fun extractXTAssets(context: Context) {
 
 fun setProfile(context: Context, profile: Int){
     val preferences: SharedPreferences = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
-    preferences.edit().putInt(SpfConfig.PROFILE_MODE, profile).apply()
+    preferences.edit { putInt(SpfConfig.PROFILE_MODE, profile) }
     runProfileWorker(context)
 }
 
@@ -938,8 +939,8 @@ fun getDefAdrenoBoost(profile: Int): Int{
 }
 
 fun setChgMax(preferences: SharedPreferences, value: Int, position: Int){
-    preferences.edit().putInt(SpfConfig.CHG_MAX, position).apply()
-    preferences.edit().putInt(SpfConfig.CHG_MAX_CUR_PROF, value).apply()
+    preferences.edit { putInt(SpfConfig.CHG_MAX, position) }
+    preferences.edit { putInt(SpfConfig.CHG_MAX_CUR_PROF, value) }
     setKernel("$value", CHG_CUR_MAX)
 }
 
@@ -1677,7 +1678,7 @@ fun grantPermissions(context: Context) {
         KeepShellPublic.doCmdSync("pm grant ${context.packageName} $it")
         if (CMD_MSG.contains("REQUEST_IGNORE_BATTERY_OPTIMIZATIONS")) {
             KeepShellPublic.doCmdSync("dumpsys deviceidle whitelist +${context.packageName}")
-            prefs.edit().putBoolean(SpfConfig.PERMISSIONS, true).apply()
+            prefs.edit { putBoolean(SpfConfig.PERMISSIONS, true) }
         }
     }
     requiredPermission2.forEach {
@@ -1722,7 +1723,7 @@ fun getGameAllList(context: Context): String{
         var listDefault = prefs.getString("game_ai_default", "")
         if (listDefault!!.isEmpty()) {
             listDefault = RootUtils.runAndGetOutput("cat $GAME_AI_LIST_DEFAULT | sed 's/\"/#/g'")
-            prefs.edit().putString("game_ai_default", listDefault).apply()
+            prefs.edit { putString("game_ai_default", listDefault) }
         }
         getGameDef = listDefault
     }
@@ -1821,7 +1822,7 @@ fun restartDkmSVC(context: Context){
     val hash = RootUtils.runAndGetOutput("data=$(dkmsvc hash); echo \${data% *}")
     val pool = SingleSchedulePool()
     if (!prefs.getString("dkmsvc_hash", "")!!.contains(hash)) {
-        prefs.edit().putString("dkmsvc_hash", hash).apply()
+        prefs.edit { putString("dkmsvc_hash", hash) }
         RootUtils.runCommand("setprop init.dkmsvc.exit 1")
         pool.delay(2, TimeUnit.SECONDS) {
             install_dkmsvc()
@@ -1860,7 +1861,7 @@ fun wakelockTimesFormat(millis: Long): String {
 fun setWLBlocker(context: Context) {
     val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
     if (prefs.getString(SpfConfig.WAKELOCK_BLOCKER, "")!!.isEmpty())
-        prefs.edit().putString(SpfConfig.WAKELOCK_BLOCKER, getWakelockBlockDef()).apply()
+        prefs.edit { putString(SpfConfig.WAKELOCK_BLOCKER, getWakelockBlockDef()) }
     // Set Wakelock Blocker
     setKernel(getWakelockBlockDef(), BOEFFLA_WL_BLOCKER)
     // Clear Default Wakelock Blocker

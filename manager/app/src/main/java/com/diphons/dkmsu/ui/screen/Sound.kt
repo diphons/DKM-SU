@@ -53,6 +53,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.SwitchItem
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
@@ -138,7 +139,7 @@ fun SoundScreen(navigator: DestinationsNavigator) {
                             value = seek_microfon,
                             onValueChange = {
                                 setKernel("${(it * 100).toInt() * 20 / 100}", MICROPHONE_GAIN)
-                                prefs.edit().putFloat(SpfConfig.SC_MICROFON, it).apply()
+                                prefs.edit { putFloat(SpfConfig.SC_MICROFON, it) }
                                 seek_microfon = it
                             },
                             colors = SliderDefaults.colors(
@@ -184,7 +185,7 @@ fun SoundScreen(navigator: DestinationsNavigator) {
                             value = seek_earfon,
                             onValueChange = {
                                 setKernel("${(it * 100).toInt() * 20 / 100}", EARPIECE_GAIN)
-                                prefs.edit().putFloat(SpfConfig.SC_EARFON, it).apply()
+                                prefs.edit { putFloat(SpfConfig.SC_EARFON, it) }
                                 seek_earfon = it
                             },
                             colors = SliderDefaults.colors(
@@ -225,13 +226,11 @@ fun SoundScreen(navigator: DestinationsNavigator) {
                         title = stringResource(id = R.string.per_channel_controls),
                         checked = switch_headfon
                     ) {
-                        prefs.edit().putBoolean("sc_switch_headfon", it).apply()
+                        prefs.edit { putBoolean("sc_switch_headfon", it) }
                         switch_headfon = it
                         if (!switch_headfon) {
                             seek_headfon2 = seek_headfon
-                            prefs.edit()
-                                .putFloat("sc_headfon2", seek_headfon2)
-                                .apply()
+                            prefs.edit { putFloat("sc_headfon2", seek_headfon2) }
                         }
                         setKernel("${(seek_headfon * 100).toInt() * 20 / 100} ${(seek_headfon2 * 100).toInt() * 20 / 100}", HEADPHONE_GAIN)
                     }
@@ -249,11 +248,9 @@ fun SoundScreen(navigator: DestinationsNavigator) {
                                 .padding(end = 30.dp),
                             value = seek_headfon,
                             onValueChange = {
-                                prefs.edit().putFloat(SpfConfig.SC_HEADFON, it).apply()
+                                prefs.edit { putFloat(SpfConfig.SC_HEADFON, it) }
                                 if (!switch_headfon) {
-                                    prefs.edit()
-                                        .putFloat(SpfConfig.SC_HEADFON2, it)
-                                        .apply()
+                                    prefs.edit { putFloat(SpfConfig.SC_HEADFON2, it) }
                                     seek_headfon2 = it
                                 }
                                 seek_headfon = it
@@ -298,9 +295,7 @@ fun SoundScreen(navigator: DestinationsNavigator) {
                                     .padding(end = 30.dp),
                                 value = seek_headfon2,
                                 onValueChange = {
-                                    prefs.edit()
-                                        .putFloat(SpfConfig.SC_HEADFON2, it)
-                                        .apply()
+                                    prefs.edit { putFloat(SpfConfig.SC_HEADFON2, it) }
                                     seek_headfon2 = it
                                     setKernel("${(seek_headfon * 100).toInt() * 20 / 100} ${(seek_headfon2 * 100).toInt() * 20 / 100}", HEADPHONE_GAIN)
                                 },

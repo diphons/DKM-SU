@@ -54,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.getKernelVersion
 import com.diphons.dkmsu.ui.component.SwitchItem
@@ -146,7 +147,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                                     }
                                 } else if (hasXiaomiDevice())
                                     setXiaomiTouch(it, 14, context)
-                                prefs.edit().putBoolean(SpfConfig.DT2W, it).apply()
+                                prefs.edit { putBoolean(SpfConfig.DT2W, it) }
                                 dt2w = it
                             }
                         }
@@ -170,7 +171,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                                     else
                                         setKernel("0", TOUCH_SAMPLE)
                                 }
-                                prefs.edit().putBoolean(SpfConfig.TOUCH_SAMPLE, it).apply()
+                                prefs.edit { putBoolean(SpfConfig.TOUCH_SAMPLE, it) }
                                 touch_sample = it
                             }
                         }
@@ -193,7 +194,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                                         .padding(end = 50.dp),
                                     value = seek_haptic, onValueChange = {
                                         setKernel("${(it * 100).toInt()}", HAPTIC_LEVEL)
-                                        prefs.edit().putFloat(SpfConfig.HAPTIC_LEVEL, it).apply()
+                                        prefs.edit { putFloat(SpfConfig.HAPTIC_LEVEL, it) }
                                         seek_haptic = it
                                     },
                                     colors = SliderDefaults.colors(
@@ -250,7 +251,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                             summary = stringResource(id = R.string.xt_game_sum)
                         ) {
                             setXiaomiTouch(it, 0, context)
-                            prefs.edit().putBoolean(SpfConfig.XT_GAME, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.XT_GAME, it) }
                             switch_xt_game = it
                         }
                         var switch_xt_active by rememberSaveable {
@@ -261,7 +262,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                             checked = switch_xt_active
                         ) {
                             setXiaomiTouch(it, 1, context)
-                            prefs.edit().putBoolean(SpfConfig.XT_ACTIVE, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.XT_ACTIVE, it) }
                             switch_xt_active = it
                         }
                         var switch_xt_up by rememberSaveable {
@@ -273,7 +274,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                             summary = stringResource(id = R.string.xt_up_sum)
                         ) {
                             setXiaomiTouch(it, 2, context)
-                            prefs.edit().putBoolean(SpfConfig.XT_UP, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.XT_UP, it) }
                             switch_xt_up = it
                         }
                         var switch_xt_tole by rememberSaveable {
@@ -284,7 +285,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                             checked = switch_xt_tole,
                         ) {
                             setXiaomiTouch(it, 3, context)
-                            prefs.edit().putBoolean(SpfConfig.XT_TOLE, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.XT_TOLE, it) }
                             switch_xt_tole = it
                         }
                         var switch_xt_aim by rememberSaveable {
@@ -295,7 +296,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                             checked = switch_xt_aim
                         ) {
                             setXiaomiTouch(it, 4, context)
-                            prefs.edit().putBoolean(SpfConfig.XT_AIM, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.XT_AIM, it) }
                             switch_xt_aim = it
                         }
                         var switch_xt_tap by rememberSaveable {
@@ -307,7 +308,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                             summary = stringResource(id = R.string.xt_tap_sum)
                         ) {
                             setXiaomiTouch(it, 5, context)
-                            prefs.edit().putBoolean(SpfConfig.XT_TAP, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.XT_TAP, it) }
                             switch_xt_tap = it
                         }
                         var switch_xt_exp by rememberSaveable {
@@ -318,7 +319,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                             checked = switch_xt_exp
                         ) {
                             setXiaomiTouch(it, 6, context)
-                            prefs.edit().putBoolean(SpfConfig.XT_EXP, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.XT_EXP, it) }
                             switch_xt_exp = it
                         }
                         var switch_xt_edge by rememberSaveable {
@@ -329,7 +330,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                             checked = switch_xt_edge
                         ) {
                             setXiaomiTouch(it, 7, context)
-                            prefs.edit().putBoolean(SpfConfig.XT_EDGE, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.XT_EDGE, it) }
                             switch_xt_edge = it
                         }
                         var switch_xt_grip by rememberSaveable {
@@ -340,7 +341,7 @@ fun TouchScreen(navigator: DestinationsNavigator) {
                             checked = switch_xt_grip
                         ) {
                             setXiaomiTouch(it, 15, context)
-                            prefs.edit().putBoolean(SpfConfig.XT_GRIP, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.XT_GRIP, it) }
                             switch_xt_grip = it
                         }
                     }

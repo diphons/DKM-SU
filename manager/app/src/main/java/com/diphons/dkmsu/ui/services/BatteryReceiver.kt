@@ -12,6 +12,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.*
 import androidx.core.app.NotificationCompat
+import androidx.core.content.edit
 import androidx.core.graphics.drawable.IconCompat
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.MainActivity
@@ -119,7 +120,7 @@ class BatteryReceiver : BroadcastReceiver() {
                     if (count >= 100)
                         count = 0
                     // Add notification to service when service is running
-                    globalConfig.edit().putInt(SpfConfig.BATTERY_NOTIF_STATUS, count).apply()
+                    globalConfig.edit { putInt(SpfConfig.BATTERY_NOTIF_STATUS, count) }
                     // Schedule the task to run again after 1.5 second
                     if (globalConfig.getBoolean(SpfConfig.BATTERY_NOTIF, false)) {
                         managerA.notify(Utils.NOTIF_ID_BS, Utils.notificationbs)

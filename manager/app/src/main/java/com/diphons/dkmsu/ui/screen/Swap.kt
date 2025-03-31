@@ -76,6 +76,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.edit
 import androidx.core.text.isDigitsOnly
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.DialogSwap
@@ -167,7 +168,7 @@ fun SwapScreen(navigator: DestinationsNavigator) {
         swapSlider = getSwapPos
 
         if (swapEnable && prefs.getInt(SpfConfig.SWAP_SIZE, 0) == 0)
-            prefs.edit().putInt(SpfConfig.SWAP_SIZE, swapTotal).apply()
+            prefs.edit { putInt(SpfConfig.SWAP_SIZE, swapTotal) }
     }
 
     LaunchedEffect(Unit) {
@@ -274,19 +275,19 @@ fun SwapScreen(navigator: DestinationsNavigator) {
                                         if (getValueInput.isNotEmpty()) {
                                             when (mode) {
                                                 "0" -> {swappiness = getValueInput
-                                                    prefs.edit().putString(SpfConfig.SWAPPINESS, swappiness).apply()
+                                                    prefs.edit { putString(SpfConfig.SWAPPINESS, swappiness) }
                                                     setKernel(swappiness!!, VM_SWAPPINESS)}
                                                 "1" -> {dirtyRatio = getValueInput
-                                                    prefs.edit().putString(SpfConfig.DIRTY_RATIO, dirtyRatio).apply()
+                                                    prefs.edit { putString(SpfConfig.DIRTY_RATIO, dirtyRatio) }
                                                     setKernel(dirtyRatio!!, VM_DIRTY_RATIO)}
                                                 "2" -> {dirtyBackgroundRatio = getValueInput
-                                                    prefs.edit().putString(SpfConfig.DIRTY_BACK_RATIO, dirtyBackgroundRatio).apply()
+                                                    prefs.edit { putString(SpfConfig.DIRTY_BACK_RATIO, dirtyBackgroundRatio) }
                                                     setKernel(dirtyBackgroundRatio!!, VM_DIRTY_BACK_RATIO)}
                                                 "3" -> {dirtyWritebackCentisecs = getValueInput
-                                                    prefs.edit().putString(SpfConfig.DIRTY_WRITE_CENTISECS, dirtyWritebackCentisecs).apply()
+                                                    prefs.edit { putString(SpfConfig.DIRTY_WRITE_CENTISECS, dirtyWritebackCentisecs) }
                                                     setKernel(dirtyWritebackCentisecs!!, VM_DIRTY_WRITE_CENTISECS)}
                                                 "4" -> {dirtyExpireCentisecs = getValueInput
-                                                    prefs.edit().putString(SpfConfig.DIRTY_EXPIRE_CENTISECS, dirtyExpireCentisecs).apply()
+                                                    prefs.edit { putString(SpfConfig.DIRTY_EXPIRE_CENTISECS, dirtyExpireCentisecs) }
                                                     setKernel(dirtyExpireCentisecs!!, VM_DIRTY_EXPIRE_CENTISECS)}
                                             }
                                         }
@@ -467,8 +468,8 @@ fun SwapScreen(navigator: DestinationsNavigator) {
             runDialogLoad.hide()
         }
         swapTotal = getSwapSize(swapSlider, totalMem)
-        prefs.edit().putInt(SpfConfig.SWAP_SIZE, swapTotal).apply()
-        prefs.edit().putString(SpfConfig.SWAP_ALGORITHM, swapAlgorithm).apply()
+        prefs.edit { putInt(SpfConfig.SWAP_SIZE, swapTotal) }
+        prefs.edit { putString(SpfConfig.SWAP_ALGORITHM, swapAlgorithm) }
         getSwapPos = swapSlider
         swapAlgorithmCurr = swapAlgorithm!!
         CMD_MSG = "${context.getString(R.string.set)} ZRAM ${context.getString(R.string.to)} ${mbToGB(swapTotal)} GB"
@@ -532,7 +533,7 @@ fun SwapScreen(navigator: DestinationsNavigator) {
                             checked = swapBoot,
                             onCheckedChange = {
                                 swapBoot = it
-                                prefs.edit().putBoolean(SpfConfig.SWAP_BOOT, it).apply()
+                                prefs.edit { putBoolean(SpfConfig.SWAP_BOOT, it) }
                                 if (it && swapEnable && swapTotal <= 0)
                                     applySwap()
                             }
@@ -588,7 +589,7 @@ fun SwapScreen(navigator: DestinationsNavigator) {
                             .fillMaxWidth()
                             .clickable {
                                 swapEnable = !swapEnable
-                                prefs.edit().putBoolean(SpfConfig.SWAP_ENABLE, swapEnable).apply()
+                                prefs.edit { putBoolean(SpfConfig.SWAP_ENABLE, swapEnable) }
                                 if (swapEnable)
                                     applySwap()
                                 else
@@ -609,7 +610,7 @@ fun SwapScreen(navigator: DestinationsNavigator) {
                             checked = swapEnable,
                             onCheckedChange = {
                                 swapEnable = it
-                                prefs.edit().putBoolean(SpfConfig.SWAP_ENABLE, it).apply()
+                                prefs.edit { putBoolean(SpfConfig.SWAP_ENABLE, it) }
                                 if (it)
                                     applySwap()
                                 else
@@ -689,7 +690,7 @@ fun SwapScreen(navigator: DestinationsNavigator) {
                             onValueChange = {
                                 swapSlider = it
                                 if (!swapEnable)
-                                    prefs.edit().putInt(SpfConfig.SWAP_SIZE, getSwapSize(swapSlider, totalMem)).apply()
+                                    prefs.edit { putInt(SpfConfig.SWAP_SIZE, getSwapSize(swapSlider, totalMem)) }
                             },
                             colors = SliderDefaults.colors(
                                 activeTrackColor = MaterialTheme.colorScheme.primary,

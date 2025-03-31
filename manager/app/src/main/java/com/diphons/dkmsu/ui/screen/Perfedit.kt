@@ -58,6 +58,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.edit
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.store.*
@@ -207,36 +208,36 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
     }
 
     if (globalConfig.getString(SpfConfig.TCP_CONG_DEF, "")!!.isEmpty())
-        globalConfig.edit().putString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS)).apply()
+        globalConfig.edit { putString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS)) }
 
     fun resetProfile(){
-        prefs.edit().putInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1)).apply()
-        prefs.edit().putInt("cpu1_min_freq", getMinFreq(context, 1)).apply()
-        prefs.edit().putString("cpu1_gov", getDefCPUGov(context, profile, 1)).apply()
+        prefs.edit { putInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1)) }
+        prefs.edit { putInt("cpu1_min_freq", getMinFreq(context, 1)) }
+        prefs.edit { putString("cpu1_gov", getDefCPUGov(context, profile, 1)) }
 
         cpu1_max_freq = getDefCPUMaxFreq(context, profile, 1)
         cpu1_min_freq = getMinFreq(context, 1)
         cpu1_gov = getDefCPUGov(context, profile, 1)
         if (getMaxCluster(context) > 1) {
-            prefs.edit().putInt("cpu2_max_freq", getDefCPUMaxFreq(context, profile, 2)).apply()
-            prefs.edit().putInt("cpu2_min_freq", getMinFreq(context, 2)).apply()
-            prefs.edit().putString("cpu2_gov", getDefCPUGov(context, profile, 2)).apply()
+            prefs.edit { putInt("cpu2_max_freq", getDefCPUMaxFreq(context, profile, 2)) }
+            prefs.edit { putInt("cpu2_min_freq", getMinFreq(context, 2)) }
+            prefs.edit { putString("cpu2_gov", getDefCPUGov(context, profile, 2)) }
 
             cpu2_max_freq = getDefCPUMaxFreq(context, profile, 2)
             cpu2_min_freq = getMinFreq(context, 2)
             cpu2_gov = getDefCPUGov(context, profile, 2)
             if (getMaxCluster(context) > 2) {
-                prefs.edit().putInt("cpu3_max_freq", getDefCPUMaxFreq(context, profile, 3)).apply()
-                prefs.edit().putInt("cpu3_min_freq", getMinFreq(context, 3)).apply()
-                prefs.edit().putString("cpu3_gov", getDefCPUGov(context, profile, 3)).apply()
+                prefs.edit { putInt("cpu3_max_freq", getDefCPUMaxFreq(context, profile, 3)) }
+                prefs.edit { putInt("cpu3_min_freq", getMinFreq(context, 3)) }
+                prefs.edit { putString("cpu3_gov", getDefCPUGov(context, profile, 3)) }
 
                 cpu3_max_freq = getDefCPUMaxFreq(context, profile, 3)
                 cpu3_min_freq = getMinFreq(context, 3)
                 cpu3_gov = getDefCPUGov(context, profile, 3)
                 if (getMaxCluster(context) > 3) {
-                    prefs.edit().putInt("cpu4_max_freq", getDefCPUMaxFreq(context, profile, 4)).apply()
-                    prefs.edit().putInt("cpu4_min_freq", getMinFreq(context, 4)).apply()
-                    prefs.edit().putString("cpu4_gov", getDefCPUGov(context, profile, 4)).apply()
+                    prefs.edit { putInt("cpu4_max_freq", getDefCPUMaxFreq(context, profile, 4)) }
+                    prefs.edit { putInt("cpu4_min_freq", getMinFreq(context, 4)) }
+                    prefs.edit { putString("cpu4_gov", getDefCPUGov(context, profile, 4)) }
 
                     cpu4_max_freq = getDefCPUMaxFreq(context, profile, 4)
                     cpu4_min_freq = getMinFreq(context, 4)
@@ -245,14 +246,14 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
             }
         }
 
-        prefs.edit().putInt("gpu_max_freq", getGPUMaxFreq(context)).apply()
-        prefs.edit().putInt("gpu_min_freq", getGPUMinFreq(context)).apply()
-        prefs.edit().putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)).apply()
-        prefs.edit().putInt("gpu_def_power", gpuMaxPwrLevel(context)).apply()
+        prefs.edit { putInt("gpu_max_freq", getGPUMaxFreq(context)) }
+        prefs.edit { putInt("gpu_min_freq", getGPUMinFreq(context)) }
+        prefs.edit { putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)) }
+        prefs.edit { putInt("gpu_def_power", gpuMaxPwrLevel(context)) }
         if (hasAdrenoBoost)
-            prefs.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
-        prefs.edit().putInt("thermal", getDefThermalProfile(profile, gki_mode)).apply()
-        prefs.edit().putString("io_sched", getDefIOSched()).apply()
+            prefs.edit { putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)) }
+        prefs.edit { putInt("thermal", getDefThermalProfile(profile, gki_mode)) }
+        prefs.edit { putString("io_sched", getDefIOSched()) }
 
         gpu_max_freq = getGPUMaxFreq(context)
         gpu_min_freq = getGPUMinFreq(context)
@@ -387,7 +388,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                                 cpu2_max_freq = strToInt(getValueDialog)
                             else
                                 cpu1_max_freq = strToInt(getValueDialog)
-                            prefs.edit().putInt("cpu${event.cpu}_max_freq", strToInt(getValueDialog)).apply()
+                            prefs.edit { putInt("cpu${event.cpu}_max_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 1) {
                             if (event.cpu == 4)
                                 cpu4_min_freq = strToInt(getValueDialog)
@@ -397,7 +398,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                                 cpu2_min_freq = strToInt(getValueDialog)
                             else
                                 cpu1_min_freq = strToInt(getValueDialog)
-                            prefs.edit().putInt("cpu${event.cpu}_min_freq", strToInt(getValueDialog)).apply()
+                            prefs.edit { putInt("cpu${event.cpu}_min_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 2) {
                             if (event.cpu == 4)
                                 cpu4_gov = getValueDialog
@@ -407,7 +408,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                                 cpu2_gov = getValueDialog
                             else
                                 cpu1_gov = getValueDialog
-                            prefs.edit().putString("cpu${event.cpu}_gov", getValueDialog).apply()
+                            prefs.edit { putString("cpu${event.cpu}_gov", getValueDialog) }
                         }
                         setCPU(getValueDialog, event.cpu, event.mode)
                     }
@@ -425,19 +426,19 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                     if (getValueDialog.isNotEmpty()) {
                         if (event.mode == 0) {
                             gpu_max_freq = strToInt(getValueDialog)
-                            prefs.edit().putInt("gpu_max_freq", strToInt(getValueDialog)).apply()
+                            prefs.edit { putInt("gpu_max_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 1) {
                             gpu_min_freq = strToInt(getValueDialog)
-                            prefs.edit().putInt("gpu_min_freq", strToInt(getValueDialog)).apply()
+                            prefs.edit { putInt("gpu_min_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 2) {
                             gpu_gov = getValueDialog
-                            prefs.edit().putString("gpu_gov", getValueDialog).apply()
+                            prefs.edit { putString("gpu_gov", getValueDialog) }
                         } else if (event.mode == 3) {
                             gpu_def_power = strToInt(getValueDialog)
-                            prefs.edit().putInt("gpu_def_power", strToInt(getValueDialog)).apply()
+                            prefs.edit { putInt("gpu_def_power", strToInt(getValueDialog)) }
                         } else if (event.mode == 4) {
                             gpu_adreno_boost = getValueDialog
-                            prefs.edit().putInt("gpu_adreno_boost", parseAdrenoBoost(context, getValueDialog)).apply()
+                            prefs.edit { putInt("gpu_adreno_boost", parseAdrenoBoost(context, getValueDialog)) }
                         }
                         setGPU(context, getValueDialog, event.mode)
                     }
@@ -454,7 +455,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         io_sched = getValueDialog
-                        prefs.edit().putString("io_sched", getValueDialog).apply()
+                        prefs.edit { putString("io_sched", getValueDialog) }
                         setIOSched(getValueDialog)
                     }
                     dialogEvent = null
@@ -470,7 +471,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         thermal_profile = getValueDialog
-                        prefs.edit().putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)).apply()
+                        prefs.edit { putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)) }
                         setKernel("${getThermalInt(context, getValueDialog, gki_mode)}", THERMAL_PROFILE, true)
                     }
                     dialogEvent = null
@@ -486,7 +487,7 @@ fun PerfeditScreen(navigator: DestinationsNavigator) {
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         tcp_congs = getValueDialog
-                        prefs.edit().putString("tcp", tcp_congs).apply()
+                        prefs.edit { putString("tcp", tcp_congs) }
                         setKernel(tcp_congs!!, TCP_CONGS)
                     }
                     dialogEvent = null

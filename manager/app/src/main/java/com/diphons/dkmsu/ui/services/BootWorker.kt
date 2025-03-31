@@ -2,6 +2,7 @@ package com.diphons.dkmsu.ui.services
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.diphons.dkmsu.R
@@ -45,12 +46,12 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
             activateSELinux(selinuxState, applicationContext)
         }
 
-        globalConfig.edit().putBoolean(SpfConfig.GKI_MODE, getKNVersion()).apply()
+        globalConfig.edit { putBoolean(SpfConfig.GKI_MODE, getKNVersion()) }
         if (hasModule(GAME_AI)) {
             var listDefault = gameai_prefs.getString("game_ai_default", "")
             if (listDefault!!.isEmpty()) {
                 listDefault = RootUtils.runAndGetOutput("cat $GAME_AI_LIST_DEFAULT | sed 's/\"/#/g'")
-                gameai_prefs.edit().putString("game_ai_default", listDefault).apply()
+                gameai_prefs.edit { putString("game_ai_default", listDefault) }
             }
             setGameList(applicationContext)
         }
@@ -170,7 +171,7 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
 
         // TCP Cong Default
         if (globalConfig.getString(SpfConfig.TCP_CONG_DEF, "")!!.isEmpty())
-            globalConfig.edit().putString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS)).apply()
+            globalConfig.edit { putString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS)) }
 
         // Memory
         val swappiness = globalConfig.getString(SpfConfig.SWAPPINESS, "")

@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.SwitchItem
 import com.diphons.dkmsu.ui.popup.FPSMonitor
@@ -139,7 +140,7 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
                     if (!checkRefresRate().contains("$refreshrete"))
                         refreshrete = checkRefresRate()
                     if (infinity_display!!.isEmpty() && refreshrete!!.contains("finity")) {
-                        prefs.edit().putString(SpfConfig.DYNAMIC_FPS, refreshrete).apply()
+                        prefs.edit { putString(SpfConfig.DYNAMIC_FPS, refreshrete) }
                         infinity_display = "infinity"
                     }
                 } else
@@ -159,7 +160,7 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
                             )
                     }, onClick = {
                         refreshrete = if (reason == 0) "infinity" else "$reason"
-                        prefs.edit().putString(SpfConfig.REFRESH_RATE, "$reason").apply()
+                        prefs.edit { putString(SpfConfig.REFRESH_RATE, "$reason") }
                         setRefreshRate(reason)
                         showDropdown = false
                     })
@@ -317,7 +318,7 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
                         )
                     }, onClick = {
                         fps_monitor_mode = reason
-                        prefs.edit().putInt(SpfConfig.MONITOR_MINI_MODE, reason).apply()
+                        prefs.edit { putInt(SpfConfig.MONITOR_MINI_MODE, reason) }
                         showFPSDropdown = false
                         if (prefs.getBoolean(SpfConfig.MONITOR_MINI, false)) {
                             FPSMonitor(context).hidePopupWindow()
@@ -421,7 +422,7 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
                             FPSMonitor(context).showPopupWindow()
                         else
                             FPSMonitor(context).hidePopupWindow()
-                        prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, it).apply()
+                        prefs.edit { putBoolean(SpfConfig.MONITOR_MINI, it) }
                         fps_monitor = it
                     }
                     if (fps_monitor_mode == 2) {
@@ -436,7 +437,7 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
                             else
                                 stringResource(R.string.fps_small_view_enable)
                         ) {
-                            prefs.edit().putBoolean(SpfConfig.MONITOR_MINI_SMALL, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.MONITOR_MINI_SMALL, it) }
                             fps_monitor_small = it
                         }
                         if (fps_monitor_small) {
@@ -454,7 +455,7 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
                                 checked = fps_monitor_bat,
                                 summary = stringResource(R.string.fps_battery_view_sum)
                             ) {
-                                prefs.edit().putBoolean(SpfConfig.MONITOR_MINI_BATT, it).apply()
+                                prefs.edit { putBoolean(SpfConfig.MONITOR_MINI_BATT, it) }
                                 fps_monitor_bat = it
                             }
                             SwitchItem(
@@ -462,7 +463,7 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
                                 checked = fps_monitor_temp,
                                 summary = stringResource(R.string.fps_temp_view_sum)
                             ) {
-                                prefs.edit().putBoolean(SpfConfig.MONITOR_MINI_TEMP, it).apply()
+                                prefs.edit { putBoolean(SpfConfig.MONITOR_MINI_TEMP, it) }
                                 fps_monitor_temp = it
                             }
                             SwitchItem(
@@ -470,7 +471,7 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
                                 checked = fps_monitor_ram,
                                 summary = stringResource(R.string.fps_ram_view_sum)
                             ) {
-                                prefs.edit().putBoolean(SpfConfig.MONITOR_MINI_RAM, it).apply()
+                                prefs.edit { putBoolean(SpfConfig.MONITOR_MINI_RAM, it) }
                                 fps_monitor_ram = it
                             }
                         }

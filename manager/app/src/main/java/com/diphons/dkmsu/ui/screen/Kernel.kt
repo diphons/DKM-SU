@@ -75,6 +75,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.diphons.dkmsu.Natives
 import com.ramcosta.composedestinations.annotation.Destination
@@ -153,7 +154,7 @@ fun KernelScreen(navigator: DestinationsNavigator) {
         val check_profile_name = "$chg_profile_name"
         if (check_profile_name.contains("Default") || check_profile_name.isEmpty() || get_current_max.value == 0) {
             get_current_max.value = getCurrentCharger()
-            prefs.edit().putInt(SpfConfig.CHG_CUR_MAX, get_current_max.value!!).apply()
+            prefs.edit { putInt(SpfConfig.CHG_CUR_MAX, get_current_max.value!!) }
         }
     }
     // Get chg max by current max

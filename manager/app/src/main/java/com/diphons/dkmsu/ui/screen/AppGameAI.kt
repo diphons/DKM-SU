@@ -74,6 +74,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.edit
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.ramcosta.composedestinations.annotation.Destination
@@ -232,9 +233,9 @@ fun AppGameAIScreen(
         }
         if (!getList!!.contains(packageName)) {
             if (getList!!.isEmpty())
-                globalConfig.edit().putString(SpfConfig.PER_APP_LIST, packageName).apply()
+                globalConfig.edit { putString(SpfConfig.PER_APP_LIST, packageName) }
             else
-                globalConfig.edit().putString(SpfConfig.PER_APP_LIST, "$getList $packageName").apply()
+                globalConfig.edit { putString(SpfConfig.PER_APP_LIST, "$getList $packageName") }
         }
         getList = globalConfig.getString(SpfConfig.PER_APP_LIST, "")
     }
@@ -250,7 +251,7 @@ fun AppGameAIScreen(
                 else
                     dataSource = "$dataSource\n$after"
             }
-            prefs.edit().putString("game_ai_list", dataSource).apply()
+            prefs.edit { putString("game_ai_list", dataSource) }
         }
         setGameList(context)
 
@@ -262,7 +263,7 @@ fun AppGameAIScreen(
         var dataSource = "${prefs.getString("game_ai_list", "")}"
         if (data.isNotEmpty()) {
             dataSource = dataSource.replace(data, "")
-            prefs.edit().putString("game_ai_list", dataSource).apply()
+            prefs.edit { putString("game_ai_list", dataSource) }
             setGameList(context)
             reloadData = true
         }
@@ -446,16 +447,16 @@ fun AppGameAIScreen(
                     if (getValueDialog.isNotEmpty()) {
                         if (event.mode == 0) {
                             gpu_max_freq = strToInt(getValueDialog)
-                            perapp.edit().putInt("gpu_max_freq", strToInt(getValueDialog)).apply()
+                            perapp.edit { putInt("gpu_max_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 1) {
                             gpu_min_freq = strToInt(getValueDialog)
-                            perapp.edit().putInt("gpu_min_freq", strToInt(getValueDialog)).apply()
+                            perapp.edit { putInt("gpu_min_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 2) {
                             gpu_gov = getValueDialog
-                            perapp.edit().putString("gpu_gov", getValueDialog).apply()
+                            perapp.edit { putString("gpu_gov", getValueDialog) }
                         } else if (event.mode == 3) {
                             gpu_def_power = strToInt(getValueDialog)
-                            perapp.edit().putInt("gpu_def_power", strToInt(getValueDialog)).apply()
+                            perapp.edit { putInt("gpu_def_power", strToInt(getValueDialog)) }
                         } else if (event.mode == 4) {
                             getdata = "#gpu#: $adreno"
                             val getdataold = data
@@ -481,7 +482,7 @@ fun AppGameAIScreen(
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         io_sched = getValueDialog
-                        perapp.edit().putString("io_sched", getValueDialog).apply()
+                        perapp.edit { putString("io_sched", getValueDialog) }
                         updateVisible()
                     }
                     dialogEvent = null
@@ -519,7 +520,7 @@ fun AppGameAIScreen(
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         tcp_congs = getValueDialog
-                        perapp.edit().putString("tcp", getValueDialog).apply()
+                        perapp.edit { putString("tcp", getValueDialog) }
                         updateVisible()
                     }
                     dialogEvent = null
@@ -565,20 +566,20 @@ fun AppGameAIScreen(
         dialogEvent = DialogEvent(DialogType.Gpu, 0, mode, title, gpu_ref, gpu_def)
     }
     fun resetValue(){
-        perapp.edit().putString(SpfConfig.REFRESH_RATE, "Default").apply()
-        perapp.edit().putBoolean(SpfConfig.MONITOR_MINI, false).apply()
-        perapp.edit().putBoolean(SpfConfig.TOUCH_SAMPLE, false).apply()
-        perapp.edit().putFloat(SpfConfig.SC_MICROFON, 0f).apply()
-        perapp.edit().putFloat(SpfConfig.SC_EARFON, 0f).apply()
-        perapp.edit().putBoolean(SpfConfig.SC_SWITCH_HEADFON, false).apply()
-        perapp.edit().putFloat(SpfConfig.SC_HEADFON, 0f).apply()
-        perapp.edit().putFloat(SpfConfig.SC_HEADFON2, 0f).apply()
-        perapp.edit().putString("io_sched", getDefIOSched()).apply()
-        perapp.edit().putString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))).apply()
-        perapp.edit().putInt("gpu_max_freq", getGPUMaxFreq(context)).apply()
-        perapp.edit().putInt("gpu_min_freq", getGPUMinFreq(context)).apply()
-        perapp.edit().putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)).apply()
-        perapp.edit().putInt("gpu_def_power", gpuMaxPwrLevel(context)).apply()
+        perapp.edit { putString(SpfConfig.REFRESH_RATE, "Default") }
+        perapp.edit { putBoolean(SpfConfig.MONITOR_MINI, false) }
+        perapp.edit { putBoolean(SpfConfig.TOUCH_SAMPLE, false) }
+        perapp.edit { putFloat(SpfConfig.SC_MICROFON, 0f) }
+        perapp.edit { putFloat(SpfConfig.SC_EARFON, 0f) }
+        perapp.edit { putBoolean(SpfConfig.SC_SWITCH_HEADFON, false) }
+        perapp.edit { putFloat(SpfConfig.SC_HEADFON, 0f) }
+        perapp.edit { putFloat(SpfConfig.SC_HEADFON2, 0f) }
+        perapp.edit { putString("io_sched", getDefIOSched()) }
+        perapp.edit { putString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))) }
+        perapp.edit { putInt("gpu_max_freq", getGPUMaxFreq(context)) }
+        perapp.edit { putInt("gpu_min_freq", getGPUMinFreq(context)) }
+        perapp.edit { putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)) }
+        perapp.edit { putInt("gpu_def_power", gpuMaxPwrLevel(context)) }
     }
     Scaffold(
         topBar = {
@@ -598,7 +599,7 @@ fun AppGameAIScreen(
                         getList = getList!!.replace("$packageName ", "")
                     else
                         getList = getList!!.replace(packageName, "")
-                    globalConfig.edit().putString(SpfConfig.PER_APP_LIST, getList).apply()
+                    globalConfig.edit { putString(SpfConfig.PER_APP_LIST, getList) }
                     resetValue()
                     RootUtils.runCommand("rm -fr /data/data/${context.packageName}/shared_prefs/$packageName.xml")
                     navigator.popBackStack()
@@ -660,7 +661,7 @@ fun AppGameAIScreen(
                             )
                         }, onClick = {
                             refreshrete = if (reason == 0) "Default" else "$reason"
-                            perapp.edit().putString(SpfConfig.REFRESH_RATE, "$reason").apply()
+                            perapp.edit { putString(SpfConfig.REFRESH_RATE, "$reason") }
                             showDropdown = false
                             updateVisible()
                         })
@@ -764,7 +765,7 @@ fun AppGameAIScreen(
                         else
                             stringResource(R.string.fps_monitor_show_enable)
                     ) {
-                        perapp.edit().putBoolean(SpfConfig.MONITOR_MINI, it).apply()
+                        perapp.edit { putBoolean(SpfConfig.MONITOR_MINI, it) }
                         fps_monitor = it
                         updateVisible()
                     }
@@ -783,7 +784,7 @@ fun AppGameAIScreen(
                             checked = touch_sample,
                             summary = stringResource(id = R.string.touch_sample_sum)
                         ) {
-                            perapp.edit().putBoolean(SpfConfig.TOUCH_SAMPLE, it).apply()
+                            perapp.edit { putBoolean(SpfConfig.TOUCH_SAMPLE, it) }
                             touch_sample = it
                             updateVisible()
                         }
@@ -1120,7 +1121,7 @@ fun AppGameAIScreen(
                                     .padding(end = 30.dp),
                                 value = seek_microfon,
                                 onValueChange = {
-                                    perapp.edit().putFloat(SpfConfig.SC_MICROFON, it).apply()
+                                    perapp.edit { putFloat(SpfConfig.SC_MICROFON, it) }
                                     seek_microfon = it
                                     updateVisible()
                                 },
@@ -1163,7 +1164,7 @@ fun AppGameAIScreen(
                                     .padding(end = 30.dp),
                                 value = seek_earfon,
                                 onValueChange = {
-                                    perapp.edit().putFloat(SpfConfig.SC_EARFON, it).apply()
+                                    perapp.edit { putFloat(SpfConfig.SC_EARFON, it) }
                                     seek_earfon = it
                                     updateVisible()
                                 },
@@ -1196,13 +1197,13 @@ fun AppGameAIScreen(
                             title = stringResource(id = R.string.per_channel_controls),
                             checked = switch_headfon
                         ) {
-                            perapp.edit().putBoolean("sc_switch_headfon", it).apply()
+                            perapp.edit { putBoolean("sc_switch_headfon", it) }
                             switch_headfon = it
                             if (!switch_headfon) {
                                 seek_headfon2 = seek_headfon
-                                perapp.edit()
-                                    .putFloat("sc_headfon2", seek_headfon2)
-                                    .apply()
+                                perapp.edit {
+                                    putFloat("sc_headfon2", seek_headfon2)
+                                     }
                             }
                             updateVisible()
                         }
@@ -1220,11 +1221,11 @@ fun AppGameAIScreen(
                                     .padding(end = 30.dp),
                                 value = seek_headfon,
                                 onValueChange = {
-                                    perapp.edit().putFloat(SpfConfig.SC_HEADFON, it).apply()
+                                    perapp.edit { putFloat(SpfConfig.SC_HEADFON, it) }
                                     if (!switch_headfon) {
-                                        perapp.edit()
-                                            .putFloat(SpfConfig.SC_HEADFON2, it)
-                                            .apply()
+                                        perapp.edit {
+                                            putFloat(SpfConfig.SC_HEADFON2, it)
+                                             }
                                         seek_headfon2 = it
                                     }
                                     seek_headfon = it
@@ -1269,9 +1270,9 @@ fun AppGameAIScreen(
                                         .padding(end = 30.dp),
                                     value = seek_headfon2,
                                     onValueChange = {
-                                        perapp.edit()
-                                            .putFloat(SpfConfig.SC_HEADFON2, it)
-                                            .apply()
+                                        perapp.edit {
+                                            putFloat(SpfConfig.SC_HEADFON2, it)
+                                             }
                                         seek_headfon2 = it
                                         updateVisible()
                                     },

@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import androidx.core.content.edit
 import com.diphons.dkmsu.Natives
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ksuApp
@@ -29,7 +30,7 @@ class SelinuxTile : TileService() {
         val newIcon: Icon
 
         state = prefs.getBoolean(SpfConfig.SELINUX_MODE, !Utils.isSELinuxActive())
-        prefs.edit().putBoolean(SpfConfig.SELINUX_MODE, !state).apply()
+        prefs.edit { putBoolean(SpfConfig.SELINUX_MODE, !state) }
         if (state) {
             newState = Tile.STATE_INACTIVE
             newLabel = "Enforcing"

@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import androidx.core.content.edit
 import com.diphons.dkmsu.Natives
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ksuApp
@@ -42,7 +43,7 @@ class RefreshRateTile : TileService() {
         else
             id += 1
         refreshrete = getfpsbyid(id)
-        prefs.edit().putString(SpfConfig.REFRESH_RATE, refreshrete).apply()
+        prefs.edit { putString(SpfConfig.REFRESH_RATE, refreshrete) }
         setRefreshRate(strToInt(refreshrete))
 
         val newIcon = Icon.createWithResource(applicationContext, R.drawable.ic_refreshrate)
@@ -74,7 +75,7 @@ class RefreshRateTile : TileService() {
                 if (!checkRefresRate().contains(refreshrete))
                     refreshrete = checkRefresRate()
                 if (infinity_display.isEmpty() && refreshrete.contains("finity")) {
-                    prefs.edit().putString(SpfConfig.DYNAMIC_FPS, refreshrete).apply()
+                    prefs.edit { putString(SpfConfig.DYNAMIC_FPS, refreshrete) }
                     infinity_display = "infinity"
                 }
             } else

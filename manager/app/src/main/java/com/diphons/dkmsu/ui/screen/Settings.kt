@@ -63,6 +63,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
+import androidx.core.content.edit
 import com.maxkeppeker.sheets.core.models.base.Header
 import com.maxkeppeker.sheets.core.models.base.IconSource
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
@@ -218,7 +219,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 summary = stringResource(id = R.string.settings_check_update_summary),
                 checked = checkUpdate
             ) {
-                prefs.edit().putBoolean("check_update", it).apply()
+                prefs.edit { putBoolean("check_update", it) }
                 checkUpdate = it
             }
 
@@ -233,7 +234,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                 summary = stringResource(id = R.string.enable_web_debugging_summary),
                 checked = enableWebDebugging
             ) {
-                prefs.edit().putBoolean("enable_web_debugging", it).apply()
+                prefs.edit { putBoolean("enable_web_debugging", it) }
                 enableWebDebugging = it
             }
 
@@ -268,7 +269,7 @@ fun SettingScreen(navigator: DestinationsNavigator) {
                         confirmButton = {
                             TextButton(onClick = {
                                 showWarningDialog = false
-                                prefs.edit().putBoolean(SpfConfig.KSUD_MODE, !useOverlayFs).apply()
+                                prefs.edit { putBoolean(SpfConfig.KSUD_MODE, !useOverlayFs) }
                                 useOverlayFs = !useOverlayFs
                                 if (useOverlayFs) {
                                     moduleBackup()

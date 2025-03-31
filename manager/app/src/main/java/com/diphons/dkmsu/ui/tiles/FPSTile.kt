@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import androidx.core.content.edit
 import com.diphons.dkmsu.Natives
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.R
@@ -28,7 +29,7 @@ class FPSTile : TileService() {
         val newState: Int
 
         state = prefs.getBoolean(SpfConfig.MONITOR_MINI, false)
-        prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, !state).apply()
+        prefs.edit { putBoolean(SpfConfig.MONITOR_MINI, !state) }
         if (state || FPSActive) {
             newState = Tile.STATE_INACTIVE
             FPSMonitor(applicationContext).hidePopupWindow()

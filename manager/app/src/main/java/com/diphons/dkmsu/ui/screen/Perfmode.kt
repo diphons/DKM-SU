@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -206,7 +207,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
     var tcp_congs = MutableLiveData<String>(profile_load.getString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))))
 
     if (globalConfig.getString(SpfConfig.TCP_CONG_DEF, "")!!.isEmpty())
-        globalConfig.edit().putString(SpfConfig.TCP_CONG_DEF, tcp_congs.value).apply()
+        globalConfig.edit { putString(SpfConfig.TCP_CONG_DEF, tcp_congs.value) }
 
     fun reloadDataInfo(pref_profile: SharedPreferences){
         cpu1_max_freq.value = pref_profile.getInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1))
@@ -245,33 +246,33 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
     }
 
     fun resetProfile(){
-        profile_none.edit().putInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1)).apply()
-        profile_none.edit().putInt("cpu1_min_freq", getMinFreq(context, 1)).apply()
-        profile_none.edit().putString("cpu1_gov", getDefCPUGov(context, profile, 1)).apply()
+        profile_none.edit { putInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1)) }
+        profile_none.edit { putInt("cpu1_min_freq", getMinFreq(context, 1)) }
+        profile_none.edit { putString("cpu1_gov", getDefCPUGov(context, profile, 1)) }
 
         cpu1_max_freq.value = getDefCPUMaxFreq(context, profile, 1)
         cpu1_min_freq.value = getMinFreq(context, 1)
         cpu1_gov.value = getDefCPUGov(context, profile, 1)
         if (getMaxCluster(context) > 1) {
-            profile_none.edit().putInt("cpu2_max_freq", getDefCPUMaxFreq(context, profile, 2)).apply()
-            profile_none.edit().putInt("cpu2_min_freq", getMinFreq(context, 2)).apply()
-            profile_none.edit().putString("cpu2_gov", getDefCPUGov(context, profile, 2)).apply()
+            profile_none.edit { putInt("cpu2_max_freq", getDefCPUMaxFreq(context, profile, 2)) }
+            profile_none.edit { putInt("cpu2_min_freq", getMinFreq(context, 2)) }
+            profile_none.edit { putString("cpu2_gov", getDefCPUGov(context, profile, 2)) }
 
             cpu2_max_freq.value = getDefCPUMaxFreq(context, profile, 2)
             cpu2_min_freq.value = getMinFreq(context, 2)
             cpu2_gov.value = getDefCPUGov(context, profile, 2)
             if (getMaxCluster(context) > 2) {
-                profile_none.edit().putInt("cpu3_max_freq", getDefCPUMaxFreq(context, profile, 3)).apply()
-                profile_none.edit().putInt("cpu3_min_freq", getMinFreq(context, 3)).apply()
-                profile_none.edit().putString("cpu3_gov", getDefCPUGov(context, profile, 3)).apply()
+                profile_none.edit { putInt("cpu3_max_freq", getDefCPUMaxFreq(context, profile, 3)) }
+                profile_none.edit { putInt("cpu3_min_freq", getMinFreq(context, 3)) }
+                profile_none.edit { putString("cpu3_gov", getDefCPUGov(context, profile, 3)) }
 
                 cpu3_max_freq.value = getDefCPUMaxFreq(context, profile, 3)
                 cpu3_min_freq.value = getMinFreq(context, 3)
                 cpu3_gov.value = getDefCPUGov(context, profile, 3)
                 if (getMaxCluster(context) > 3) {
-                    profile_none.edit().putInt("cpu4_max_freq", getDefCPUMaxFreq(context, profile, 4)).apply()
-                    profile_none.edit().putInt("cpu4_min_freq", getMinFreq(context, 4)).apply()
-                    profile_none.edit().putString("cpu4_gov", getDefCPUGov(context, profile, 4)).apply()
+                    profile_none.edit { putInt("cpu4_max_freq", getDefCPUMaxFreq(context, profile, 4)) }
+                    profile_none.edit { putInt("cpu4_min_freq", getMinFreq(context, 4)) }
+                    profile_none.edit { putString("cpu4_gov", getDefCPUGov(context, profile, 4)) }
 
                     cpu4_max_freq.value = getDefCPUMaxFreq(context, profile, 4)
                     cpu4_min_freq.value = getMinFreq(context, 4)
@@ -280,14 +281,14 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
             }
         }
 
-        profile_none.edit().putInt("gpu_max_freq", getGPUMaxFreq(context)).apply()
-        profile_none.edit().putInt("gpu_min_freq", getGPUMinFreq(context)).apply()
-        profile_none.edit().putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)).apply()
-        profile_none.edit().putInt("gpu_def_power", gpuMaxPwrLevel(context)).apply()
+        profile_none.edit { putInt("gpu_max_freq", getGPUMaxFreq(context)) }
+        profile_none.edit { putInt("gpu_min_freq", getGPUMinFreq(context)) }
+        profile_none.edit { putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)) }
+        profile_none.edit { putInt("gpu_def_power", gpuMaxPwrLevel(context)) }
         if (hasAdrenoBoost)
-            profile_none.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
-        profile_none.edit().putInt("thermal", getDefThermalProfile(profile, gki_mode)).apply()
-        profile_none.edit().putString("io_sched", getDefIOSched()).apply()
+            profile_none.edit { putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)) }
+        profile_none.edit { putInt("thermal", getDefThermalProfile(profile, gki_mode)) }
+        profile_none.edit { putString("io_sched", getDefIOSched()) }
 
         gpu_max_freq.value = getGPUMaxFreq(context)
         gpu_min_freq.value = getGPUMinFreq(context)
@@ -422,7 +423,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                 cpu2_max_freq.value = strToInt(getValueDialog)
                             else
                                 cpu1_max_freq.value = strToInt(getValueDialog)
-                            profile_none.edit().putInt("cpu${event.cpu}_max_freq", strToInt(getValueDialog)).apply()
+                            profile_none.edit { putInt("cpu${event.cpu}_max_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 1) {
                             if (event.cpu == 4)
                                 cpu4_min_freq.value = strToInt(getValueDialog)
@@ -432,7 +433,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                 cpu2_min_freq.value = strToInt(getValueDialog)
                             else
                                 cpu1_min_freq.value = strToInt(getValueDialog)
-                            profile_none.edit().putInt("cpu${event.cpu}_min_freq", strToInt(getValueDialog)).apply()
+                            profile_none.edit { putInt("cpu${event.cpu}_min_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 2) {
                             if (event.cpu == 4)
                                 cpu4_gov.value = getValueDialog
@@ -442,7 +443,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                 cpu2_gov.value = getValueDialog
                             else
                                 cpu1_gov.value = getValueDialog
-                            profile_none.edit().putString("cpu${event.cpu}_gov", getValueDialog).apply()
+                            profile_none.edit { putString("cpu${event.cpu}_gov", getValueDialog) }
                         }
                         setCPU(getValueDialog, event.cpu, event.mode)
                     }
@@ -460,19 +461,19 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                     if (getValueDialog.isNotEmpty()) {
                         if (event.mode == 0) {
                             gpu_max_freq.value = strToInt(getValueDialog)
-                            profile_none.edit().putInt("gpu_max_freq", strToInt(getValueDialog)).apply()
+                            profile_none.edit { putInt("gpu_max_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 1) {
                             gpu_min_freq.value = strToInt(getValueDialog)
-                            profile_none.edit().putInt("gpu_min_freq", strToInt(getValueDialog)).apply()
+                            profile_none.edit { putInt("gpu_min_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 2) {
                             gpu_gov.value = getValueDialog
-                            profile_none.edit().putString("gpu_gov", getValueDialog).apply()
+                            profile_none.edit { putString("gpu_gov", getValueDialog) }
                         } else if (event.mode == 3) {
                             gpu_def_power.value = strToInt(getValueDialog)
-                            profile_none.edit().putInt("gpu_def_power", strToInt(getValueDialog)).apply()
+                            profile_none.edit { putInt("gpu_def_power", strToInt(getValueDialog)) }
                         } else if (event.mode == 4) {
                             gpu_adreno_boost.value = getValueDialog
-                            profile_none.edit().putInt("gpu_adreno_boost", parseAdrenoBoost(context, getValueDialog)).apply()
+                            profile_none.edit { putInt("gpu_adreno_boost", parseAdrenoBoost(context, getValueDialog)) }
                         }
                         setGPU(context, getValueDialog, event.mode)
                     }
@@ -489,7 +490,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         io_sched.value = getValueDialog
-                        profile_none.edit().putString("io_sched", getValueDialog).apply()
+                        profile_none.edit { putString("io_sched", getValueDialog) }
                         setIOSched(getValueDialog)
                     }
                     dialogEvent = null
@@ -505,7 +506,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         thermal_profile.value = getValueDialog
-                        profile_none.edit().putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)).apply()
+                        profile_none.edit { putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)) }
                         setKernel("${getThermalInt(context, getValueDialog, gki_mode)}", THERMAL_PROFILE, true)
                     }
                     dialogEvent = null
@@ -521,7 +522,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         tcp_congs.value = getValueDialog
-                        profile_none.edit().putString("tcp", getValueDialog).apply()
+                        profile_none.edit { putString("tcp", getValueDialog) }
                         setKernel(getValueDialog, TCP_CONGS)
                     }
                     dialogEvent = null
@@ -603,10 +604,10 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
     }
     fun perf_mode_switch(mode: Boolean){
         perf_mode = mode
-        globalConfig.edit().putBoolean(SpfConfig.PERF_MODE, mode).apply()
+        globalConfig.edit { putBoolean(SpfConfig.PERF_MODE, mode) }
         if (mode) {
             profile = globalConfig.getInt(SpfConfig.PROFILE_MODE_LAST, 0)
-            globalConfig.edit().putInt(SpfConfig.PROFILE_MODE, profile).apply()
+            globalConfig.edit { putInt(SpfConfig.PROFILE_MODE, profile) }
             if (gameai)
                 setKernel("1", GAME_AI)
             else {
@@ -614,7 +615,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                 setProfile(context, globalConfig.getInt(SpfConfig.PROFILE_MODE, 0))
             }
         } else {
-            globalConfig.edit().putInt(SpfConfig.PROFILE_MODE_LAST, profile).apply()
+            globalConfig.edit { putInt(SpfConfig.PROFILE_MODE_LAST, profile) }
             profile = 5
             reloadDataInfo(profile_none)
             setProfile(context, profile)
@@ -772,7 +773,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                     profile = globalConfig.getInt(SpfConfig.PROFILE_MODE, 0)
                                     setProfile(context, profile)
                                 }
-                                globalConfig.edit().putBoolean(SpfConfig.GAME_AI, it).apply()
+                                globalConfig.edit { putBoolean(SpfConfig.GAME_AI, it) }
                                 gameai = it
                             }
                             if (gameai) {
@@ -788,7 +789,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                         setKernel("1", GAME_AI_LOG)
                                     else
                                         setKernel("0", GAME_AI_LOG)
-                                    globalConfig.edit().putBoolean(SpfConfig.GAME_AI_LOG, it).apply()
+                                    globalConfig.edit { putBoolean(SpfConfig.GAME_AI_LOG, it) }
                                     game_ai_log = it
                                 }
                             }
@@ -842,7 +843,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                         profile = globalConfig.getInt(SpfConfig.PROFILE_MODE, 0)
                                         setProfile(context, profile)
                                     }
-                                    globalConfig.edit().putBoolean(SpfConfig.GAME_AI, it).apply()
+                                    globalConfig.edit { putBoolean(SpfConfig.GAME_AI, it) }
                                     gameai = it
                                 }
                                 if (gameai) {
@@ -858,7 +859,7 @@ fun PerfmodeScreen(navigator: DestinationsNavigator) {
                                             setKernel("1", GAME_AI_LOG)
                                         else
                                             setKernel("0", GAME_AI_LOG)
-                                        globalConfig.edit().putBoolean(SpfConfig.GAME_AI_LOG, it).apply()
+                                        globalConfig.edit { putBoolean(SpfConfig.GAME_AI_LOG, it) }
                                         game_ai_log = it
                                     }
                                 }

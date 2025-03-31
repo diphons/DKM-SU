@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.SwitchItem
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
@@ -65,8 +66,6 @@ import com.diphons.dkmsu.ui.util.Utils.*
 import com.diphons.dkmsu.ui.util.setKernel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.DisplayColorScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 
@@ -173,13 +172,13 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
             seek_contrast = db_cont
             seek_hue = db_hue
         }
-        prefs.edit().putFloat(SpfConfig.DISPLAY_RED, display_rgb).apply()
-        prefs.edit().putFloat(SpfConfig.DISPLAY_GREEN, display_rgb).apply()
-        prefs.edit().putFloat(SpfConfig.DISPLAY_BLUE, display_rgb).apply()
-        prefs.edit().putFloat(SpfConfig.DISPLAY_SATURATED, display_sat).apply()
-        prefs.edit().putFloat(SpfConfig.DISPLAY_VALUE, display_sat).apply()
-        prefs.edit().putFloat(SpfConfig.DISPLAY_CONTRAST, display_sat).apply()
-        prefs.edit().putFloat(SpfConfig.DISPLAY_HUE, display_hue).apply()
+        prefs.edit { putFloat(SpfConfig.DISPLAY_RED, display_rgb) }
+        prefs.edit { putFloat(SpfConfig.DISPLAY_GREEN, display_rgb) }
+        prefs.edit { putFloat(SpfConfig.DISPLAY_BLUE, display_rgb) }
+        prefs.edit { putFloat(SpfConfig.DISPLAY_SATURATED, display_sat) }
+        prefs.edit { putFloat(SpfConfig.DISPLAY_VALUE, display_sat) }
+        prefs.edit { putFloat(SpfConfig.DISPLAY_CONTRAST, display_sat) }
+        prefs.edit { putFloat(SpfConfig.DISPLAY_HUE, display_hue) }
 
         setKernel("${(seek_red * 256).toInt()}", DISPLAY_RED)
         setKernel("${(seek_green * 256).toInt()}", DISPLAY_GREEN)
@@ -215,14 +214,14 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                     db_hue = seek_hue
                     display_amoled = false
 
-                    prefs.edit().putFloat(SpfConfig.DISPLAY_RED, display_rgb).apply()
-                    prefs.edit().putFloat(SpfConfig.DISPLAY_GREEN, display_rgb).apply()
-                    prefs.edit().putFloat(SpfConfig.DISPLAY_BLUE, display_rgb).apply()
-                    prefs.edit().putFloat(SpfConfig.DISPLAY_SATURATED, display_sat).apply()
-                    prefs.edit().putFloat(SpfConfig.DISPLAY_VALUE, display_sat).apply()
-                    prefs.edit().putFloat(SpfConfig.DISPLAY_CONTRAST, display_sat).apply()
-                    prefs.edit().putFloat(SpfConfig.DISPLAY_HUE, display_hue).apply()
-                    prefs.edit().putBoolean(SpfConfig.DISPLAY_AMOLED, display_amoled).apply()
+                    prefs.edit { putFloat(SpfConfig.DISPLAY_RED, display_rgb) }
+                    prefs.edit { putFloat(SpfConfig.DISPLAY_GREEN, display_rgb) }
+                    prefs.edit { putFloat(SpfConfig.DISPLAY_BLUE, display_rgb) }
+                    prefs.edit { putFloat(SpfConfig.DISPLAY_SATURATED, display_sat) }
+                    prefs.edit { putFloat(SpfConfig.DISPLAY_VALUE, display_sat) }
+                    prefs.edit { putFloat(SpfConfig.DISPLAY_CONTRAST, display_sat) }
+                    prefs.edit { putFloat(SpfConfig.DISPLAY_HUE, display_hue) }
+                    prefs.edit { putBoolean(SpfConfig.DISPLAY_AMOLED, display_amoled) }
 
                     setKernel("${(seek_red * 256).toInt()}", DISPLAY_RED)
                     setKernel("${(seek_green * 256).toInt()}", DISPLAY_GREEN)
@@ -261,7 +260,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                             summary = stringResource(R.string.amoled_color_sum)
                         ) {
                             amoledColor(it)
-                            prefs.edit().putBoolean(SpfConfig.DISPLAY_AMOLED, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.DISPLAY_AMOLED, it) }
                             display_amoled = it
                         }
                         Spacer(
@@ -289,7 +288,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                     .padding(start = 30.dp, end = 40.dp),
                                 value = seek_red,
                                 onValueChange = {
-                                    prefs.edit().putFloat(SpfConfig.DISPLAY_RED, it).apply()
+                                    prefs.edit { putFloat(SpfConfig.DISPLAY_RED, it) }
                                     seek_red = it
                                     setKernel("${(it * 256).toInt()}", DISPLAY_RED)
                                 },
@@ -334,7 +333,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                     .padding(start = 30.dp, end = 40.dp),
                                 value = seek_green,
                                 onValueChange = {
-                                    prefs.edit().putFloat(SpfConfig.DISPLAY_GREEN, it).apply()
+                                    prefs.edit { putFloat(SpfConfig.DISPLAY_GREEN, it) }
                                     seek_green = it
                                     setKernel("${(it * 256).toInt()}", DISPLAY_GREEN)
                                 },
@@ -380,7 +379,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                     .padding(start = 30.dp, end = 40.dp),
                                 value = seek_blue,
                                 onValueChange = {
-                                    prefs.edit().putFloat(SpfConfig.DISPLAY_BLUE, it).apply()
+                                    prefs.edit { putFloat(SpfConfig.DISPLAY_BLUE, it) }
                                     seek_blue = it
                                     setKernel("${(it * 256).toInt()}", DISPLAY_BLUE)
                                 },
@@ -430,7 +429,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                 value = seek_saturation,
                                 valueRange = 0.3364623f..1f,
                                 onValueChange = {
-                                    prefs.edit().putFloat(SpfConfig.DISPLAY_SATURATED, it).apply()
+                                    prefs.edit { putFloat(SpfConfig.DISPLAY_SATURATED, it) }
                                     seek_saturation = it
                                     setKernel("${(it * 383).toInt()}", DISPLAY_SATURATED)
                                 },
@@ -474,7 +473,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                 value = seek_value,
                                 valueRange = 0.3364623f..1f,
                                 onValueChange = {
-                                    prefs.edit().putFloat(SpfConfig.DISPLAY_VALUE, it).apply()
+                                    prefs.edit { putFloat(SpfConfig.DISPLAY_VALUE, it) }
                                     seek_value = it
                                     setKernel("${(it * 383).toInt()}", DISPLAY_VALUE)
                                 },
@@ -518,7 +517,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                 value = seek_contrast,
                                 valueRange = 0.3364623f..1f,
                                 onValueChange = {
-                                    prefs.edit().putFloat(SpfConfig.DISPLAY_CONTRAST, it).apply()
+                                    prefs.edit { putFloat(SpfConfig.DISPLAY_CONTRAST, it) }
                                     seek_contrast = it
                                     setKernel("${(it * 383).toInt()}", DISPLAY_CONTRAST)
                                 },
@@ -561,7 +560,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                     .padding(end = 40.dp),
                                 value = seek_hue,
                                 onValueChange = {
-                                    prefs.edit().putFloat(SpfConfig.DISPLAY_HUE, it).apply()
+                                    prefs.edit { putFloat(SpfConfig.DISPLAY_HUE, it) }
                                     seek_hue = it
                                     setKernel("${(it * 1536).toInt()}", DISPLAY_HUE)
                                 },

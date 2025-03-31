@@ -62,6 +62,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.SwitchItem
 import com.diphons.dkmsu.ui.component.rememberCustomDialog
@@ -327,7 +328,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                                 setKernel("1", BLOCK_JOYOSE)
                             else
                                 setKernel("0", BLOCK_JOYOSE)
-                            globalConfig.edit().putBoolean(SpfConfig.BLOCK_JOYOSE, it).apply()
+                            globalConfig.edit { putBoolean(SpfConfig.BLOCK_JOYOSE, it) }
                             block_joyose = it
                         }
                     }
@@ -339,7 +340,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
             }
             if (!spoofDefault!!.contains("encrypted")) {
                 if (globalConfig.getString(SpfConfig.SPOOF_DEFAULT, "")!!.isEmpty())
-                    globalConfig.edit().putString(SpfConfig.SPOOF_DEFAULT, spoofDefault).apply()
+                    globalConfig.edit { putString(SpfConfig.SPOOF_DEFAULT, spoofDefault) }
                 ElevatedCard(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -367,7 +368,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                                 else
                                     RootUtils.runCommand("resetprop ro.crypto.state $spoofDefault")
                             }
-                            globalConfig.edit().putBoolean(SpfConfig.SPOOF_ENCRYPT, it).apply()
+                            globalConfig.edit { putBoolean(SpfConfig.SPOOF_ENCRYPT, it) }
                             spoofEncrypt = it
                         }
                     }
@@ -395,7 +396,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                         fontSize = 15.sp,
                         fontSizeSum = 13.sp
                     ) {
-                        globalConfig.edit().putBoolean(SpfConfig.SELINUX_MODE, it).apply()
+                        globalConfig.edit { putBoolean(SpfConfig.SELINUX_MODE, it) }
                         selinuxSwitch = it
                         activateSELinux(!it, context)
                     }
@@ -412,7 +413,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                         fontSize = 15.sp,
                         fontSizeSum = 13.sp
                     ) {
-                        globalConfig.edit().putBoolean(SpfConfig.SELINUX_ONBOOT, it).apply()
+                        globalConfig.edit { putBoolean(SpfConfig.SELINUX_ONBOOT, it) }
                         selinuxOnBoot = it
                     }
                 }
@@ -476,8 +477,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                                         CMD_MSG = context.getString(R.string.susfs_not_alowed)
                                         runDialog.show()
                                     } else {
-                                        globalConfig.edit()
-                                            .putString(SpfConfig.SPOOF_KERNEL, kernel_spoof).apply()
+                                        globalConfig.edit { putString(SpfConfig.SPOOF_KERNEL, kernel_spoof) }
                                         runSVCWorker(context, "susfs1")
                                         uname = "$kernel_spoof${getKnVersion()}"
                                     }
@@ -497,8 +497,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                                     .align(Alignment.CenterStart)
                                     .clickable {
                                         kernel_spoof = ""
-                                        globalConfig.edit()
-                                            .putString(SpfConfig.SPOOF_KERNEL, kernel_spoof).apply()
+                                        globalConfig.edit { putString(SpfConfig.SPOOF_KERNEL, kernel_spoof) }
                                         runSVCWorker(context, "susfs1")
                                         uname = getSpoofKnVersion()
                                     },
@@ -526,8 +525,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                                             CMD_MSG = context.getString(R.string.susfs_not_alowed)
                                             runDialog.show()
                                         } else {
-                                            globalConfig.edit()
-                                                .putString(SpfConfig.SPOOF_KERNEL, kernel_spoof).apply()
+                                            globalConfig.edit { putString(SpfConfig.SPOOF_KERNEL, kernel_spoof) }
                                             runSVCWorker(context, "susfs1")
                                             uname = "$kernel_spoof${getKnVersion()}"
                                         }

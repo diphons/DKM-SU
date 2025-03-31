@@ -116,6 +116,7 @@ import com.diphons.dkmsu.ui.util.stringToList
 import com.diphons.dkmsu.ui.util.stringToList2
 import com.diphons.dkmsu.ui.util.thermalList
 import com.diphons.dkmsu.ui.viewmodel.PerAppViewModel
+import androidx.core.content.edit
 
 /**
  * @author diphons
@@ -241,9 +242,9 @@ fun AppPerProfileScreen(
            resetVisible = true
         if (!getList!!.contains(packageName)) {
             if (getList!!.isEmpty())
-                globalConfig.edit().putString(SpfConfig.PER_APP_LIST, packageName).apply()
+                globalConfig.edit { putString(SpfConfig.PER_APP_LIST, packageName) }
             else
-                globalConfig.edit().putString(SpfConfig.PER_APP_LIST, "$getList $packageName").apply()
+                globalConfig.edit { putString(SpfConfig.PER_APP_LIST, "$getList $packageName") }
         }
         getList = globalConfig.getString(SpfConfig.PER_APP_LIST, "")
     }
@@ -368,7 +369,7 @@ fun AppPerProfileScreen(
                                 cpu2_max_freq = strToInt(getValueDialog)
                             else
                                 cpu1_max_freq = strToInt(getValueDialog)
-                            prefs.edit().putInt("cpu${event.cpu}_max_freq", strToInt(getValueDialog)).apply()
+                            prefs.edit { putInt("cpu${event.cpu}_max_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 1) {
                             if (event.cpu == 4)
                                 cpu4_min_freq = strToInt(getValueDialog)
@@ -378,7 +379,7 @@ fun AppPerProfileScreen(
                                 cpu2_min_freq = strToInt(getValueDialog)
                             else
                                 cpu1_min_freq = strToInt(getValueDialog)
-                            prefs.edit().putInt("cpu${event.cpu}_min_freq", strToInt(getValueDialog)).apply()
+                            prefs.edit { putInt("cpu${event.cpu}_min_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 2) {
                             if (event.cpu == 4)
                                 cpu4_gov = getValueDialog
@@ -388,7 +389,7 @@ fun AppPerProfileScreen(
                                 cpu2_gov = getValueDialog
                             else
                                 cpu1_gov = getValueDialog
-                            prefs.edit().putString("cpu${event.cpu}_gov", getValueDialog).apply()
+                            prefs.edit { putString("cpu${event.cpu}_gov", getValueDialog) }
                         }
                         updateVisible()
                     }
@@ -406,19 +407,19 @@ fun AppPerProfileScreen(
                     if (getValueDialog.isNotEmpty()) {
                         if (event.mode == 0) {
                             gpu_max_freq = strToInt(getValueDialog)
-                            prefs.edit().putInt("gpu_max_freq", strToInt(getValueDialog)).apply()
+                            prefs.edit { putInt("gpu_max_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 1) {
                             gpu_min_freq = strToInt(getValueDialog)
-                            prefs.edit().putInt("gpu_min_freq", strToInt(getValueDialog)).apply()
+                            prefs.edit { putInt("gpu_min_freq", strToInt(getValueDialog)) }
                         } else if (event.mode == 2) {
                             gpu_gov = getValueDialog
-                            prefs.edit().putString("gpu_gov", getValueDialog).apply()
+                            prefs.edit { putString("gpu_gov", getValueDialog) }
                         } else if (event.mode == 3) {
                             gpu_def_power = strToInt(getValueDialog)
-                            prefs.edit().putInt("gpu_def_power", strToInt(getValueDialog)).apply()
+                            prefs.edit { putInt("gpu_def_power", strToInt(getValueDialog)) }
                         } else if (event.mode == 4) {
                             gpu_adreno_boost = getValueDialog
-                            prefs.edit().putInt("gpu_adreno_boost", parseAdrenoBoost(context, getValueDialog)).apply()
+                            prefs.edit { putInt("gpu_adreno_boost", parseAdrenoBoost(context, getValueDialog)) }
                         }
                         updateVisible()
                     }
@@ -435,7 +436,7 @@ fun AppPerProfileScreen(
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         io_sched = getValueDialog
-                        prefs.edit().putString("io_sched", getValueDialog).apply()
+                        prefs.edit { putString("io_sched", getValueDialog) }
                         updateVisible()
                     }
                     dialogEvent = null
@@ -451,7 +452,7 @@ fun AppPerProfileScreen(
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         thermal_profile = getValueDialog
-                        prefs.edit().putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)).apply()
+                        prefs.edit { putInt("thermal", getThermalInt(context, getValueDialog, gki_mode)) }
                         updateVisible()
                     }
                     dialogEvent = null
@@ -467,7 +468,7 @@ fun AppPerProfileScreen(
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         tcp_congs = getValueDialog
-                        prefs.edit().putString("tcp", getValueDialog).apply()
+                        prefs.edit { putString("tcp", getValueDialog) }
                         updateVisible()
                     }
                     dialogEvent = null
@@ -571,27 +572,27 @@ fun AppPerProfileScreen(
     }
 
     fun resetValue(){
-        prefs.edit().putInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1)).apply()
-        prefs.edit().putInt("cpu1_min_freq", getMinFreq(context, 1)).apply()
-        prefs.edit().putString("cpu1_gov", getDefCPUGov(context, profile, 1)).apply()
-        prefs.edit().putInt("cpu2_max_freq", getDefCPUMaxFreq(context, profile, 2)).apply()
-        prefs.edit().putInt("cpu2_min_freq", getMinFreq(context, 2)).apply()
-        prefs.edit().putString("cpu2_gov", getDefCPUGov(context, profile, 2)).apply()
-        prefs.edit().putInt("cpu3_max_freq", getDefCPUMaxFreq(context, profile, 3)).apply()
-        prefs.edit().putInt("cpu3_min_freq", getMinFreq(context, 3)).apply()
-        prefs.edit().putString("cpu3_gov", getDefCPUGov(context, profile, 3)).apply()
-        prefs.edit().putInt("cpu4_max_freq", getDefCPUMaxFreq(context, profile, 4)).apply()
-        prefs.edit().putInt("cpu4_min_freq", getMinFreq(context, 4)).apply()
-        prefs.edit().putString("cpu4_gov", getDefCPUGov(context, profile, 4)).apply()
-        prefs.edit().putInt("gpu_max_freq", getGPUMaxFreq(context)).apply()
-        prefs.edit().putInt("gpu_min_freq", getGPUMinFreq(context)).apply()
-        prefs.edit().putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)).apply()
-        prefs.edit().putInt("gpu_def_power", gpuMaxPwrLevel(context)).apply()
-        prefs.edit().putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)).apply()
-        prefs.edit().putInt("thermal", getDefThermalProfile(profile, gki_mode)).apply()
-        prefs.edit().putString("io_sched", getDefIOSched()).apply()
-        prefs.edit().putString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))).apply()
-        prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, false).apply()
+        prefs.edit { putInt("cpu1_max_freq", getDefCPUMaxFreq(context, profile, 1)) }
+        prefs.edit { putInt("cpu1_min_freq", getMinFreq(context, 1)) }
+        prefs.edit { putString("cpu1_gov", getDefCPUGov(context, profile, 1)) }
+        prefs.edit { putInt("cpu2_max_freq", getDefCPUMaxFreq(context, profile, 2)) }
+        prefs.edit { putInt("cpu2_min_freq", getMinFreq(context, 2)) }
+        prefs.edit { putString("cpu2_gov", getDefCPUGov(context, profile, 2)) }
+        prefs.edit { putInt("cpu3_max_freq", getDefCPUMaxFreq(context, profile, 3)) }
+        prefs.edit { putInt("cpu3_min_freq", getMinFreq(context, 3)) }
+        prefs.edit { putString("cpu3_gov", getDefCPUGov(context, profile, 3)) }
+        prefs.edit { putInt("cpu4_max_freq", getDefCPUMaxFreq(context, profile, 4)) }
+        prefs.edit { putInt("cpu4_min_freq", getMinFreq(context, 4)) }
+        prefs.edit { putString("cpu4_gov", getDefCPUGov(context, profile, 4)) }
+        prefs.edit { putInt("gpu_max_freq", getGPUMaxFreq(context)) }
+        prefs.edit { putInt("gpu_min_freq", getGPUMinFreq(context)) }
+        prefs.edit { putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)) }
+        prefs.edit { putInt("gpu_def_power", gpuMaxPwrLevel(context)) }
+        prefs.edit { putInt("gpu_adreno_boost", getDefAdrenoBoost(profile)) }
+        prefs.edit { putInt("thermal", getDefThermalProfile(profile, gki_mode)) }
+        prefs.edit { putString("io_sched", getDefIOSched()) }
+        prefs.edit { putString("tcp", globalConfig.getString(SpfConfig.TCP_CONG_DEF, readKernel(TCP_CONGS))) }
+        prefs.edit { putBoolean(SpfConfig.MONITOR_MINI, false) }
     }
     Scaffold(
         topBar = {
@@ -609,7 +610,7 @@ fun AppPerProfileScreen(
                         getList = getList!!.replace("$packageName ", "")
                     else
                         getList = getList!!.replace(packageName, "")
-                    globalConfig.edit().putString(SpfConfig.PER_APP_LIST, getList).apply()
+                    globalConfig.edit { putString(SpfConfig.PER_APP_LIST, getList) }
                     resetValue()
                     RootUtils.runCommand("rm -fr /data/data/${context.packageName}/shared_prefs/$packageName.xml")
                     navigator.popBackStack()
@@ -648,7 +649,7 @@ fun AppPerProfileScreen(
                                 )
                             }, onClick = {
                                 refreshrete = if (reason == 0) "Default" else "$reason"
-                                prefs.edit().putString(SpfConfig.REFRESH_RATE, "$reason").apply()
+                                prefs.edit { putString(SpfConfig.REFRESH_RATE, "$reason") }
                                 showDropdown = false
                                 updateVisible()
                             })
@@ -751,7 +752,7 @@ fun AppPerProfileScreen(
                             else
                                 stringResource(R.string.fps_monitor_show_enable)
                         ) {
-                            prefs.edit().putBoolean(SpfConfig.MONITOR_MINI, it).apply()
+                            prefs.edit { putBoolean(SpfConfig.MONITOR_MINI, it) }
                             fps_monitor = it
                             updateVisible()
                         }
@@ -770,7 +771,7 @@ fun AppPerProfileScreen(
                                 checked = touch_sample,
                                 summary = stringResource(id = R.string.touch_sample_sum)
                             ) {
-                                prefs.edit().putBoolean(SpfConfig.TOUCH_SAMPLE, it).apply()
+                                prefs.edit { putBoolean(SpfConfig.TOUCH_SAMPLE, it) }
                                 touch_sample = it
                                 updateVisible()
                             }
@@ -1491,7 +1492,7 @@ fun AppPerProfileScreen(
                                         .padding(end = 30.dp),
                                     value = seek_microfon,
                                     onValueChange = {
-                                        prefs.edit().putFloat(SpfConfig.SC_MICROFON, it).apply()
+                                        prefs.edit { putFloat(SpfConfig.SC_MICROFON, it) }
                                         seek_microfon = it
                                         updateVisible()
                                     },
@@ -1534,7 +1535,7 @@ fun AppPerProfileScreen(
                                         .padding(end = 30.dp),
                                     value = seek_earfon,
                                     onValueChange = {
-                                        prefs.edit().putFloat(SpfConfig.SC_EARFON, it).apply()
+                                        prefs.edit { putFloat(SpfConfig.SC_EARFON, it) }
                                         seek_earfon = it
                                         updateVisible()
                                     },
@@ -1567,13 +1568,13 @@ fun AppPerProfileScreen(
                                 title = stringResource(id = R.string.per_channel_controls),
                                 checked = switch_headfon
                             ) {
-                                prefs.edit().putBoolean("sc_switch_headfon", it).apply()
+                                prefs.edit() { putBoolean("sc_switch_headfon", it) }
                                 switch_headfon = it
                                 if (!switch_headfon) {
                                     seek_headfon2 = seek_headfon
-                                    prefs.edit()
-                                        .putFloat("sc_headfon2", seek_headfon2)
-                                        .apply()
+                                    prefs.edit() {
+                                        putFloat("sc_headfon2", seek_headfon2)
+                                    }
                                 }
                                 updateVisible()
                             }
@@ -1591,11 +1592,11 @@ fun AppPerProfileScreen(
                                         .padding(end = 30.dp),
                                     value = seek_headfon,
                                     onValueChange = {
-                                        prefs.edit().putFloat(SpfConfig.SC_HEADFON, it).apply()
+                                        prefs.edit { putFloat(SpfConfig.SC_HEADFON, it) }
                                         if (!switch_headfon) {
-                                            prefs.edit()
-                                                .putFloat(SpfConfig.SC_HEADFON2, it)
-                                                .apply()
+                                            prefs.edit {
+                                                putFloat(SpfConfig.SC_HEADFON2, it)
+                                                 }
                                             seek_headfon2 = it
                                         }
                                         seek_headfon = it
@@ -1640,9 +1641,9 @@ fun AppPerProfileScreen(
                                             .padding(end = 30.dp),
                                         value = seek_headfon2,
                                         onValueChange = {
-                                            prefs.edit()
-                                                .putFloat(SpfConfig.SC_HEADFON2, it)
-                                                .apply()
+                                            prefs.edit {
+                                                putFloat(SpfConfig.SC_HEADFON2, it)
+                                                 }
                                             seek_headfon2 = it
                                             updateVisible()
                                         },

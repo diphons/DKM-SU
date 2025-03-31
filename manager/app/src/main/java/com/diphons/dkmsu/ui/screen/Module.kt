@@ -87,6 +87,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
@@ -224,13 +225,13 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                                             onClick = {
                                                 viewModel.sortAToZ = !viewModel.sortAToZ
                                                 viewModel.sortZToA = false
-                                                prefs.edit()
-                                                    .putBoolean(
+                                                prefs.edit {
+                                                    putBoolean(
                                                         "module_sort_a_to_z",
                                                         viewModel.sortAToZ
                                                     )
                                                     .putBoolean("module_sort_z_to_a", false)
-                                                    .apply()
+                                                     }
                                                 scope.launch {
                                                     viewModel.fetchModuleList()
                                                 }
@@ -250,13 +251,13 @@ fun ModuleScreen(navigator: DestinationsNavigator) {
                                             onClick = {
                                                 viewModel.sortZToA = !viewModel.sortZToA
                                                 viewModel.sortAToZ = false
-                                                prefs.edit()
-                                                    .putBoolean(
+                                                prefs.edit {
+                                                    putBoolean(
                                                         "module_sort_z_to_a",
                                                         viewModel.sortZToA
                                                     )
                                                     .putBoolean("module_sort_a_to_z", false)
-                                                    .apply()
+                                                     }
                                                 scope.launch {
                                                     viewModel.fetchModuleList()
                                                 }

@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -96,7 +97,7 @@ class MainActivity : ComponentActivity() {
 
         //Extract Assets
         if (isManager && rootAvailable()) {
-            prefs.edit().putBoolean(SpfConfig.GKI_MODE, getKNVersion()).apply()
+            prefs.edit { putBoolean(SpfConfig.GKI_MODE, getKNVersion()) }
             extractXTAssets(this)
         }
         setContent {
