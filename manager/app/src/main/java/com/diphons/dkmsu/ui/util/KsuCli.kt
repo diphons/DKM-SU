@@ -1010,7 +1010,7 @@ fun getDefThermalProfile(profile: Int, gki: Boolean): Int{
         return when (profile) {
             1 -> 6
             2 -> 19
-            3 -> 6
+            3 -> 1
             4 -> 1
             else -> 0
         }
@@ -1018,7 +1018,7 @@ fun getDefThermalProfile(profile: Int, gki: Boolean): Int{
         return when (profile) {
             1 -> 10
             3 -> 10
-            2 -> 16
+            2 -> -1
             4 -> 8
             else -> -1
         }
