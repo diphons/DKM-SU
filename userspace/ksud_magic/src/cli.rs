@@ -240,6 +240,9 @@ enum Module {
         id: String,
     },
 
+    /// current mount system
+    Mount,
+
     /// list all modules
     List,
 }
@@ -325,6 +328,7 @@ pub fn run() -> Result<()> {
                 Module::Enable { id } => module::enable_module(&id),
                 Module::Disable { id } => module::disable_module(&id),
                 Module::Action { id } => module::run_action(&id),
+                Module::Mount => module::mount_system(),
                 Module::List => module::list_modules(),
             }
         }
