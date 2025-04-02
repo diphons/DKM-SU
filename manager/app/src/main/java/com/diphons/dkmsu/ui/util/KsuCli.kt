@@ -1572,6 +1572,13 @@ fun allowlistRestore(): Boolean {
     return result.isEmpty()
 }
 
+fun currentMountSystem(): String {
+    val shell = getRootShell()
+    val cmd = "module mount"
+    val result = ShellUtils.fastCmd(shell, "${getKsuDaemonPath()} $cmd").trim()
+    return if (result.isEmpty()) "Unavailable" else result.substringAfter(":").substringAfter(" ").trim().replace("_", " ")
+}
+
 fun setAppProfileTemplate(id: String, template: String): Boolean {
     val shell = getRootShell()
     val escapedTemplate = template.replace("\"", "\\\"")

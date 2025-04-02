@@ -633,11 +633,7 @@ private fun InfoCard() {
                 Spacer(Modifier.height(4.dp))
                 InfoCardItem(
                     label = stringResource(R.string.home_module_mount),
-                    content = if (useOverlayFs.value!!) {
-                        stringResource(R.string.home_overlayfs_mount)
-                    } else {
-                        stringResource(R.string.home_magic_mount)
-                    },
+                    content = currentMountSystem(),
                 )
             }
         }

@@ -57,7 +57,7 @@
     <string name="module_version">Версия</string>
     <string name="module_author">К</string>
     <string name="module_overlay_fs_not_available">OverlayFS отключен ядром, модуль недоступен.</string>
-    <string name="home_module_mount">Системный модуль</string>
+    <string name="home_module_mount">Системное крепление</string>
     <string name="home_magic_mount">Волшебное крепление</string>
     <string name="home_overlayfs_mount">OverlayFS</string>
     <string name="use_overlay_fs">Использовать OverlayFS</string>

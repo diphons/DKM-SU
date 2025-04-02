@@ -57,7 +57,7 @@
     <string name="module_version">Versi</string>
     <string name="module_author">Oleh</string>
     <string name="module_overlay_fs_not_available">OverlayFS dinonaktifkan oleh kernel, modul tidak tersedia.</string>
-    <string name="home_module_mount">Modul Sistem</string>
+    <string name="home_module_mount">Mount Sistem</string>
     <string name="home_magic_mount">Magic Mount</string>
     <string name="home_overlayfs_mount">OverlayFS</string>
     <string name="use_overlay_fs">Gunakan OverlayFS</string>

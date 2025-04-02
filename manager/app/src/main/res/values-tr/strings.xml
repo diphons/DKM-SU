@@ -57,7 +57,7 @@
     <string name="module_version">Sürüm</string>
     <string name="module_author">İle</string>
     <string name="module_overlay_fs_not_available">OverlayFS çekirdek tarafından devre dışı bırakıldı, modül mevcut değil.</string>
-    <string name="home_module_mount">Sistem Modülü</string>
+    <string name="home_module_mount">Sistem Montajı</string>
     <string name="home_magic_mount">Sihirli Dağ</string>
     <string name="home_overlayfs_mount">KaplamaFS</string>
     <string name="use_overlay_fs">OverlayFS\'yi kullanın</string>

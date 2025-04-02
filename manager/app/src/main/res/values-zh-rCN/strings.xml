@@ -57,7 +57,7 @@
     <string name="module_version">版本</string>
     <string name="module_author">作者</string>
     <string name="module_overlay_fs_not_available">OverlayFS被内核禁用，模块不可用。</string>
-    <string name="home_module_mount">系统模块</string>
+    <string name="home_module_mount">系统安装</string>
     <string name="home_magic_mount">Magic Mount</string>
     <string name="home_overlayfs_mount">OverlayFS</string>
     <string name="use_overlay_fs">使用 OverlayFS</string>
