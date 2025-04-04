@@ -26,31 +26,39 @@
         android:orientation="vertical"
         tools:ignore="UselessLeaf" />
 
-    <TextView android:id="@+id/jitter_mma"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:singleLine="true" />
+        android:orientation="vertical"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp">
 
-    <TextView android:id="@+id/totalish_mma"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="true" />
+        <TextView android:id="@+id/jitter_mma"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true" />
 
-    <TextView android:id="@+id/ui_frametime_mma"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="true" />
+        <TextView android:id="@+id/totalish_mma"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true" />
 
-    <TextView android:id="@+id/rt_frametime_mma"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="true" />
+        <TextView android:id="@+id/ui_frametime_mma"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true" />
 
-    <TextView android:id="@+id/total_mma"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="true" />
+        <TextView android:id="@+id/rt_frametime_mma"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true" />
 
+        <TextView android:id="@+id/total_mma"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true" />
+
+    </LinearLayout>
     <View android:layout_width="match_parent"
         android:layout_height="0px"
         android:layout_weight="1" />
@@ -58,6 +66,7 @@
     <view class="com.diphons.dkmsu.ui.uibench.RenderingJitter$PointGraphView"
         android:id="@+id/graph"
         android:layout_height="200dp"
-        android:layout_width="match_parent" />
+        android:layout_width="match_parent"
+        android:layout_marginBottom="44dp"/>
 
 </LinearLayout>
