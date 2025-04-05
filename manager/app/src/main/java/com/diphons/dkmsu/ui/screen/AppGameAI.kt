@@ -312,6 +312,9 @@ fun AppGameAIScreen(
     var gpu_def_power by rememberSaveable {
         mutableStateOf(perapp.getInt("gpu_def_power", gpuMaxPwrLevel(context)))
     }
+    val hasAdrenoBoost by rememberSaveable {
+        mutableStateOf(hasModule("${getGPUPath(context)}/$ADRENO_BOOST"))
+    }
 
     @Composable
     fun listDialog(
@@ -822,7 +825,19 @@ fun AppGameAIScreen(
                 }
             }
 
-            ElevatedCard {
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 22.dp)
+                        .padding(top = 15.dp, bottom = 10.dp),
+                    text = "CPU",
+                    fontSize = 15.sp,
+                    style = MaterialTheme.typography.titleSmall
+                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -839,14 +854,18 @@ fun AppGameAIScreen(
                         modifier = Modifier
                             .padding(vertical = 8.dp)
                             .align(Alignment.CenterStart),
-                        text = "CPU Governor"
+                        text = "Governor",
+                        fontSize = 13.sp,
+                        style = MaterialTheme.typography.bodySmall
                     )
                     Text(
                         modifier = Modifier
                             .padding(vertical = 8.dp)
                             .align(Alignment.CenterEnd),
                         text = governor,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontSize = 13.sp,
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -956,43 +975,64 @@ fun AppGameAIScreen(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            dialogEvent = DialogEvent(
-                                DialogType.Gpu, 0, 4,
-                                "Adreno Boost",
-                                "${context.getString(R.string.off)} ${context.getString(R.string.low)} ${context.getString(R.string.medium)} ${context.getString(R.string.high)}",
-                                parseAdrenoBoost(context, strToInt(adreno))
-                            )
-                        }
-                        .padding(vertical = 10.dp, horizontal = 22.dp)
-                ) {
-                    Text(
+                if (hasAdrenoBoost) {
+                    Box(
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .align(Alignment.CenterStart),
-                        text = "Adreno Boost"
-                    )
-                    Text(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .align(Alignment.CenterEnd),
-                        text = parseAdrenoBoost(context, strToInt(adreno)),
-                        textAlign = TextAlign.Center
-                    )
+                            .fillMaxWidth()
+                            .clickable {
+                                dialogEvent = DialogEvent(
+                                    DialogType.Gpu, 0, 4,
+                                    "Choose Adreno Boost Level",
+                                    "${context.getString(R.string.off)} ${context.getString(R.string.low)} ${
+                                        context.getString(
+                                            R.string.medium
+                                        )
+                                    } ${context.getString(R.string.high)}",
+                                    parseAdrenoBoost(context, strToInt(adreno))
+                                )
+                            }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .align(Alignment.CenterStart),
+                            text = "Adreno Boost",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .align(Alignment.CenterEnd),
+                            text = parseAdrenoBoost(context, strToInt(adreno)),
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
 
-            ElevatedCard {
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp, horizontal = 22.dp),
+                    text = "Thermal",
+                    fontSize = 15.sp,
+                    style = MaterialTheme.typography.titleSmall
+                )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
                             dialogEvent = DialogEvent(
                                 DialogType.Thermal, 0, 0,
-                                "Thermal",
+                                "Choose Thermal Profile",
                                 thermalList(context, gki_mode),
                                 getThermalString(context, thermal, gki_mode))
                         }
@@ -1000,16 +1040,18 @@ fun AppGameAIScreen(
                 ) {
                     Text(
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
                             .align(Alignment.CenterStart),
-                        text = "Thermal"
+                        text = "Profile",
+                        fontSize = 13.sp,
+                        style = MaterialTheme.typography.bodySmall
                     )
                     Text(
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
                             .align(Alignment.CenterEnd),
                         text = getThermalString(context, thermal, gki_mode),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontSize = 13.sp,
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -1203,7 +1245,7 @@ fun AppGameAIScreen(
                                 seek_headfon2 = seek_headfon
                                 perapp.edit {
                                     putFloat("sc_headfon2", seek_headfon2)
-                                     }
+                                }
                             }
                             updateVisible()
                         }
@@ -1225,7 +1267,7 @@ fun AppGameAIScreen(
                                     if (!switch_headfon) {
                                         perapp.edit {
                                             putFloat(SpfConfig.SC_HEADFON2, it)
-                                             }
+                                        }
                                         seek_headfon2 = it
                                     }
                                     seek_headfon = it
@@ -1272,7 +1314,7 @@ fun AppGameAIScreen(
                                     onValueChange = {
                                         perapp.edit {
                                             putFloat(SpfConfig.SC_HEADFON2, it)
-                                             }
+                                        }
                                         seek_headfon2 = it
                                         updateVisible()
                                     },
@@ -1473,4 +1515,3 @@ private fun AppMenuBox(packageName: String, content: @Composable () -> Unit) {
 @Composable
 private fun AppGameAIPreview() {
 }
-
