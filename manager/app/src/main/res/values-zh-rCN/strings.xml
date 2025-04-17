@@ -343,4 +343,6 @@
     <string name="please_wait">请稍等</string>
     <string name="ram_approximately">大约</string>
     <string name="ram_recycle">回收 ZRAM</string>
+    <string name="bypass_chg">旁路充电</string>
+    <string name="bypass_chg_summary">直接使用充电器供电，无需电池。\n\n确保使用原装充电器。</string>
 </resources>

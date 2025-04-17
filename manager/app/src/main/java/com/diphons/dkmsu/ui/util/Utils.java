@@ -90,6 +90,7 @@ public class Utils {
     public static String CHG_CUR_MAX = "/sys/class/power_supply/battery/constant_charge_current_max";
     public static String NIGHT_CHARGING = "/sys/class/power_supply/battery/night_charging";
     public static String STEP_CHARGING = "/sys/class/power_supply/battery/step_charging_enabled";
+    public static String INPUT_SUSPEND = "/sys/class/power_supply/battery/input_suspend";
     public static String PIF_UPDATER = "/vendor/bin/oemports10t_PIF-updater";
     public static String CMD_MSG = "";
 

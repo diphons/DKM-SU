@@ -343,4 +343,6 @@
     <string name="please_wait">lütfen bekle</string>
     <string name="ram_approximately">Yaklaşık</string>
     <string name="ram_recycle">ZRAM\'ı geri dönüştürün</string>
+    <string name="bypass_chg">Bypass Şarjı</string>
+    <string name="bypass_chg_summary">Aküyü dahil etmeden doğrudan şarj cihazından güç kullanın.\n\nStok şarj cihazını kullandığınızdan emin olun.</string>
 </resources>

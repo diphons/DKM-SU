@@ -544,6 +544,27 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                     }
                 }
             }
+            if (hasModule(INPUT_SUSPEND)) {
+                ElevatedCard {
+                    var bypassChg by rememberSaveable {
+                        mutableStateOf(prefs.getBoolean(SpfConfig.BYPASS_CHARGING, false))
+                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                    ) {
+                        SwitchItem(
+                            title = stringResource(R.string.bypass_chg),
+                            checked = bypassChg,
+                            summary = stringResource(R.string.bypass_chg_summary)
+                        ) {
+                            prefs.edit { putBoolean(SpfConfig.BYPASS_CHARGING, it) }
+                            bypassChg = it
+                        }
+                    }
+                }
+            }
             if (hasModule(FCHG_SYS)) {
                 ElevatedCard {
                     var fast_chg by rememberSaveable {

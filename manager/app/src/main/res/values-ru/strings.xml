@@ -343,4 +343,6 @@
     <string name="please_wait">пожалуйста, подождите</string>
     <string name="ram_approximately">Примерно</string>
     <string name="ram_recycle">Переработка ZRAM</string>
+    <string name="bypass_chg">Обходная зарядка</string>
+    <string name="bypass_chg_summary">Используйте питание напрямую от зарядного устройства, не задействуя аккумулятор.\n\nОбязательно используйте штатное зарядное устройство.</string>
 </resources>

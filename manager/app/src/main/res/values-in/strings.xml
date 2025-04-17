@@ -343,4 +343,6 @@
     <string name="please_wait">Mohon tunggu</string>
     <string name="ram_approximately">Sekitar</string>
     <string name="ram_recycle">Mendaur ulang ZRAM</string>
+    <string name="bypass_chg">Lewati Pengisian Daya</string>
+    <string name="bypass_chg_summary">Gunakan daya langsung dari pengisi daya tanpa melibatkan baterai.\n\nPastikan Anda menggunakan pengisi daya bawaan.</string>
 </resources>
