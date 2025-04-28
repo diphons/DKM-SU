@@ -95,102 +95,72 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
         }
     }
     //Default value
-    val display_rgb = 1f
-    val display_sat = 0.6662165f
-    val display_hue = 0f
+    val displayRgb = 1f
+    val displaySat = 0.6662165f
+    val displayHue = 0f
+    val displayAmoledRgb = 0.9040460f
+    val displayAmoledSat = 0.71083844f
+    val displayAmoledCont = 0.6870402f
 
-    //Backup value
-    var db_red by rememberSaveable {
-        mutableStateOf(display_rgb)
+    var seekRed by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_RED, displayRgb))
     }
-    var db_green by rememberSaveable {
-        mutableStateOf(display_rgb)
+    var seekGreen by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_GREEN, displayRgb))
     }
-    var db_blue by rememberSaveable {
-        mutableStateOf(display_rgb)
+    var seekBlue by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_BLUE, displayRgb))
     }
-    var db_sat by rememberSaveable {
-        mutableStateOf(display_sat)
+    var seekSaturation by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_SATURATED, displaySat))
     }
-    var db_val by rememberSaveable {
-        mutableStateOf(display_sat)
+    var seekValue by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_VALUE, displaySat))
     }
-    var db_cont by rememberSaveable {
-        mutableStateOf(display_sat)
+    var seekContrast by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_CONTRAST, displaySat))
     }
-    var db_hue by rememberSaveable {
-        mutableStateOf(display_hue)
+    var seekHue by rememberSaveable {
+        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_HUE, displayHue))
     }
-    var seek_red by rememberSaveable {
-        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_RED, display_rgb))
-    }
-    var seek_green by rememberSaveable {
-        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_GREEN, display_rgb))
-    }
-    var seek_blue by rememberSaveable {
-        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_BLUE, display_rgb))
-    }
-    var seek_saturation by rememberSaveable {
-        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_SATURATED, display_sat))
-    }
-    var seek_value by rememberSaveable {
-        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_VALUE, display_sat))
-    }
-    var seek_contrast by rememberSaveable {
-        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_CONTRAST, display_sat))
-    }
-    var seek_hue by rememberSaveable {
-        mutableStateOf(prefs.getFloat(SpfConfig.DISPLAY_HUE, display_hue))
-    }
-    var display_amoled by rememberSaveable {
+    var displayAmoled by rememberSaveable {
         mutableStateOf(prefs.getBoolean(SpfConfig.DISPLAY_AMOLED, false))
     }
+    var onLoad by remember {mutableStateOf(false)}
 
     fun amoledColor(enabled: Boolean){
         if (enabled) {
-            db_red = seek_red
-            db_green = seek_green
-            db_blue = seek_blue
-            db_sat = seek_saturation
-            db_val = seek_value
-            db_cont = seek_contrast
-            db_hue = seek_hue
-
-            seek_red = 0.9040460f
-            seek_green = 0.9040460f
-            seek_blue = 0.9040460f
-            seek_saturation = 0.71083844f
-            seek_value = display_sat
-            seek_contrast = 0.6870402f
-            seek_hue = display_hue
+            seekRed = prefs.getFloat(SpfConfig.DISPLAY_AMOLED_RED, displayAmoledRgb)
+            seekGreen = prefs.getFloat(SpfConfig.DISPLAY_AMOLED_GREEN, displayAmoledRgb)
+            seekBlue = prefs.getFloat(SpfConfig.DISPLAY_AMOLED_BLUE, displayAmoledRgb)
+            seekSaturation = prefs.getFloat(SpfConfig.DISPLAY_AMOLED_SATURATED, displayAmoledSat)
+            seekValue = prefs.getFloat(SpfConfig.DISPLAY_AMOLED_VALUE, displaySat)
+            seekContrast = prefs.getFloat(SpfConfig.DISPLAY_AMOLED_CONTRAST, displayAmoledCont)
+            seekHue = prefs.getFloat(SpfConfig.DISPLAY_AMOLED_HUE, displayHue)
         } else {
-            seek_red = db_red
-            seek_green = db_green
-            seek_blue = db_blue
-            seek_saturation = db_sat
-            seek_value = db_val
-            seek_contrast = db_cont
-            seek_hue = db_hue
+            seekRed = prefs.getFloat(SpfConfig.DISPLAY_RED, displayRgb)
+            seekGreen = prefs.getFloat(SpfConfig.DISPLAY_GREEN, displayRgb)
+            seekBlue = prefs.getFloat(SpfConfig.DISPLAY_BLUE, displayRgb)
+            seekSaturation = prefs.getFloat(SpfConfig.DISPLAY_SATURATED, displaySat)
+            seekValue = prefs.getFloat(SpfConfig.DISPLAY_VALUE, displaySat)
+            seekContrast = prefs.getFloat(SpfConfig.DISPLAY_CONTRAST, displaySat)
+            seekHue = prefs.getFloat(SpfConfig.DISPLAY_HUE, displayHue)
         }
-        prefs.edit { putFloat(SpfConfig.DISPLAY_RED, display_rgb) }
-        prefs.edit { putFloat(SpfConfig.DISPLAY_GREEN, display_rgb) }
-        prefs.edit { putFloat(SpfConfig.DISPLAY_BLUE, display_rgb) }
-        prefs.edit { putFloat(SpfConfig.DISPLAY_SATURATED, display_sat) }
-        prefs.edit { putFloat(SpfConfig.DISPLAY_VALUE, display_sat) }
-        prefs.edit { putFloat(SpfConfig.DISPLAY_CONTRAST, display_sat) }
-        prefs.edit { putFloat(SpfConfig.DISPLAY_HUE, display_hue) }
 
-        setKernel("${(seek_red * 256).toInt()}", DISPLAY_RED)
-        setKernel("${(seek_green * 256).toInt()}", DISPLAY_GREEN)
-        setKernel("${(seek_blue * 256).toInt()}", DISPLAY_BLUE)
-        setKernel("${(seek_saturation * 383).toInt()}", DISPLAY_SATURATED)
-        setKernel("${(seek_value * 383).toInt()}", DISPLAY_VALUE)
-        setKernel("${(seek_contrast * 383).toInt()}", DISPLAY_CONTRAST)
-        setKernel("${(seek_hue * 1536).toInt()}", DISPLAY_HUE)
+        setKernel("${(seekRed * 256).toInt()}", DISPLAY_RED)
+        setKernel("${(seekGreen * 256).toInt()}", DISPLAY_GREEN)
+        setKernel("${(seekBlue * 256).toInt()}", DISPLAY_BLUE)
+        setKernel("${(seekSaturation * 383).toInt()}", DISPLAY_SATURATED)
+        setKernel("${(seekValue * 383).toInt()}", DISPLAY_VALUE)
+        setKernel("${(seekContrast * 383).toInt()}", DISPLAY_CONTRAST)
+        setKernel("${(seekHue * 1536).toInt()}", DISPLAY_HUE)
     }
     // Apply Amoled on load
-    amoledColor(display_amoled)
-    
+    if (!onLoad) {
+        onLoad = true
+        amoledColor(displayAmoled)
+    }
+
     Scaffold(
         topBar = {
             TopBar(
@@ -198,38 +168,29 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                     navigator.popBackStack()
                 },
                 onResetClick = {
-                    seek_red = display_rgb
-                    seek_green = display_rgb
-                    seek_blue = display_rgb
-                    seek_saturation = display_sat
-                    seek_value = display_sat
-                    seek_contrast = display_sat
-                    seek_hue = display_hue
-                    db_red = seek_red
-                    db_green = seek_green
-                    db_blue = seek_blue
-                    db_sat = seek_saturation
-                    db_val = seek_value
-                    db_cont = seek_contrast
-                    db_hue = seek_hue
-                    display_amoled = false
+                    seekRed = if (displayAmoled) displayAmoledRgb else displayRgb
+                    seekGreen = if (displayAmoled) displayAmoledRgb else displayRgb
+                    seekBlue = if (displayAmoled) displayAmoledRgb else displayRgb
+                    seekSaturation = if (displayAmoled) displayAmoledSat else displaySat
+                    seekValue = displaySat
+                    seekContrast = if (displayAmoled) displayAmoledCont else displaySat
+                    seekHue = displayHue
 
-                    prefs.edit { putFloat(SpfConfig.DISPLAY_RED, display_rgb) }
-                    prefs.edit { putFloat(SpfConfig.DISPLAY_GREEN, display_rgb) }
-                    prefs.edit { putFloat(SpfConfig.DISPLAY_BLUE, display_rgb) }
-                    prefs.edit { putFloat(SpfConfig.DISPLAY_SATURATED, display_sat) }
-                    prefs.edit { putFloat(SpfConfig.DISPLAY_VALUE, display_sat) }
-                    prefs.edit { putFloat(SpfConfig.DISPLAY_CONTRAST, display_sat) }
-                    prefs.edit { putFloat(SpfConfig.DISPLAY_HUE, display_hue) }
-                    prefs.edit { putBoolean(SpfConfig.DISPLAY_AMOLED, display_amoled) }
+                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_RED else SpfConfig.DISPLAY_RED, seekRed) }
+                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_GREEN else SpfConfig.DISPLAY_GREEN, seekGreen) }
+                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_BLUE else SpfConfig.DISPLAY_BLUE, seekBlue) }
+                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_SATURATED else SpfConfig.DISPLAY_SATURATED, seekSaturation) }
+                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_VALUE else SpfConfig.DISPLAY_VALUE, seekValue) }
+                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_CONTRAST else SpfConfig.DISPLAY_CONTRAST, seekContrast) }
+                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_HUE else SpfConfig.DISPLAY_HUE, seekHue) }
 
-                    setKernel("${(seek_red * 256).toInt()}", DISPLAY_RED)
-                    setKernel("${(seek_green * 256).toInt()}", DISPLAY_GREEN)
-                    setKernel("${(seek_blue * 256).toInt()}", DISPLAY_BLUE)
-                    setKernel("${(seek_saturation * 383).toInt()}", DISPLAY_SATURATED)
-                    setKernel("${(seek_value * 383).toInt()}", DISPLAY_VALUE)
-                    setKernel("${(seek_contrast * 383).toInt()}", DISPLAY_CONTRAST)
-                    setKernel("${(seek_hue * 1536).toInt()}", DISPLAY_HUE)
+                    setKernel("${(seekRed * 256).toInt()}", DISPLAY_RED)
+                    setKernel("${(seekGreen * 256).toInt()}", DISPLAY_GREEN)
+                    setKernel("${(seekBlue * 256).toInt()}", DISPLAY_BLUE)
+                    setKernel("${(seekSaturation * 383).toInt()}", DISPLAY_SATURATED)
+                    setKernel("${(seekValue * 383).toInt()}", DISPLAY_VALUE)
+                    setKernel("${(seekContrast * 383).toInt()}", DISPLAY_CONTRAST)
+                    setKernel("${(seekHue * 1536).toInt()}", DISPLAY_HUE)
                 },
                 scrollBehavior = scrollBehavior,
                 borderVisible = if (scrollPos > 0.1f) true else false
@@ -256,12 +217,12 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                     ) {
                         SwitchItem(
                             title = stringResource(R.string.amoled_color),
-                            checked = display_amoled,
+                            checked = displayAmoled,
                             summary = stringResource(R.string.amoled_color_sum)
                         ) {
                             amoledColor(it)
                             prefs.edit { putBoolean(SpfConfig.DISPLAY_AMOLED, it) }
-                            display_amoled = it
+                            displayAmoled = it
                         }
                         Spacer(
                             modifier = Modifier
@@ -286,10 +247,10 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                             Slider(
                                 modifier = Modifier
                                     .padding(start = 30.dp, end = 40.dp),
-                                value = seek_red,
+                                value = seekRed,
                                 onValueChange = {
-                                    prefs.edit { putFloat(SpfConfig.DISPLAY_RED, it) }
-                                    seek_red = it
+                                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_RED else SpfConfig.DISPLAY_RED, it) }
+                                    seekRed = it
                                     setKernel("${(it * 256).toInt()}", DISPLAY_RED)
                                 },
                                 colors = SliderDefaults.colors(
@@ -314,7 +275,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
                                     .padding(bottom = 1.dp),
-                                text = "${(seek_red * 256).toInt()}"
+                                text = "${(seekRed * 256).toInt()}"
                             )
                         }
                         Box(
@@ -331,10 +292,10 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                             Slider(
                                 modifier = Modifier
                                     .padding(start = 30.dp, end = 40.dp),
-                                value = seek_green,
+                                value = seekGreen,
                                 onValueChange = {
-                                    prefs.edit { putFloat(SpfConfig.DISPLAY_GREEN, it) }
-                                    seek_green = it
+                                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_GREEN else SpfConfig.DISPLAY_GREEN, it) }
+                                    seekGreen = it
                                     setKernel("${(it * 256).toInt()}", DISPLAY_GREEN)
                                 },
                                 colors = SliderDefaults.colors(
@@ -359,7 +320,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
                                     .padding(bottom = 1.dp),
-                                text = "${(seek_green * 256).toInt()}"
+                                text = "${(seekGreen * 256).toInt()}"
                             )
                         }
 
@@ -377,10 +338,10 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                             Slider(
                                 modifier = Modifier
                                     .padding(start = 30.dp, end = 40.dp),
-                                value = seek_blue,
+                                value = seekBlue,
                                 onValueChange = {
-                                    prefs.edit { putFloat(SpfConfig.DISPLAY_BLUE, it) }
-                                    seek_blue = it
+                                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_BLUE else SpfConfig.DISPLAY_BLUE, it) }
+                                    seekBlue = it
                                     setKernel("${(it * 256).toInt()}", DISPLAY_BLUE)
                                 },
                                 colors = SliderDefaults.colors(
@@ -405,7 +366,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
                                     .padding(bottom = 1.dp),
-                                text = "${(seek_blue * 256).toInt()}"
+                                text = "${(seekBlue * 256).toInt()}"
                             )
                         }
 
@@ -426,11 +387,11 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                             Slider(
                                 modifier = Modifier
                                     .padding(end = 40.dp),
-                                value = seek_saturation,
+                                value = seekSaturation,
                                 valueRange = 0.3364623f..1f,
                                 onValueChange = {
-                                    prefs.edit { putFloat(SpfConfig.DISPLAY_SATURATED, it) }
-                                    seek_saturation = it
+                                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_SATURATED else SpfConfig.DISPLAY_SATURATED, it) }
+                                    seekSaturation = it
                                     setKernel("${(it * 383).toInt()}", DISPLAY_SATURATED)
                                 },
                                 colors = SliderDefaults.colors(
@@ -455,7 +416,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
                                     .padding(bottom = 1.dp),
-                                text = "${(seek_saturation * 383).toInt()}"
+                                text = "${(seekSaturation * 383).toInt()}"
                             )
                         }
                         Text(
@@ -470,11 +431,11 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                             Slider(
                                 modifier = Modifier
                                     .padding(end = 40.dp),
-                                value = seek_value,
+                                value = seekValue,
                                 valueRange = 0.3364623f..1f,
                                 onValueChange = {
-                                    prefs.edit { putFloat(SpfConfig.DISPLAY_VALUE, it) }
-                                    seek_value = it
+                                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_VALUE else SpfConfig.DISPLAY_VALUE, it) }
+                                    seekValue = it
                                     setKernel("${(it * 383).toInt()}", DISPLAY_VALUE)
                                 },
                                 colors = SliderDefaults.colors(
@@ -499,7 +460,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
                                     .padding(bottom = 1.dp),
-                                text = "${(seek_value * 383).toInt()}"
+                                text = "${(seekValue * 383).toInt()}"
                             )
                         }
                         Text(
@@ -514,11 +475,11 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                             Slider(
                                 modifier = Modifier
                                     .padding(end = 40.dp),
-                                value = seek_contrast,
+                                value = seekContrast,
                                 valueRange = 0.3364623f..1f,
                                 onValueChange = {
-                                    prefs.edit { putFloat(SpfConfig.DISPLAY_CONTRAST, it) }
-                                    seek_contrast = it
+                                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_CONTRAST else SpfConfig.DISPLAY_CONTRAST, it) }
+                                    seekContrast = it
                                     setKernel("${(it * 383).toInt()}", DISPLAY_CONTRAST)
                                 },
                                 colors = SliderDefaults.colors(
@@ -543,7 +504,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
                                     .padding(bottom = 1.dp),
-                                text = "${(seek_contrast * 383).toInt()}"
+                                text = "${(seekContrast * 383).toInt()}"
                             )
                         }
                         Text(
@@ -558,10 +519,10 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                             Slider(
                                 modifier = Modifier
                                     .padding(end = 40.dp),
-                                value = seek_hue,
+                                value = seekHue,
                                 onValueChange = {
-                                    prefs.edit { putFloat(SpfConfig.DISPLAY_HUE, it) }
-                                    seek_hue = it
+                                    prefs.edit { putFloat(if (displayAmoled) SpfConfig.DISPLAY_AMOLED_HUE else SpfConfig.DISPLAY_HUE, it) }
+                                    seekHue = it
                                     setKernel("${(it * 1536).toInt()}", DISPLAY_HUE)
                                 },
                                 colors = SliderDefaults.colors(
@@ -586,7 +547,7 @@ fun DisplayColorScreen(navigator: DestinationsNavigator) {
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
                                     .padding(bottom = 1.dp),
-                                text = "${(seek_hue * 1536).toInt()}"
+                                text = "${(seekHue * 1536).toInt()}"
                             )
                         }
                     }

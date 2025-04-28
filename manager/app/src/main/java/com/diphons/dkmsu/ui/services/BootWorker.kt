@@ -122,13 +122,13 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
             val colCont: Float
             val colHue: Float
             if (globalConfig.getBoolean(SpfConfig.DISPLAY_AMOLED, false)) {
-                colRed = 0.9040460f
-                colGreen = 0.9040460f
-                colBlue = 0.9040460f
-                colSat = 0.71083844f
-                colVal = 0.6662165f
-                colCont = 0.6870402f
-                colHue = 0f
+                colRed = globalConfig.getFloat(SpfConfig.DISPLAY_AMOLED_RED, 0.9040460f)
+                colGreen = globalConfig.getFloat(SpfConfig.DISPLAY_AMOLED_GREEN, 0.9040460f)
+                colBlue = globalConfig.getFloat(SpfConfig.DISPLAY_AMOLED_BLUE, 0.9040460f)
+                colSat = globalConfig.getFloat(SpfConfig.DISPLAY_AMOLED_SATURATED, 0.71083844f)
+                colVal = globalConfig.getFloat(SpfConfig.DISPLAY_AMOLED_VALUE, 0.6662165f)
+                colCont = globalConfig.getFloat(SpfConfig.DISPLAY_AMOLED_CONTRAST, 0.6870402f)
+                colHue = globalConfig.getFloat(SpfConfig.DISPLAY_AMOLED_HUE, 0f)
             } else {
                 colRed = globalConfig.getFloat(SpfConfig.DISPLAY_RED, 1f)
                 colGreen = globalConfig.getFloat(SpfConfig.DISPLAY_GREEN, 1f)

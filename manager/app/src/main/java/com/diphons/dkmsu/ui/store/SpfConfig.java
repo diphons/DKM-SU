@@ -40,6 +40,13 @@ public class SpfConfig {
     public static String DISPLAY_VALUE = "display_value";
     public static String DISPLAY_CONTRAST = "display_contrast";
     public static String DISPLAY_HUE = "display_hue";
+    public static String DISPLAY_AMOLED_RED = "display_amoled_red";
+    public static String DISPLAY_AMOLED_GREEN = "display_amoled_green";
+    public static String DISPLAY_AMOLED_BLUE = "display_amoled_blue";
+    public static String DISPLAY_AMOLED_SATURATED = "display_amoled_saturated";
+    public static String DISPLAY_AMOLED_VALUE = "display_amoled_value";
+    public static String DISPLAY_AMOLED_CONTRAST = "display_amoled_contrast";
+    public static String DISPLAY_AMOLED_HUE = "display_amoled_hue";
     public static String REFRESH_RATE = "refresh_rate";
     public static String DYNAMIC_CHARGING = "chg_dynamic";
     public static String CHG_MAX = "chg_max";
