@@ -301,7 +301,7 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
                 mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI, false))
             }
             var fps_monitor_mode by rememberSaveable {
-                mutableStateOf(prefs.getInt(SpfConfig.MONITOR_MINI_MODE, 0))
+                mutableStateOf(prefs.getInt(SpfConfig.MONITOR_MINI_MODE, 2))
             }
             var showFPSDropdown by remember { mutableStateOf(false) }
             @Composable

@@ -61,15 +61,12 @@ public class FPSMonitor(private val mContext: Context) {
         }
 
         mWindowManager = mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val view: View
         bola = false
-        getMode = prefs.getInt(SpfConfig.MONITOR_MINI_MODE, 0)
-        if (getMode == 2) {
-            view = setUpViewOneplus(mContext)
-        } else if (getMode == 0) {
-            view = setUpViewFPS(mContext)
-        } else {
-            view = setUpView(mContext)
+        getMode = prefs.getInt(SpfConfig.MONITOR_MINI_MODE, 2)
+        val view = when (getMode) {
+            2 -> setUpViewOneplus(mContext)
+            1 -> setUpView(mContext)
+            else ->  setUpViewFPS(mContext)
         }
         val params = LayoutParams()
 
