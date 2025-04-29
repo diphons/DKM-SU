@@ -159,12 +159,13 @@ fun SwapScreen(navigator: DestinationsNavigator) {
             } catch (_: java.lang.Exception) {
             }
         }
-        swapEnable = prefs.getBoolean(SpfConfig.SWAP_ENABLE, swapTotal > 0)
+        if (!swapBoot)
+            swapEnable = swapTotal > 0
 
-        if (swapTotal > 0)
-            getSwapPos = getSwapPosition(swapTotal, totalMem)
+        getSwapPos = if (swapTotal > 0)
+            getSwapPosition(swapTotal, totalMem)
         else
-            getSwapPos = getSwapPosition(prefs.getInt(SpfConfig.SWAP_SIZE, 1024), totalMem)
+            getSwapPosition(prefs.getInt(SpfConfig.SWAP_SIZE, 1024), totalMem)
         swapSlider = getSwapPos
 
         if (swapEnable && prefs.getInt(SpfConfig.SWAP_SIZE, 0) == 0)
