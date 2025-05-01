@@ -45,6 +45,8 @@ class BatteryReceiver : BroadcastReceiver() {
         }
 
         val managerA = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val battNotifyMode = globalConfig.getInt(SpfConfig.BATTERY_NOTIF_MODE, 1)
+        var chargeType = ""
         handler = Handler(Looper.getMainLooper())
         runnable = object : Runnable {
             override fun run() {
@@ -55,6 +57,7 @@ class BatteryReceiver : BroadcastReceiver() {
                     var status = 0
                     var timeFullNow = ""
                     kotlin.runCatching {
+                        chargeType = Utils.getChargeType()
                         getStatus = RootUtils.runAndGetOutput("getprop init.dkmsvc.battery.status")
                     }
                     if (getStatus.isNotEmpty()) {
@@ -122,9 +125,10 @@ class BatteryReceiver : BroadcastReceiver() {
                     // Add notification to service when service is running
                     globalConfig.edit { putInt(SpfConfig.BATTERY_NOTIF_STATUS, count) }
                     // Schedule the task to run again after 1.5 second
-                    if (globalConfig.getBoolean(SpfConfig.BATTERY_NOTIF, false)) {
-                        managerA.notify(Utils.NOTIF_ID_BS, Utils.notificationbs)
-                        handler.postDelayed(this, 1500)
+                    if (globalConfig.getBoolean(SpfConfig.BATTERY_NOTIF, false) &&
+                        (battNotifyMode == 0 || (battNotifyMode == 1 && !chargeType.contains("N/A")))) {
+                            managerA.notify(Utils.NOTIF_ID_BS, Utils.notificationbs)
+                            handler.postDelayed(this, 1500)
                     } else {
                         managerA.cancel(Utils.NOTIF_ID_BS)
                         handler.removeCallbacks(runnable)
@@ -134,7 +138,7 @@ class BatteryReceiver : BroadcastReceiver() {
         }
 
         if (globalConfig.getBoolean(SpfConfig.BATTERY_NOTIF, false)) {
-            if (!show) {
+            if (!show && (battNotifyMode == 0 || (battNotifyMode == 1 && !chargeType.contains("N/A")))) {
                 show = true
                 startNotif(context)
                 handler.post(runnable)
@@ -142,6 +146,10 @@ class BatteryReceiver : BroadcastReceiver() {
         } else {
             if (show) {
                 show = false
+                if (battNotifyMode == 1 && !chargeType.contains("N/A")) {
+                    managerA.cancel(Utils.NOTIF_ID_BS)
+                    handler.removeCallbacks(runnable)
+                }
             }
         }
     }

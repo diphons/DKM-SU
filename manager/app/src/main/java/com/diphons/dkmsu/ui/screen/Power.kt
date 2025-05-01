@@ -496,24 +496,111 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                 }
             }
 
+            var batteryNotifyMode by rememberSaveable {
+                mutableStateOf(prefs.getInt(SpfConfig.BATTERY_NOTIF_MODE, 1))
+            }
+            var showBNDropdown by remember { mutableStateOf(false) }
+            @Composable
+            fun BatteryNotifyDropdownItem(title: String, reason: Int) {
+                DropdownMenuItem(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    text = {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            text = title,
+                            textAlign = TextAlign.Center
+                        )
+                    }, onClick = {
+                        batteryNotifyMode = reason
+                        prefs.edit { putInt(SpfConfig.BATTERY_NOTIF_MODE, reason) }
+                        showBNDropdown = false
+                    })
+            }
+
             ElevatedCard {
-                var batteryNotif by rememberSaveable {
+                var batteryNotify by rememberSaveable {
                     mutableStateOf(prefs.getBoolean(SpfConfig.BATTERY_NOTIF, false))
                 }
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(5.dp)
+                        .padding(start = 5.dp, end = 5.dp, top = 5.dp)
                 ) {
                     SwitchItem(
                         title = stringResource(R.string.battery_status),
-                        checked = batteryNotif,
+                        checked = batteryNotify,
                         summary = stringResource(R.string.battery_status_sum)
                     ) {
                         prefs.edit { putBoolean(SpfConfig.BATTERY_NOTIF, it) }
-                        batteryNotif = it
+                        batteryNotify = it
                         if (it)
                             RootUtils.runCommand("setprop init.dkmsvc.cmd battery")
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 21.dp, end = 21.dp, bottom = 21.dp),
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart),
+                        text = "Battery status view mode"
+                    )
+
+                    ElevatedCard(
+                        colors = CardDefaults.elevatedCardColors(containerColor = run {
+                            MaterialTheme.colorScheme.primary
+                        }),
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .clickable {
+                                    showBNDropdown = true
+                                }
+                        ) {
+                            Box(
+                                modifier = Modifier
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .padding(
+                                            top = 9.dp,
+                                            bottom = 9.dp,
+                                            start = 15.dp,
+                                            end = 32.dp
+                                        ),
+                                    text = if (batteryNotifyMode == 0) "Always"
+                                    else
+                                        "Plugged",
+                                    fontSize = 16.sp,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    textAlign = TextAlign.Center
+                                )
+
+                                Row(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd)
+                                        .padding(end = 6.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Filled.KeyboardArrowDown, "",
+                                    )
+                                }
+                            }
+                            DropdownMenu(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                expanded = showBNDropdown, onDismissRequest = {
+                                    showBNDropdown = false
+                                }) {
+                                BatteryNotifyDropdownItem("Always", reason = 0)
+                                BatteryNotifyDropdownItem("Plugged", reason = 1)
+                            }
+                        }
                     }
                 }
             }

@@ -91,6 +91,7 @@ public class Utils {
     public static String NIGHT_CHARGING = "/sys/class/power_supply/battery/night_charging";
     public static String STEP_CHARGING = "/sys/class/power_supply/battery/step_charging_enabled";
     public static String INPUT_SUSPEND = "/sys/class/power_supply/battery/input_suspend";
+    public static String CHARGE_TYPE = "/sys/class/power_supply/battery/charge_type";
     public static String PIF_UPDATER = "/vendor/bin/oemports10t_PIF-updater";
     public static String CMD_MSG = "";
 
@@ -421,4 +422,12 @@ public class Utils {
         ControlSelinux.runCommand_se(active ? "1" : "0", SETENFORCE, ControlSelinux.CommandType.SHELL, context);
     }
     public static boolean swapRun = false;
+
+    public static String getChargeType(){
+        String getVal = RootUtils.runAndGetOutput("cat " + CHARGE_TYPE);
+        if (getVal.isEmpty())
+            return "N/A";
+        else
+            return getVal;
+    }
 }

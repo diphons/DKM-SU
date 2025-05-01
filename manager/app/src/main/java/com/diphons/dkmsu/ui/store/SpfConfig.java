@@ -86,6 +86,7 @@ public class SpfConfig {
     public static int CURRENT_NOW_UNIT_DEFAULT = -1000;
     public static String BATTERY_NOTIF = "battery_notif";
     public static String BATTERY_NOTIF_STATUS = "battery_notif_status";
+    public static String BATTERY_NOTIF_MODE = "battery_notif_mode";
     public static String BYPASS_CHARGING = "bypass_charging";
     public static String SPOOF_DEFAULT = "spoof_default";
     public static String SPOOF_ENCRYPT = "spoof_encrypt";
