@@ -463,7 +463,7 @@ private fun StatusCard(
                                 Spacer(Modifier.height(1.dp))
                                 if (suSFS == "Supported") {
                                     Text(
-                                        text = ": ${getSuSFSVersion()} (${if (workingMode.contains("GKI")) "GKI" else getSuSFSVariant()}) $susSUMode",
+                                        text = ": ${getSuSFSVersion()}",
                                         fontSize = 13.sp,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
