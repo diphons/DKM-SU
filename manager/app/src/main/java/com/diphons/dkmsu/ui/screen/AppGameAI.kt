@@ -501,13 +501,14 @@ fun AppGameAIScreen(
                 ) {
                     if (getValueDialog.isNotEmpty()) {
                         getdata = "#t#: $thermal"
-                        val getdataold = data
+                        val getDataOld = data
+                        val getThermalVal = "${getThermalInt(context, getValueDialog, gki_mode)}"
                         data = data.replace(
                             getdata,
-                            "#t#: ${getThermalInt(context, getValueDialog, gki_mode)}"
+                            "#t#: ${if (getThermalVal.contains("-")) "#$getThermalVal#" else getThermalVal}"
                         )
                         thermal = getThermalInt(context, getValueDialog, gki_mode)
-                        setData(getdataold, data)
+                        setData(getDataOld, data)
                         updateVisible()
                     }
                     dialogEvent = null
