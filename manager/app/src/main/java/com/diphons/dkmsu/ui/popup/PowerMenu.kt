@@ -14,6 +14,10 @@ import com.diphons.dkmsu.ui.component.KeepShellPublic
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.util.Utils
 import com.diphons.dkmsu.ui.util.reboot
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class PowerMenu(context: Context) {
     private val mContext: Context = context.applicationContext
@@ -85,37 +89,53 @@ class PowerMenu(context: Context) {
             card_reboot_userspace.visibility = View.GONE
 
         power_shutdown.setOnClickListener {
+            hapticFeedback.run()
             reboot("shutdown")
             close()
         }
         power_reboot.setOnClickListener {
+            hapticFeedback.run()
             reboot("")
             close()
         }
         power_download.setOnClickListener {
+            hapticFeedback.run()
             reboot("download")
             close()
         }
 
         power_recovery.setOnClickListener {
+            hapticFeedback.run()
             reboot("recovery")
             close()
         }
         power_fastboot.setOnClickListener {
+            hapticFeedback.run()
             reboot("bootloader")
             close()
         }
         power_emergency.setOnClickListener {
+            hapticFeedback.run()
             reboot("edl")
             close()
         }
         reboot_userspace.setOnClickListener {
+            hapticFeedback.run()
             reboot("userspace")
             close()
         }
         setDialogState(view)
 
         return view
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    val hapticFeedback = Runnable {
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                mView!!.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            } catch (_: Exception) {}
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility", "GestureBackNavigation")
