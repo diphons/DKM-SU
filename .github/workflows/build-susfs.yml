@@ -20,14 +20,14 @@ jobs:
     name: Build userspace susfs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
     - name: Build susfs
       working-directory: ./userspace/susfs
       run: $ANDROID_NDK/ndk-build
     - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: susfs-aarch64-linux-android
         path: ./userspace/susfs/libs
