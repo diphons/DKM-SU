@@ -1,17 +1,21 @@
 package com.diphons.dkmsu.ui.util;
 
-import static android.content.ContentValues.TAG;
-
+import android.animation.ValueAnimator;
 import android.app.Notification;
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import android.graphics.Paint;
-import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -20,19 +24,26 @@ import android.graphics.drawable.VectorDrawable;
 import android.hardware.display.DisplayManager;
 import android.net.Uri;
 import android.os.BatteryManager;
+import android.os.Environment;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.diphons.dkmsu.R;
+import com.diphons.dkmsu.ui.store.SpfConfig;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
-
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -78,6 +89,9 @@ public class Utils {
 
     public static final String CPUFREQ = "/sys/devices/system/cpu/cpufreq";
     public static final String CPUFREQ_FULL_TABLE = "stats/trans_table";
+    public static final String CPU_LITTLE_GOV = CPUFREQ + "/policy0/scaling_governor";
+    public static final String CPU_BIG_GOV = CPUFREQ + "/policy4/scaling_governor";
+    public static final String CPU_PRIME_GOV = CPUFREQ + "/policy7/scaling_governor";
     public static final String CPU_GOV = "scaling_governor";
     public static final String CPU_INFO_MAX = "cpuinfo_max_freq";
     public static final String CPU_INFO_MIN = "cpuinfo_min_freq";
@@ -85,6 +99,22 @@ public class Utils {
     public static final String CPU_MIN_FREQ = "scaling_min_freq";
     public static final String CPU_AV_GOV = "scaling_available_governors";
     public static final String CPU_AV_FREQ = "scaling_available_frequencies";
+
+    public static final String CPU_INPUT_BOOST = "/sys/module/cpu_input_boost/parameters/";
+    public static final String CPU_FREQ_IDLE_BIG = CPU_INPUT_BOOST + "cpu_freq_idle_big";
+    public static final String CPU_FREQ_IDLE_LITTLE = CPU_INPUT_BOOST + "cpu_freq_idle_little";
+    public static final String CPU_FREQ_IDLE_PRIME = CPU_INPUT_BOOST + "cpu_freq_idle_prime";
+    public static final String CPU_FREQ_MIN_BIG = CPU_INPUT_BOOST + "cpu_freq_min_big";
+    public static final String CPU_FREQ_MIN_LITTLE = CPU_INPUT_BOOST + "cpu_freq_min_little";
+    public static final String CPU_FREQ_MIN_PRIME = CPU_INPUT_BOOST + "cpu_freq_min_prime";
+    public static final String INPUT_BOOST_DURATION = CPU_INPUT_BOOST + "input_boost_duration";
+    public static final String INPUT_BOOST_FREQ_BIG = CPU_INPUT_BOOST + "input_boost_freq_big";
+    public static final String INPUT_BOOST_FREQ_LITTLE = CPU_INPUT_BOOST + "input_boost_freq_little";
+    public static final String INPUT_BOOST_FREQ_PRIME = CPU_INPUT_BOOST + "input_boost_freq_prime";
+    public static final String MAX_BOOST_FREQ_BIG = CPU_INPUT_BOOST + "max_boost_freq_big";
+    public static final String MAX_BOOST_FREQ_LITTLE = CPU_INPUT_BOOST + "max_boost_freq_little";
+    public static final String MAX_BOOST_FREQ_PRIME = CPU_INPUT_BOOST + "max_boost_freq_prime";
+    public static final String WAKE_BOOST_DURATION = CPU_INPUT_BOOST + "wake_boost_duration";
 
     public static String THERMAL_PROFILE = "/sys/class/thermal/thermal_message/sconfig";
     public static String CHG_CUR_MAX = "/sys/class/power_supply/battery/constant_charge_current_max";
@@ -294,10 +324,8 @@ public class Utils {
         }
     }
 
-    public static int color_start = Color.parseColor("#FFFFFF");
-    public static int color_end = Color.parseColor("#FFFFFF");
-
-    public static Bitmap getBitmapFromDrawable(Integer mode, Drawable drawable) {
+    public static Bitmap getBitmapFromDrawable(Context context, @DrawableRes int drawableId, int colors) {
+        Drawable drawable = AppCompatResources.getDrawable(context, drawableId);
         GradientDrawable gd = new GradientDrawable();
         // Set the color array to draw gradient
         gd.setColors(new int[]{
@@ -320,14 +348,8 @@ public class Utils {
             gd.setSize(canvas.getWidth(), canvas.getHeight()); // Width 450 pixels and height 150 pixels
             drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
 
-            RadialGradient radial = new RadialGradient((float) canvas.getWidth() / 2, (float) canvas.getHeight() /2, canvas.getWidth(), color_end,
-                    color_start, android.graphics.Shader.TileMode.CLAMP);
-            LinearGradient linear = new LinearGradient(0,0,0, canvas.getHeight(), color_start, color_end, Shader.TileMode.MIRROR);
-            if (mode == 1) {
-                p.setShader(radial);
-            } else {
-                p.setShader(linear);
-            }
+            LinearGradient linear = new LinearGradient(0,0,0, canvas.getHeight(), colors, colors, Shader.TileMode.MIRROR);
+            p.setShader(linear);
 
             canvas.drawRect(0,0,canvas.getWidth(),canvas.getHeight(),p);
             drawable.draw(canvas);
@@ -336,11 +358,6 @@ public class Utils {
         } else {
             throw new IllegalArgumentException("unsupported drawable type");
         }
-    }
-
-    public static Bitmap getBitmapFromDrawable(Context context, Integer mode, @DrawableRes int drawableId) {
-        Drawable drawable = AppCompatResources.getDrawable(context, drawableId);
-        return getBitmapFromDrawable(mode, drawable);
     }
 
     /*
@@ -361,9 +378,6 @@ public class Utils {
     public static void clearEndData(Context context){
         RootUtils.runCommand("path=/data/data/" + context.getPackageName() + "/shared_prefs/game_ai.xml; sed -i 's/&#10;    //g' $path; sed -i 's/&#10;</</g' $path");
     }
-
-    public static Notification notificationbs;
-    public static final int NOTIF_ID_BS=80;
 
     public static String getStatusString(int status, int value, Context context) {
         String statusString = context.getString(R.string.unknown);
@@ -429,5 +443,120 @@ public class Utils {
             return "N/A";
         else
             return getVal;
+    }
+
+    public static Boolean bypassChg = false;
+    public static Boolean resetStats = false;
+
+    public static String getInternalDataStorage() {
+        return Environment.getExternalStorageDirectory().toString();
+    }
+
+    public static Bitmap bitmapWallpaper;
+    public static String setwall_msg = "";
+    public static boolean setwall = false;
+
+    public static void SaveWallpaper(Bitmap bitmap){
+        File file = new File(getInternalDataStorage() + "/wall.jpg");
+        if (file.exists())
+            file.delete();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
+                out.flush();
+                out.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setWallpaper(Context context) {
+        String imagePath = getInternalDataStorage() + "/wall.jpg";
+        FileInputStream is;
+        try {
+            is = new FileInputStream(new File(imagePath));
+            BufferedInputStream bis = new BufferedInputStream(is);
+            Bitmap b = BitmapFactory.decodeStream(bis);
+            Bitmap bitmapToUse = Bitmap.createScaledBitmap(b, 1080, 2400, true);
+            b.recycle();
+            if(!("").equals(imagePath)){
+                WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
+                wallpaperManager.setBitmap(bitmapToUse);
+                CMD_MSG = "Wallpaper Setted";
+            } else {
+                CMD_MSG = "Wallpaper can't Set. error on building wallpaper";
+            }
+            setwall = true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            CMD_MSG = "Wallpaper can't Set. error on building wallpaper";
+            setwall = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            CMD_MSG = "Wallpaper can't Set. error " + e.getMessage();
+            setwall = true;
+        }
+    }
+
+    public static String cpu_gov = "";
+    public static int gameInitialY;
+    public static void animLayout(View view, int valueEnd){
+        ValueAnimator anim = ValueAnimator.ofInt(view.getMeasuredHeight(), valueEnd);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(@NonNull ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+                layoutParams.height = val;
+                view.setLayoutParams(layoutParams);
+            }
+        });
+        anim.setDuration(1000);
+        anim.start();
+    }
+
+    public static boolean cekCPU7(String vcek) {
+        return Utils.existFile(vcek);
+    }
+
+    public static void getGovOnly(){
+        if (cekCPU7(CPU_PRIME_GOV)) {
+            cpu_gov = Utils.readFile(CPU_PRIME_GOV);
+        } else if (cekCPU7(CPU_BIG_GOV)) {
+            cpu_gov = Utils.readFile(CPU_BIG_GOV);
+        } else {
+            cpu_gov = Utils.readFile(CPU_LITTLE_GOV);
+        }
+    }
+    public static String getBoard() {
+        return RootUtils.runAndGetOutput( "getprop ro.board.platform");
+    }
+
+    public static boolean getOrientation(Context context){
+        int orientation = context.getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static int getOrientationGameTool(SharedPreferences SPF, Context context){
+        String vparam = "0";
+        if (getOrientation(context)) {
+            vparam = SPF.getString(SpfConfig.GAME_TOOL_PORTRAIT, "0");
+        } else {
+            vparam = SPF.getString(SpfConfig.GAME_TOOL_LANDSCAPE, "0");
+        }
+        if (vparam.isEmpty()) {
+            return 0;
+        } else {
+            try {
+                return Utils.strToInt(vparam);
+            } catch (Exception e) {
+                return 0;
+            }
+        }
     }
 }

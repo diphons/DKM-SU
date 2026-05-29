@@ -1,6 +1,9 @@
 package com.diphons.dkmsu.ui.screen
 
 import android.content.Context
+import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -75,6 +78,7 @@ import com.diphons.dkmsu.ui.util.getBoard
 import com.diphons.dkmsu.ui.util.getFPSCount
 import com.diphons.dkmsu.ui.util.getfpsbyid
 import com.diphons.dkmsu.ui.util.hasModule
+import com.diphons.dkmsu.ui.util.prepareColor
 import com.diphons.dkmsu.ui.util.setKernel
 import com.diphons.dkmsu.ui.util.setProfile
 import com.diphons.dkmsu.ui.util.setRefreshRate
@@ -84,6 +88,7 @@ import com.ramcosta.composedestinations.generated.destinations.DisplayColorScree
  * @author diphons
  * @date 2024/01/02.
  */
+@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<RootGraph>
 @Composable
@@ -103,6 +108,7 @@ fun DisplayScreen(navigator: DestinationsNavigator) {
             }
         }
     }
+    prepareColor(LocalContext.current)
     Scaffold(
         topBar = {
             TopBar(
@@ -533,6 +539,7 @@ private fun TopBar(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 @Preview
 @Composable
 private fun KernelPreview() {

@@ -312,6 +312,10 @@
     <string name="wakelock_btn_unblock">Unblock</string>
     <string name="battery_status">Pil Durumu</string>
     <string name="battery_status_sum">Bildirimde pil durumunu göster</string>
+    <string name="battery_status_reset_percentage">Şarj olurken sıfırla</string>
+    <string name="battery_status_reset_percentage_sum">Şarj %100\'e ulaştığında istatistikleri sıfırla</string>
+    <string name="battery_status_reset">İstatistikleri sıfırla</string>
+    <string name="battery_status_estimated">tam şarjlı</string>
     <string name="full_charging">Tam şarjlı</string>
     <string name="turbo">Turbo</string>
     <string name="fast">Hızlı</string>
@@ -345,4 +349,16 @@
     <string name="ram_recycle">ZRAM\'ı geri dönüştürün</string>
     <string name="bypass_chg">Bypass Şarjı</string>
     <string name="bypass_chg_summary">Aküyü dahil etmeden doğrudan şarj cihazından güç kullanın.\n\nStok şarj cihazını kullandığınızdan emin olun.</string>
+    <string name="bypass_chg_content">Doğrudan güç kullanın</string>
+    <string name="keep_app_process">Koşmaya devam et</string>
+    <string name="keep_app_process_sum">Uygulamayı arka planda çalışır durumda tutun</string>
+    <string name="low_power_mode">Düşük güç modu</string>
+    <string name="balanced_mode">Dengeli mod</string>
+    <string name="pro_game_mode">Profesyonel Oyuncu modu</string>
+    <string name="performance_settings">Performans ayarları</string>
+    <string name="perf_settings_heating">Isıtma</string>
+    <string name="perf_settings_image_quality">Görüntü kalitesi</string>
+    <string name="perf_settings_touch_control">Dokunmatik kontrol</string>
+    <string name="perf_settings_smoothness">Akıcı kullanım</string>
+    <string name="kill_app">Uygulamayı devre dışı bırakın</string>
 </resources>

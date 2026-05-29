@@ -216,12 +216,16 @@ private fun AppItem(
                 FlowRow {
                     if (app.perApp) {
                         LabelText(label = "Per-App")
-                        if (getFPSCount() > 1 && app.refreshRate.isNotEmpty())
-                            LabelText(label = app.refreshRate)
-                        if (app.fpsMoninor)
-                            LabelText(label = "FPS Monitor")
-                        if (hasModule(TOUCH_SAMPLE) && app.touchImprove)
-                            LabelText(label = "Improve Touch")
+                        if (app.killApp)
+                            LabelText(label = "Kill App")
+                        else {
+                            if (getFPSCount() > 1 && app.refreshRate.isNotEmpty())
+                                LabelText(label = app.refreshRate)
+                            if (app.fpsMoninor)
+                                LabelText(label = "FPS Monitor")
+                            if (hasModule(TOUCH_SAMPLE) && app.touchImprove)
+                                LabelText(label = "Improve Touch")
+                        }
                     }
                 }
             }

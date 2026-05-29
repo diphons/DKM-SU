@@ -51,6 +51,7 @@ class PerAppViewModel : ViewModel() {
         val refreshrate: String,
         val fpsMon: Boolean,
         val touchdev: Boolean,
+        val kill: Boolean,
     ) : Parcelable {
         val packageName: String
             get() = packageInfo.packageName
@@ -64,6 +65,8 @@ class PerAppViewModel : ViewModel() {
             get() = fpsMon
         val touchImprove: Boolean
             get() = touchdev
+        val killApp: Boolean
+            get() = kill
     }
 
     var search by mutableStateOf("")
@@ -154,13 +157,15 @@ class PerAppViewModel : ViewModel() {
                 val rrMode = prefs.getString("refresh_rate", "Default")
                 val fpsM = prefs.getBoolean(SpfConfig.MONITOR_MINI, false)
                 val touchDev = prefs.getBoolean(SpfConfig.TOUCH_SAMPLE, false)
+                val killApp = prefs.getBoolean("kill_app", false)
                 AppInfo(
                     label = appInfo.loadLabel(pm).toString(),
                     packageInfo = it,
                     perapp = perApp,
                     refreshrate = "$rrMode",
                     fpsMon = fpsM,
-                    touchdev = touchDev
+                    touchdev = touchDev,
+                    kill = killApp
                 )
             }.filter { it.packageName != ksuApp.packageName }
             Log.i(TAG, "load cost: ${SystemClock.elapsedRealtime() - start}")

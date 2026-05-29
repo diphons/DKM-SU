@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:keepScreenOn="false"
+    tools:ignore="UselessParent,ContentDescription">
+	
+	<RelativeLayout
+		android:id="@+id/game_tool_card"
+		android:layout_width="wrap_content"
+		android:layout_height="31dp"
+		android:alpha="0.8">
+		
+		<ImageView
+			android:id="@+id/btn_big"
+			android:layout_centerVertical="true"
+			android:background="@drawable/ic_my_games_play"
+			android:backgroundTint="@color/white"
+            android:scaleType="centerInside"
+			android:layout_width="21dp"
+			android:layout_height="21dp"
+			android:layout_marginStart="5dp"
+			android:layout_marginEnd="5dp"
+			android:visibility="gone" />
+
+		<ImageView
+			android:id="@+id/btn_mini"
+			android:layout_width="14dp"
+			android:layout_height="14dp"
+			android:layout_centerVertical="true"
+			android:layout_marginEnd="5dp"
+			android:layout_marginStart="1dp"
+			android:background="@drawable/ic_my_games_play"
+			android:backgroundTint="@color/white"
+			android:scaleType="centerInside"
+			android:visibility="visible"/>
+	</RelativeLayout>
+</RelativeLayout>

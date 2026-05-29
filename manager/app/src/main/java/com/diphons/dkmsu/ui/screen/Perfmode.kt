@@ -86,10 +86,8 @@ import com.diphons.dkmsu.ui.util.getThermalInt
 import com.diphons.dkmsu.ui.util.getThermalString
 import com.diphons.dkmsu.ui.util.gpuMaxPwrLevel
 import com.diphons.dkmsu.ui.util.hasModule
-import com.diphons.dkmsu.ui.util.hasUsageStatsPermission
 import com.diphons.dkmsu.ui.util.parseAdrenoBoost
 import com.diphons.dkmsu.ui.util.readKernel
-import com.diphons.dkmsu.ui.util.requestPermission
 import com.diphons.dkmsu.ui.util.setCPU
 import com.diphons.dkmsu.ui.util.setGPU
 import com.diphons.dkmsu.ui.util.setIOSched
@@ -2527,7 +2525,9 @@ private fun AppItem(
                 FlowRow {
                     if (app.gameAi)
                         LabelText(label = "Game Ai")
-                    if (app.oprofile.isNotEmpty() || app.governor.isNotEmpty() || app.thermal.isNotEmpty() || app.adreno.isNotEmpty()) {
+                    if (app.killApp) {
+                        LabelText(label = "Kill App")
+                    } else if (app.oprofile.isNotEmpty() || app.governor.isNotEmpty() || app.thermal.isNotEmpty() || app.adreno.isNotEmpty()) {
                         if (app.gameMode)
                             LabelText(label = "Game")
                         LabelText(label = "Profile: ${app.oprofile}")

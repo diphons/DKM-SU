@@ -1,7 +1,9 @@
 package com.diphons.dkmsu.ui.services
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -166,8 +168,13 @@ class BootWorker(context : Context, params : WorkerParameters) : Worker(context,
             setKernel("1", STEP_CHARGING)
         if (hasModule(BOEFFLA_WL_BLOCKER))
             setWLBlocker(applicationContext)
-        if (globalConfig.getBoolean(SpfConfig.BATTERY_NOTIF, false))
-            RootUtils.runCommand("setprop init.dkmsvc.cmd battery")
+        if (globalConfig.getBoolean(SpfConfig.BATTERY_NOTIF, false)) {
+            val intent = Intent(applicationContext, BatteryService::class.java)
+            if (globalConfig.getInt(SpfConfig.BATTERY_NOTIF_MODE, 1) == 0)
+                ContextCompat.startForegroundService(applicationContext, intent)
+            else if (!getChargeType().contains("N/A"))
+                ContextCompat.startForegroundService(applicationContext, intent)
+        }
 
         // TCP Cong Default
         if (globalConfig.getString(SpfConfig.TCP_CONG_DEF, "")!!.isEmpty())

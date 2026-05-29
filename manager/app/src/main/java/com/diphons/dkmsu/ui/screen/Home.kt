@@ -50,9 +50,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.diphons.dkmsu.ui.component.rememberCustomDialog
 import com.diphons.dkmsu.ui.component.runDialog
@@ -61,6 +63,7 @@ import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.Utils.CMD_MSG
 import com.diphons.dkmsu.ui.util.Utils.DIALOG_MODE
 import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.WallpaperScreenDestination
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,7 +75,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
 
     val context = LocalContext.current
     val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
-    var scrollPos by remember { mutableStateOf(0f) }
+    var scrollPos by remember { mutableFloatStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -84,6 +87,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
             }
         }
     }
+    prepareColor(context)
     Scaffold(
         topBar = {
             TopBar(
@@ -140,7 +144,7 @@ fun HomeScreen(navigator: DestinationsNavigator) {
                 if (it >= Natives.MINIMAL_SUPPORTED_KERNEL_LKM && kernelVersion.isGKI()) Natives.isLkmMode else null
             }
 
-            StatusCard(kernelVersion, ksuVersion, lkmMode)
+            StatusCard(kernelVersion, ksuVersion, lkmMode, navigator)
             if (isManager && Natives.requireNewKernel()) {
                 WarningCard(
                     stringResource(id = R.string.require_kernel_version).format(
@@ -287,7 +291,7 @@ private fun TopBar(
 
                 val isManager = Natives.becomeManager(ksuApp.packageName)
                 var showDropdown by remember { mutableStateOf(false) }
-                if (isManager) {
+                if (isManager || rootAvailable()) {
                     IconButton(onClick = {
                         if (Settings.canDrawOverlays(context))
                             PowerMenu(context).open()
@@ -352,7 +356,8 @@ private fun TopBar(
 private fun StatusCard(
     kernelVersion: KernelVersion,
     ksuVersion: Int?,
-    lkmMode: Boolean?
+    lkmMode: Boolean?,
+    navigator: DestinationsNavigator
 ) {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(containerColor = run {
@@ -388,7 +393,7 @@ private fun StatusCard(
                             .border(BorderStroke(1.dp, MaterialTheme.colorScheme.primary), RoundedCornerShape(8.dp))
                             .clip(RoundedCornerShape(8.dp))
                             .clickable {
-
+                                navigator.navigate(WallpaperScreenDestination)
                             },
                         alignment = Alignment.Center,
                         contentScale = ContentScale.Crop,
@@ -694,17 +699,6 @@ fun getManagerVersion(context: Context): Pair<String, Long> {
     val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)!!
     val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
     return Pair(packageInfo.versionName!!, versionCode)
-}
-
-@Preview
-@Composable
-private fun StatusCardPreview() {
-    Column {
-        StatusCard(KernelVersion(5, 10, 101), 1, null)
-        StatusCard(KernelVersion(5, 10, 101), 20000, true)
-        StatusCard(KernelVersion(5, 10, 101), null, true)
-        StatusCard(KernelVersion(4, 10, 101), null, false)
-    }
 }
 
 @Preview

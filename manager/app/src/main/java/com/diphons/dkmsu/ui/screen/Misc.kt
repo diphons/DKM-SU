@@ -71,8 +71,10 @@ import com.diphons.dkmsu.ui.uibench.RenderingJitter
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.util.RootUtils
 import com.diphons.dkmsu.ui.store.*
+import com.diphons.dkmsu.ui.uibench.RenderJitter
 import com.diphons.dkmsu.ui.util.Utils
 import com.diphons.dkmsu.ui.util.Utils.*
+import com.diphons.dkmsu.ui.util.extractXTAssets
 import com.diphons.dkmsu.ui.util.getKnVersion
 import com.diphons.dkmsu.ui.util.getSpoofKnVersion
 import com.diphons.dkmsu.ui.util.getSuSFS
@@ -81,6 +83,8 @@ import com.diphons.dkmsu.ui.util.hasJoyose
 import com.diphons.dkmsu.ui.util.hasModule
 import com.diphons.dkmsu.ui.util.install_dkmsvc
 import com.diphons.dkmsu.ui.util.isInternetAvailable
+import com.diphons.dkmsu.ui.util.prepareColor
+import com.diphons.dkmsu.ui.util.restartDkmSVC
 import com.diphons.dkmsu.ui.util.runSVCWorker
 import com.diphons.dkmsu.ui.util.setKernel
 import com.diphons.dkmsu.ui.util.startPIFWorker
@@ -116,6 +120,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
             }
         }
     }
+    prepareColor(context)
     Scaffold(
         topBar = {
             TopBar(
@@ -132,6 +137,29 @@ fun MiscScreen(navigator: DestinationsNavigator) {
         val runDialog = rememberCustomDialog {
             runDialog(it)
         }
+        var dkm_service by rememberSaveable { mutableStateOf(
+            if (getStartedSVC())
+                "Started"
+            else
+                "Not Started"
+        ) }
+        var count_finish by rememberSaveable { mutableStateOf(false) }
+        if (count_finish) {
+            LaunchedEffect(Unit) {
+                repeat(10) {
+                    delay(1000) // update once a second
+                    if (getStartedSVC()) {
+                        count_finish = false
+                        dkm_service = "Started"
+                        CMD_MSG = "DKM Service Started"
+                        runDialog.hide()
+                    }
+                }
+                runDialog.hide()
+                count_finish = false
+                dkm_service = "Not Started"
+            }
+        }
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -145,6 +173,7 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                 Row(modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
+                        //context.startActivity(Intent(context, RenderJitter::class.java))
                         context.startActivity(Intent(context, RenderingJitter::class.java))
                     }
                     .padding(23.dp),
@@ -169,26 +198,6 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = null
                     )
-                }
-            }
-            var dkm_service by rememberSaveable { mutableStateOf(
-                if (getStartedSVC())
-                    "Started"
-                else
-                    "Not Started"
-            ) }
-            var count_finish by rememberSaveable { mutableStateOf(false) }
-            if (count_finish) {
-                LaunchedEffect(Unit) {
-                    for (i in 1..200) {
-                        delay(1000) // update once a second
-                        if (getStartedSVC()) {
-                            count_finish = false
-                            dkm_service = "Started"
-                            CMD_MSG = "DKM Service Started"
-                            runDialog.hide()
-                        }
-                    }
                 }
             }
             ElevatedCard(
@@ -226,17 +235,15 @@ fun MiscScreen(navigator: DestinationsNavigator) {
                             .align(Alignment.CenterEnd)
                             .clickable {
                                 DIALOG_MODE = 1
-                                if (dkm_service.contains("Not"))
-                                    CMD_MSG = "Starting DKM Service"
+                                CMD_MSG = if (dkm_service.contains("Not"))
+                                    "Starting DKM Service"
                                 else
-                                    CMD_MSG = "Restarting DKM Service"
-                                runDialog.show()
-                                RootUtils.runCommand("setprop init.dkmsvc.exit 1")
+                                    "Restarting DKM Service"
                                 dkm_service = "Restarting"
-                                install_dkmsvc()
-                                RootUtils.runCommand("setprop init.dkmsvc.exit 0; setprop init.susfs \"0\"")
+                                runDialog.show()
+                                restartDkmSVC()
+                                //extractXTAssets(context)
                                 count_finish = true
-                                startSVC()
                             },
                     ) {
                         Row(

@@ -1,0 +1,1486 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_gravity="center"
+    android:fitsSystemWindows="true"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:keepScreenOn="true"
+    tools:ignore="UselessLeaf,TooManyViews,DisableBaselineAlignment,ObsoleteLayoutParam,RtlSymmetry,TooDeepLayout,UseCompoundDrawables,RtlHardcoded,HardcodedText,SmallSp,UselessParent,ContentDescription,RelativeOverlap">
+
+    <RelativeLayout
+        android:id="@+id/popup_game_control"
+        android:layout_width="310dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:background="@drawable/toolbox_frame_default_bg"
+        android:alpha="0.95">
+
+        <LinearLayout
+            android:id="@+id/card_game_control"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            app:cardCornerRadius="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="34dp"
+                    android:paddingLeft="16dp"
+                    android:layout_marginTop="4dp"
+                    android:paddingRight="16dp">
+
+                    <LinearLayout
+                        android:layout_alignParentEnd="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/header_icon"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@drawable/ic_keep" />
+
+                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/gamer_header"
+                        style="@style/textTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textColor="@color/white"
+                        android:layout_gravity="center_horizontal"
+                        android:lines="1"
+                        android:text="@string/game_mode"
+                        android:textSize="14sp"
+                        android:textAlignment="center"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/card_info_bg"
+                    android:layout_width="match_parent"
+                    android:layout_height="130dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="5dp"
+                    android:padding="5dp">
+
+                    <RelativeLayout
+                        android:id="@+id/card_info_main"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <RelativeLayout
+                                android:layout_width="150dp"
+                                android:layout_height="match_parent">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_marginBottom="31dp"
+                                    android:orientation="vertical"
+                                    android:alpha="0.95">
+
+                                    <com.diphons.dkmsu.ui.component.FpsVisualizerView
+                                        android:id="@+id/home_fps_chat"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="-6dp"
+                                    android:orientation="vertical">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="-6dp"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:id="@+id/fps_value"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            style="@style/textTitle"
+                                            android:textAllCaps="true"
+                                            android:textSize="38sp"
+                                            android:textColor="@color/white"
+                                            android:text="60"/>
+
+                                        <TextView
+                                            android:id="@+id/fps_label"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            style="@style/textTitle"
+                                            android:textSize="16sp"
+                                            android:layout_marginStart="2dp"
+                                            android:textColor="@color/white"
+                                            android:text="fps"/>
+                                    </LinearLayout>
+                                    <LinearLayout
+                                        android:id="@+id/card_fps_calc"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:visibility="gone"
+                                        android:orientation="vertical">
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="horizontal">
+
+                                            <TextView
+                                                android:id="@+id/fps_label_max"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="match_parent"
+                                                android:text="Max : "
+                                                android:textSize="10sp"
+                                                android:textColor="@color/white"
+                                                android:gravity="center"/>
+
+                                            <TextView
+                                                android:id="@+id/fps_value_max"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent"
+                                                android:text="~"
+                                                android:textSize="10sp"
+                                                android:textColor="@color/white"
+                                                android:gravity="center_vertical" />
+
+                                        </LinearLayout>
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginTop="2dp"
+                                            android:orientation="horizontal">
+
+                                            <TextView
+                                                android:id="@+id/fps_label_min"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="match_parent"
+                                                android:text="Min : "
+                                                android:textSize="10sp"
+                                                android:textColor="@color/white"
+                                                android:gravity="center"/>
+
+                                            <TextView
+                                                android:id="@+id/fps_value_min"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent"
+                                                android:text="~"
+                                                android:textSize="10sp"
+                                                android:textColor="@color/white"
+                                                android:gravity="center_vertical" />
+
+                                        </LinearLayout>
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="horizontal">
+
+                                            <TextView
+                                                android:id="@+id/fps_label_avg"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="match_parent"
+                                                android:text="Avg : "
+                                                android:textSize="10sp"
+                                                android:textColor="@color/white"
+                                                android:gravity="center"/>
+
+                                            <TextView
+                                                android:id="@+id/fps_value_avg"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent"
+                                                android:text="~"
+                                                android:textSize="10sp"
+                                                android:textColor="@color/white"
+                                                android:gravity="center_vertical" />
+
+                                        </LinearLayout>
+                                    </LinearLayout>
+                                </LinearLayout>
+
+                            </RelativeLayout>
+
+                            <RelativeLayout
+                                android:id="@+id/card_info_main_2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginTop="12dp"
+                                android:paddingStart="2dp"
+                                android:visibility="visible"
+                                android:paddingEnd="4dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="6dp"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:id="@+id/cpu_core_label"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginStart="4dp"
+                                            android:text="CPU\t: "
+                                            android:textSize="10sp"
+                                            android:textColor="@color/white"
+                                            android:gravity="center"/>
+
+                                        <TextView
+                                            android:id="@+id/cpu_core_total_load"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:text="~"
+                                            android:textSize="10sp"
+                                            android:textColor="@color/white"
+                                            android:gravity="center_vertical" />
+
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:id="@+id/card_gpu_info"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:id="@+id/gpu_label"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginStart="4dp"
+                                            android:text="GPU\t: "
+                                            android:textSize="10sp"
+                                            android:textColor="@color/white"
+                                            android:gravity="center"/>
+
+                                        <TextView
+                                            android:id="@+id/gpu_load_info"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            android:text="~"
+                                            android:textSize="10sp"
+                                            android:textColor="@color/white"
+                                            android:gravity="center_vertical"/>
+                                    </LinearLayout>
+                                    <RelativeLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp">
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="horizontal">
+
+                                            <TextView
+                                                android:id="@+id/ram_label"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="match_parent"
+                                                android:layout_marginStart="4dp"
+                                                android:text="RAM\t: "
+                                                android:textSize="10sp"
+                                                android:textColor="@color/white"
+                                                android:gravity="center"/>
+
+                                            <TextView
+                                                android:id="@+id/ram_load_info"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="match_parent"
+                                                android:text="~"
+                                                android:textSize="10sp"
+                                                android:textColor="@color/white"
+                                                android:gravity="center_vertical"/>
+                                        </LinearLayout>
+
+                                    </RelativeLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:id="@+id/batt_label"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginStart="4dp"
+                                            android:text="BAT\t: "
+                                            android:textSize="10sp"
+                                            android:textColor="@color/white"
+                                            android:gravity="center"/>
+
+                                        <TextView
+                                            android:id="@+id/batt_disc_info"
+                                            android:layout_width="match_parent"
+                                            android:layout_marginStart="4dp"
+                                            android:layout_height="match_parent"
+                                            android:text="~"
+                                            android:textSize="10sp"
+                                            android:textColor="@color/white"
+                                            android:gravity="center_vertical"/>
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                                <ImageButton
+                                    android:id="@+id/seek_brightness_icon"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_toLeftOf="@+id/home_open_volume"
+                                    android:layout_alignParentBottom="true"
+                                    android:layout_marginBottom="4dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:src="@drawable/toolbox_brightness_mode_auto"
+                                    android:scaleType="centerInside"
+                                    android:padding="5dp"/>
+
+                                <ImageButton
+                                    android:id="@+id/home_open_volume"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_toLeftOf="@+id/home_memory_clear"
+                                    android:layout_alignParentBottom="true"
+                                    android:layout_marginBottom="4dp"
+                                    android:layout_marginEnd="8dp"
+                                    android:src="@drawable/ic_volume"
+                                    android:scaleType="centerInside"
+                                    android:padding="5dp"/>
+                                <ImageButton
+                                    android:id="@+id/home_memory_clear"
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_alignParentBottom="true"
+                                    android:layout_marginBottom="4dp"
+                                    android:src="@drawable/app_options_clear"
+                                    android:scaleType="centerInside"
+                                    android:padding="5dp"/>
+
+                            </RelativeLayout>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:layout_marginEnd="98dp"
+                            android:layout_marginBottom="8dp"
+                            android:orientation="horizontal">
+
+                            <SeekBar
+                                android:id="@+id/seek_brightness"
+                                style="@style/SeekBar"
+                                android:layout_width="0dp"
+                                android:layout_height="16dp"
+                                android:layout_weight="1"
+                                android:layout_gravity="center_vertical"
+                                android:max="255"
+                                android:min="0"
+                                android:progress="50"
+                                android:progressTint="@color/color_game_mode"/>
+
+                            <TextView
+                                android:id="@+id/txt_brightness"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0"
+                                android:visibility="gone"
+                                android:textSize="8sp" />
+
+                        </LinearLayout>
+                    </RelativeLayout>
+                    <LinearLayout
+                        android:id="@+id/card_game_perf"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="gone"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="120dp"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
+
+                            <RelativeLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/tool_bg_data_full"
+                                android:paddingStart="5dp"
+                                android:paddingEnd="5dp"
+                                android:backgroundTint="@color/color_game_mode_header">
+
+                                <com.diphons.dkmsu.ui.component.MaskedGradientView
+                                    android:id="@+id/progress_left_gradient"
+                                    android:layout_width="50dp"
+                                    android:layout_height="match_parent"/>
+
+                                <RelativeLayout
+                                    android:id="@+id/perf_progress_left"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="69dp">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="match_parent"
+                                        android:orientation="vertical">
+
+                                        <ImageView
+                                            android:layout_width="50dp"
+                                            android:layout_height="130dp"
+                                            android:background="@drawable/img_perf_settings_perf_scale_bg_left"/>
+
+                                    </LinearLayout>
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentBottom="true"
+                                        android:background="@drawable/img_perf_settings_perf_scale_indicator_line_left" />
+
+                                </RelativeLayout>
+
+                                <TextView
+                                    android:id="@+id/perf_heat_label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/perf_settings_heating"
+                                    style="@style/textTitle"
+                                    android:layout_alignParentBottom="true"
+                                    android:layout_marginBottom="5dp"
+                                    android:textColor="@color/white"
+                                    android:textSize="8sp"/>
+
+                                <ImageView
+                                    android:layout_width="50dp"
+                                    android:layout_height="match_parent"
+                                    android:background="@drawable/img_perf_settings_perf_scale_ruler_left"/>
+
+                                <com.diphons.dkmsu.ui.component.MaskedGradientView
+                                    android:id="@+id/progress_right_gradient"
+                                    android:layout_width="50dp"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_height="match_parent"/>
+
+                                <RelativeLayout
+                                    android:id="@+id/perf_progress_right"
+                                    android:layout_width="wrap_content"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_height="69dp">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="match_parent"
+                                        android:layout_alignParentEnd="true"
+                                        android:orientation="vertical">
+
+                                        <ImageView
+                                            android:layout_width="50dp"
+                                            android:layout_height="150dp"
+                                            android:background="@drawable/img_perf_settings_perf_scale_bg_right"/>
+
+                                    </LinearLayout>
+
+                                    <ImageView
+                                        android:layout_width="30dp"
+                                        android:layout_height="1dp"
+                                        android:layout_alignParentBottom="true"
+                                        android:layout_alignParentEnd="true"
+                                        android:background="@drawable/img_perf_settings_perf_scale_indicator_line_right" />
+                                </RelativeLayout>
+                                <ImageView
+                                    android:layout_width="50dp"
+                                    android:layout_height="match_parent"
+                                    android:layout_alignParentEnd="true"
+                                    android:background="@drawable/img_perf_settings_perf_scale_ruler_right"/>
+
+                                <TextView
+                                    android:id="@+id/perf_battery_label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/battery"
+                                    style="@style/textTitle"
+                                    android:layout_alignParentBottom="true"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_marginBottom="5dp"
+                                    android:textColor="@color/white"
+                                    android:textSize="8sp"/>
+
+                                <com.airbnb.lottie.LottieAnimationView
+                                    android:id="@+id/perf_anim_bg"
+                                    android:layout_width="74dp"
+                                    android:layout_height="74dp"
+                                    android:layout_centerHorizontal="true"
+                                    app:lottie_autoPlay="true"
+                                    android:layout_marginTop="7dp"
+                                    app:lottie_loop="false"
+                                    app:lottie_rawRes="@raw/anim_perf_settings_radar_edge" />
+
+                                <LinearLayout
+                                    android:layout_width="59dp"
+                                    android:layout_height="59dp"
+                                    android:layout_marginTop="15dp"
+                                    android:background="@drawable/img_perf_settings_perf_radar_bg"
+                                    android:layout_centerHorizontal="true"
+                                    android:gravity="center">
+
+                                    <com.diphons.dkmsu.ui.component.MaskedGradientView
+                                        android:id="@+id/graph_perf_low"
+                                        android:layout_width="30dp"
+                                        android:layout_height="30dp"
+                                        android:layout_marginTop="5dp"
+                                        android:layout_marginStart="-5dp"
+                                        android:visibility="visible"
+                                        android:alpha="0.1"/>
+
+                                    <com.diphons.dkmsu.ui.component.MaskedGradientView
+                                        android:id="@+id/graph_perf_bal"
+                                        android:layout_width="45dp"
+                                        android:layout_height="35dp"
+                                        android:layout_marginStart="2dp"
+                                        android:layout_marginTop="4dp"
+                                        android:visibility="gone"
+                                        android:alpha="0.1"/>
+
+                                    <com.diphons.dkmsu.ui.component.MaskedGradientView
+                                        android:id="@+id/graph_perf_pro"
+                                        android:layout_width="48dp"
+                                        android:layout_height="35dp"
+                                        android:layout_marginStart="1dp"
+                                        android:layout_marginTop="4dp"
+                                        android:visibility="gone"
+                                        android:alpha="0.1"/>
+
+                                </LinearLayout>
+
+                                <RelativeLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="12dp">
+
+                                    <TextView
+                                        android:id="@+id/perf_touch_label"
+                                        android:layout_width="50dp"
+                                        android:layout_marginStart="2dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentStart="true"
+                                        android:text="@string/perf_settings_touch_control"
+                                        style="@style/textTitle"
+                                        android:textAlignment="center"
+                                        android:textColor="@color/white"
+                                        android:textSize="8sp"/>
+
+                                    <TextView
+                                        android:id="@+id/perf_smooth_label"
+                                        android:layout_width="50dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_alignParentEnd="true"
+                                        android:layout_marginEnd="2dp"
+                                        android:text="@string/perf_settings_smoothness"
+                                        style="@style/textTitle"
+                                        android:textAlignment="center"
+                                        android:textColor="@color/white"
+                                        android:textSize="8sp"/>
+                                </RelativeLayout>
+                                <TextView
+                                    android:id="@+id/perf_quality_label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/perf_settings_image_quality"
+                                    style="@style/textTitle"
+                                    android:layout_marginTop="75dp"
+                                    android:layout_centerHorizontal="true"
+                                    android:textColor="@color/white"
+                                    android:textSize="8sp"/>
+
+                            </RelativeLayout>
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="12dp"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <Button
+                                android:id="@+id/perf_lower"
+                                android:background="@drawable/toolbox_perf_settings_mode_btn_bg_unselected"
+                                android:layout_width="match_parent"
+                                android:layout_height="26dp"
+                                android:textAllCaps="false"
+                                android:layout_alignParentTop="true"
+                                android:drawableLeft="@drawable/ic_perf_balance"
+                                android:paddingStart="6.0dip"
+                                android:paddingEnd="6.0dip"
+                                android:text="@string/low_power_mode"
+                                android:textColor="@color/op_control_text_color_primary_dark"
+                                android:layout_centerVertical="true"
+                                android:layout_alignParentStart="true"
+                                style="@style/textTitle"
+                                android:textSize="10sp"/>
+
+                            <Button
+                                android:id="@+id/perf_balance"
+                                android:background="@drawable/toolbox_perf_settings_mode_btn_bg_selected"
+                                android:layout_width="match_parent"
+                                android:layout_height="26dp"
+                                android:textAllCaps="false"
+                                android:layout_marginTop="6dp"
+                                android:drawableLeft="@drawable/ic_perf_game"
+                                android:paddingStart="6.0dip"
+                                android:paddingEnd="6.0dip"
+                                android:text="@string/balanced_mode"
+                                android:textColor="@color/op_control_text_color_primary_dark"
+                                android:layout_centerVertical="true"
+                                android:layout_centerHorizontal="true"
+                                style="@style/textTitle"
+                                android:textSize="10sp"/>
+
+                            <Button
+                                android:id="@+id/perf_pro_game"
+                                android:background="@drawable/toolbox_perf_settings_mode_btn_bg_unselected"
+                                android:layout_width="match_parent"
+                                android:layout_height="26dp"
+                                android:textAllCaps="false"
+                                android:layout_marginTop="6dp"
+                                android:layout_alignParentBottom="true"
+                                android:drawableLeft="@drawable/ic_perf_performance"
+                                android:paddingStart="6.0dip"
+                                android:paddingEnd="6.0dip"
+                                android:text="@string/pro_game_mode"
+                                android:textColor="@color/op_control_text_color_primary_dark"
+                                android:layout_centerVertical="true"
+                                android:layout_alignParentEnd="true"
+                                style="@style/textTitle"
+                                android:textSize="10sp"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/card_info_sound"
+                        android:layout_width="match_parent"
+                        android:visibility="gone"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/card_info_sound_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/textTitle"
+                            android:layout_marginTop="-2.5dp"
+                            android:layout_marginStart="4dp"
+                            android:text="@string/sound_control"
+                            android:textSize="12sp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="18dp"
+                            android:orientation="horizontal">
+
+                            <RelativeLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:paddingStart="4dp"
+                                android:paddingEnd="4dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/popup_seek_microfon_label"
+                                        style="@style/textTitle"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/microphone_gain"
+                                        android:textColor="@color/white"
+                                        android:textSize="10sp"
+                                        tools:ignore="SmallSp" />
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="12dp"
+                                        android:layout_marginTop="4dp"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <SeekBar
+                                            android:id="@+id/popup_seek_microfon"
+                                            style="@style/SeekBar"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:layout_gravity="center_vertical"
+                                            android:max="20"
+                                            android:min="0"
+                                            android:progress="0"
+                                            android:progressTint="@color/color_game_mode"/>
+
+                                        <TextView
+                                            android:id="@+id/popup_txt_mikrofon"
+                                            android:layout_width="25dp"
+                                            android:layout_height="match_parent"
+                                            android:layout_marginStart="8dp"
+                                            android:textSize="10sp"
+                                            android:text="0"
+                                            android:textAlignment="viewEnd"
+                                            android:layout_gravity="center_vertical"
+                                            tools:ignore="RtlCompat,SmallSp" />
+                                    </LinearLayout>
+
+                                    <TextView
+                                        android:id="@+id/popup_seek_earfon_label"
+                                        style="@style/textTitle"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/earpiece_gain"
+                                        android:textColor="@color/white"
+                                        android:layout_marginTop="5dp"
+                                        android:textSize="10sp"
+                                        android:layout_marginBottom="4dp"
+                                        tools:ignore="SmallSp" />
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="12dp"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <SeekBar
+                                            android:id="@+id/popup_seek_earfon"
+                                            style="@style/SeekBar"
+                                            android:layout_width="0dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_weight="1"
+                                            android:layout_gravity="center_vertical"
+                                            android:max="20"
+                                            android:min="0"
+                                            android:progress="0"
+                                            android:progressTint="@color/color_game_mode" />
+
+                                        <TextView
+                                            android:id="@+id/popup_txt_earfon"
+                                            android:layout_width="25dp"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="8dp"
+                                            android:textSize="10sp"
+                                            android:text="0"
+                                            android:textAlignment="viewEnd"
+                                            android:layout_gravity="center_vertical"
+                                            tools:ignore="RtlCompat,SmallSp" />
+                                    </LinearLayout>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:layout_alignParentBottom="true"
+                                    android:layout_marginBottom="2dp">
+
+                                    <LinearLayout
+                                        android:id="@+id/btn_reset_sc"
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:orientation="horizontal"
+                                        android:gravity="center_horizontal"
+                                        android:padding="2dp"
+                                        android:layout_marginEnd="4dp">
+                                        <ImageView
+                                            android:id="@+id/btn_reset_sc_icon"
+                                            android:layout_marginStart="2dp"
+                                            android:layout_width="16dp"
+                                            android:layout_height="16dp"
+                                            android:layout_marginEnd="2dp"
+                                            android:background="@drawable/ic_refresh"
+                                            tools:ignore="ContentDescription" />
+                                    </LinearLayout>
+                                </LinearLayout>
+                            </RelativeLayout>
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:paddingStart="4dp"
+                                android:paddingEnd="4dp">
+
+                                <Switch
+                                    android:id="@+id/popup_switch_headfon"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/white"
+                                    android:textSize="10sp"
+                                    android:text="@string/per_channel_controls"
+                                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                                <TextView
+                                    android:id="@+id/popup_judul_headfon"
+                                    style="@style/textTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/headphone_gain"
+                                    android:layout_marginTop="2dp"
+                                    android:textSize="10sp"
+                                    android:layout_marginBottom="4dp"
+                                    tools:ignore="SmallSp" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="12dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <SeekBar
+                                        android:id="@+id/popup_seek_headfon"
+                                        style="@style/SeekBar"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:layout_gravity="center_vertical"
+                                        android:max="20"
+                                        android:min="0"
+                                        android:progress="0"
+                                        android:progressTint="@color/color_game_mode" />
+
+                                    <TextView
+                                        android:id="@+id/popup_txt_headfon"
+                                        style="@style/textSmall"
+                                        android:layout_width="25dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:textAlignment="viewEnd"
+                                        android:textSize="10sp"
+                                        android:text="0"
+                                        android:layout_gravity="center_vertical"
+                                        tools:ignore="RtlCompat,SmallSp" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/popup_judul_headfon2"
+                                    style="@style/textTitle"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/headphone_gain"
+                                    android:textSize="10sp"
+                                    android:layout_marginTop="2dp"
+                                    android:layout_marginBottom="4dp"
+                                    tools:ignore="SmallSp" />
+
+                                <LinearLayout
+                                    android:id="@+id/popup_card_seek_headfon"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="12dp"
+                                    android:layout_marginBottom="10dp"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <SeekBar
+                                        android:id="@+id/popup_seek_headfon2"
+                                        style="@style/SeekBar"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:layout_gravity="center_vertical"
+                                        android:max="20"
+                                        android:min="0"
+                                        android:progress="0"
+                                        android:progressTint="@color/color_game_mode" />
+
+                                    <TextView
+                                        android:id="@+id/popup_txt_headfon2"
+                                        style="@style/textSmall"
+                                        android:layout_width="25dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="8dp"
+                                        android:textAlignment="viewEnd"
+                                        android:textSize="10sp"
+                                        android:text="0"
+                                        android:layout_gravity="center_vertical"
+                                        tools:ignore="RtlCompat,SmallSp" />
+                                </LinearLayout>
+
+                            </LinearLayout>
+                        </LinearLayout>
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/card_charger_max"
+                        android:layout_width="match_parent"
+                        android:visibility="gone"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/charger_max_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/textTitle"
+                            android:layout_marginTop="-2.5dp"
+                            android:layout_marginStart="4dp"
+                            android:text="Charger Max"
+                            android:textSize="12sp"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginTop="18dp"
+                            android:orientation="horizontal">
+                            <LinearLayout
+                                android:layout_width="60dp"
+                                android:layout_marginStart="4dp"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:orientation="vertical">
+                                    <TextView
+                                        android:id="@+id/txt_current_chg"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="22sp"
+                                        android:layout_marginTop="-2dp"
+                                        android:textAlignment="center"
+                                        android:text="~" />
+
+                                    <TextView
+                                        android:id="@+id/txt_watt"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textSize="12sp"
+                                        android:layout_marginTop="-6dp"
+                                        android:textAlignment="center"
+                                        android:textColor="@color/white"
+                                        android:text="watt"/>
+
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:id="@+id/btn_dynamic_charger"
+                                    android:layout_marginTop="6dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1.5"
+                                    android:orientation="vertical"
+                                    android:gravity="center">
+
+                                    <ImageView
+                                        android:id="@+id/btn_dynamic_charger_icon"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="16dp"
+                                        android:src="@drawable/ic_dynamic_control"
+                                        tools:ignore="ContentDescription" />
+                                    <TextView
+                                        android:id="@+id/btn_dynamic_charger_label"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:textAlignment="center"
+                                        android:text="@string/charger_dynamic"
+                                        android:textSize="10sp"
+                                        tools:ignore="SmallSp" />
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/txt_dynamic_chg_label"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text="Dynamic Charger"
+                                android:textAlignment="center"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:visibility="gone"
+                                android:gravity="center" />
+                            <LinearLayout
+                                android:id="@+id/card_chg_max"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <GridLayout
+                                    android:id="@+id/card_chg_max_val0"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:columnCount="2"
+                                    android:visibility="visible"
+                                    android:orientation="horizontal"
+                                    android:alignmentMode="alignBounds"
+                                    android:paddingHorizontal="2dp" >
+
+                                    <TextView
+                                        android:id="@+id/btn_chg0"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="25dp"
+                                        android:layout_columnWeight="1"
+                                        android:gravity="center"
+                                        android:layout_marginEnd="3dp"
+                                        android:text="28W"
+                                        android:textAlignment="center"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/btn_chg1"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="25dp"
+                                        android:layout_columnWeight="1"
+                                        android:gravity="center"
+                                        android:layout_marginStart="3dp"
+                                        android:text="30W"
+                                        android:textAlignment="center"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/btn_chg2"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="25dp"
+                                        android:layout_columnWeight="1"
+                                        android:gravity="center"
+                                        android:layout_marginTop="6dp"
+                                        android:layout_marginEnd="3dp"
+                                        android:text="33W"
+                                        android:textAlignment="center"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/btn_chg3"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="25dp"
+                                        android:layout_columnWeight="1"
+                                        android:gravity="center"
+                                        android:layout_marginTop="6dp"
+                                        android:layout_marginStart="3dp"
+                                        android:text="18W"
+                                        android:textAlignment="center"
+                                        android:textSize="12sp" />
+
+                                </GridLayout>
+
+                                <GridLayout
+                                    android:id="@+id/card_chg_max_val1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:columnCount="1"
+                                    android:visibility="gone"
+                                    android:orientation="vertical"
+                                    android:alignmentMode="alignBounds"
+                                    android:paddingHorizontal="2dp" >
+
+                                    <TextView
+                                        android:id="@+id/btn_chg5"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="30dp"
+                                        android:layout_columnWeight="1"
+                                        android:gravity="center"
+                                        android:text="67W"
+                                        android:textAlignment="center"
+                                        android:textSize="12sp" />
+
+                                    <TextView
+                                        android:id="@+id/btn_chg6"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="30dp"
+                                        android:layout_columnWeight="1"
+                                        android:gravity="center"
+                                        android:layout_marginTop="6dp"
+                                        android:text="120W"
+                                        android:textAlignment="center"
+                                        android:textSize="12sp" />
+
+                                </GridLayout>
+                            </LinearLayout>
+                        </LinearLayout>
+                    </RelativeLayout>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="124dp"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_centerVertical="true"
+                            tools:ignore="UseCompoundDrawables">
+
+                            <ImageView
+                                android:id="@+id/clock_icon"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@drawable/toolbox_ic_time"
+                                tools:ignore="ContentDescription" />
+                            <TextView
+                                android:id="@+id/clock_now"
+                                style="@style/textTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="2dp"
+                                android:textSize="8sp"
+                                android:textColor="@color/white"
+                                android:text="00:00"
+                                tools:ignore="SmallSp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_centerVertical="true"
+                            android:layout_centerHorizontal="true"
+                            tools:ignore="UseCompoundDrawables">
+
+                            <ImageView
+                                android:id="@+id/temp_now_icon"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_gravity="center_horizontal"
+                                android:background="@drawable/ic_thermal"
+                                android:backgroundTint="@color/wallbgwhite"/>
+                            <TextView
+                                android:id="@+id/temp_now"
+                                style="@style/textTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="2dp"
+                                android:textColor="@color/white"
+                                android:textSize="8sp"
+                                android:text="0C"
+                                tools:ignore="SmallSp" />
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            tools:ignore="UseCompoundDrawables">
+
+                            <ImageView
+                                android:id="@+id/battery_icon"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_gravity="center_horizontal"
+                                android:src="@drawable/ic_capacity"
+                                tools:ignore="ContentDescription" />
+
+                            <TextView
+                                android:id="@+id/battery_now"
+                                style="@style/textTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="2dp"
+                                android:textColor="@color/white"
+                                android:textSize="8sp"
+                                android:text="%"
+                                tools:ignore="SmallSp" />
+
+                        </LinearLayout>
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <ScrollView
+                    android:id="@+id/content_tool"
+                    android:layout_width="match_parent"
+                    android:layout_height="166dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:scrollbars="none"
+                    android:paddingStart="11dp"
+                    android:paddingEnd="11dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <RelativeLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp">
+
+                                <LinearLayout
+                                    android:id="@+id/btn_perfasgame"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_centerInParent="true"
+                                    android:orientation="vertical"
+                                    android:padding="8dp">
+
+                                    <ImageView
+                                        android:id="@+id/btn_perfasgame_icon"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:background="@drawable/ic_tool_performance_settings" />
+
+                                    <TextView
+                                        android:id="@+id/btn_perfasgame_label"
+                                        style="@style/textTitle"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:text="@string/profile_mode"
+                                        android:textSize="8sp"
+                                        android:textColor="@color/white"
+                                        tools:ignore="SmallSp" />
+
+                                </LinearLayout>
+                            </RelativeLayout>
+
+                            <RelativeLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp">
+
+                                <LinearLayout
+                                    android:id="@+id/btn_fpsmeter"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_centerInParent="true"
+                                    android:orientation="vertical"
+                                    android:padding="8dp">
+
+                                    <ImageView
+                                        android:id="@+id/btn_fpsmeter_icon"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:background="@drawable/ic_refreshrate"
+                                        tools:ignore="ContentDescription" />
+
+                                    <TextView
+                                        android:id="@+id/btn_fpsmeter_label"
+                                        style="@style/textTitle"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:text="FPS Meter"
+                                        android:textSize="8sp"
+                                        android:textColor="@color/white"
+                                        tools:ignore="SmallSp" />
+
+                                </LinearLayout>
+                            </RelativeLayout>
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <RelativeLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp">
+
+                                <LinearLayout
+                                    android:id="@+id/btn_sound_control"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_centerInParent="true"
+                                    android:orientation="vertical"
+                                    android:padding="8dp">
+
+                                    <ImageView
+                                        android:id="@+id/btn_sound_control_icon"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:background="@drawable/sound" />
+
+                                    <TextView
+                                        android:id="@+id/btn_sound_control_label"
+                                        style="@style/textTitle"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:text="@string/sound_control"
+                                        android:textColor="@color/white"
+                                        android:textSize="8sp" />
+
+                                </LinearLayout>
+                            </RelativeLayout>
+                            <RelativeLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp">
+
+                                <LinearLayout
+                                    android:id="@+id/btn_touchimprove"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_centerInParent="true"
+                                    android:orientation="vertical"
+                                    android:padding="8dp">
+
+                                    <ImageView
+                                        android:id="@+id/btn_touchimprove_icon"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:background="@drawable/ic_touch" />
+
+                                    <TextView
+                                        android:id="@+id/btn_touchimprove_label"
+                                        style="@style/textTitle"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:text="@string/touch_sample"
+                                        android:textColor="@color/white"
+                                        android:textSize="8sp" />
+
+                                </LinearLayout>
+                            </RelativeLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <RelativeLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp">
+
+                                <LinearLayout
+                                    android:id="@+id/btn_charger_max"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_centerInParent="true"
+                                    android:orientation="vertical"
+                                    android:padding="8dp">
+
+                                    <ImageView
+                                        android:id="@+id/btn_charger_max_icon"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:background="@drawable/battery" />
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:orientation="horizontal">
+
+                                        <TextView
+                                            android:id="@+id/txt_chg_mode_desc"
+                                            style="@style/textTitle"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Charger Max"
+                                            android:textColor="@color/white"
+                                            android:textSize="8sp" />
+
+                                        <TextView
+                                            android:id="@+id/txt_current_chg_max"
+                                            style="@style/textTitle"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginStart="4dp"
+                                            android:text="~"
+                                            android:textColor="@color/white"
+                                            android:textSize="8sp" />
+                                    </LinearLayout>
+                                </LinearLayout>
+                            </RelativeLayout>
+
+                            <RelativeLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="5dp"
+                                android:visibility="visible">
+
+                                <LinearLayout
+                                    android:id="@+id/btn_bypass"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_centerInParent="true"
+                                    android:orientation="vertical"
+                                    android:padding="8dp">
+
+                                    <ImageView
+                                        android:id="@+id/btn_bypass_icon"
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:background="@drawable/ic_bypass_charging" />
+
+                                    <TextView
+                                        android:id="@+id/btn_bypass_label"
+                                        style="@style/textTitle"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:text="@string/bypass_chg"
+                                        android:textColor="@color/white"
+                                        android:textSize="8sp" />
+
+                                </LinearLayout>
+                            </RelativeLayout>
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </ScrollView>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

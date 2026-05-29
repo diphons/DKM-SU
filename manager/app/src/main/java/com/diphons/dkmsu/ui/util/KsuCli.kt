@@ -1,30 +1,31 @@
 package com.diphons.dkmsu.ui.util
 
 import android.annotation.SuppressLint
-import android.app.AppOpsManager
-import android.app.NotificationManager
-import android.app.Service.NOTIFICATION_SERVICE
 import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.database.Cursor
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.Build
+import android.os.BatteryManager
 import android.os.Environment
 import android.os.Parcelable
-import android.os.Process
 import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.system.Os
 import android.util.Log
-import androidx.activity.ComponentActivity
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.edit
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.diphons.dkmsu.BuildConfig
 import com.diphons.dkmsu.KernelVersion
@@ -33,14 +34,15 @@ import com.diphons.dkmsu.R
 import com.diphons.dkmsu.getKernelVersion
 import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.component.KeepShellPublic
-import com.diphons.dkmsu.ui.component.SwapUtils
+import com.diphons.dkmsu.ui.component.PropsUtils.getProp
+import com.diphons.dkmsu.ui.services.BatteryWorker
 import com.diphons.dkmsu.ui.services.ExtractAssetsWorker
 import com.diphons.dkmsu.ui.services.PIFWorker
 import com.diphons.dkmsu.ui.services.PermWorker
 import com.diphons.dkmsu.ui.services.ProfileWorker
 import com.diphons.dkmsu.ui.services.SVCWorker
-import com.diphons.dkmsu.ui.util.Utils.*
 import com.diphons.dkmsu.ui.store.*
+import com.diphons.dkmsu.ui.util.Utils.*
 import com.topjohnwu.superuser.CallbackList
 import com.topjohnwu.superuser.Shell
 import com.topjohnwu.superuser.ShellUtils
@@ -50,8 +52,6 @@ import kotlinx.parcelize.Parcelize
 import org.json.JSONArray
 import java.io.File
 import java.time.Duration
-import java.util.Timer
-import java.util.TimerTask
 import java.util.TreeMap
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
@@ -70,7 +70,7 @@ private fun ksuDaemonOverlayfsPath(): String {
     return ksuApp.applicationInfo.nativeLibraryDir + File.separator + "libksud_overlayfs.so"
 }
 
-private fun dkmsvcDaemonPath(): String {
+fun dkmsvcDaemonPath(): String {
     return ksuApp.applicationInfo.nativeLibraryDir + File.separator + "libdkmsvc.so"
 }
 
@@ -157,8 +157,8 @@ fun execKsud(args: String, newShell: Boolean = false): Boolean {
 
 fun install_dkmsvc() {
     val start = SystemClock.elapsedRealtime()
-    val svcsusfs = File(ksuApp.applicationInfo.nativeLibraryDir, "libdkmsvc.so").absolutePath
-    val result = execKsud("dkmsvc --dkmsvc $svcsusfs", true)
+    val dkmsvc = File(ksuApp.applicationInfo.nativeLibraryDir, "libdkmsvc.so").absolutePath
+    val result = execKsud("dkmsvc --dkmsvc $dkmsvc", true)
     Log.w(TAG, "install dkmsvc result: $result, cost: ${SystemClock.elapsedRealtime() - start}ms")
 }
 
@@ -226,12 +226,6 @@ fun getSuSFSFeatures(): String {
     return result
 }
 
-fun susfsSUS_SU_0(): String {
-    val shell = getRootShell()
-    val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} sus_su 0")
-    return result
-}
-
 fun susfsSUS_SU_2(): String {
     val shell = getRootShell()
     val result = ShellUtils.fastCmd(shell, "${getSuSFSPath()} sus_su 2")
@@ -244,30 +238,9 @@ fun susfsSUS_SU_Mode(): String {
     return result
 }
 
-/*
- * SVC Function
- * susfs1 - spoof kernel
- * susfs2 - susfs log
- * susfs3 - hide cusrom
- * susfs4 - hide gapps
- * susfs5 - hide revanced
- * susfs6 - hide cmdline
- * susfs7 - hide loop
- * susfs8 - hide lsposed
- * susfs9 - Set All (for set on boot)
- * susfsm - Set SUS Mount
- * susfsmr - Reset List SUS Mount
- * susfsu - Set TRY Umount
- * susfsur - Reset List TRY Umount
- * susfsp - Set SUS PATH
- * susfspr - Reset List SUS Path
- */
 var svcInit: String = ""
 fun getSVCVersion(): String{
-    var result = RootUtils.runAndGetOutput("getprop init.dkmsvc.version")
-    if (result.isEmpty())
-        result = RootUtils.runAndGetOutput("dkmsvc version")
-    return result
+    return KeepShellPublic.doCmdSync("${dkmsvcDaemonPath()} version")
 }
 
 fun runSVCWorker(context: Context, value: String){
@@ -276,6 +249,15 @@ fun runSVCWorker(context: Context, value: String){
         .build()
     val workManager = WorkManager.getInstance(context)
     workManager.enqueue(startSVCWK)
+}
+
+fun batteryWorker(context: Context) {
+    val request = PeriodicWorkRequestBuilder<BatteryWorker>(15, TimeUnit.MINUTES).build()
+    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        "BatteryServiceMonitor",
+        ExistingPeriodicWorkPolicy.KEEP,
+        request
+    )
 }
 
 fun getSUSList(context: Context, filename: String): String{
@@ -368,7 +350,7 @@ fun getBoard(context: Context): String {
     val prefs: SharedPreferences = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
     var result = prefs.getString(SpfConfig.DEVICE_BOARD, "")
     if (result!!.isEmpty()) {
-        result = RootUtils.runAndGetOutput("getprop ro.board.platform")
+        result = getProp("ro.board.platform")
         prefs.edit { putString(SpfConfig.DEVICE_BOARD, result) }
     }
     return result
@@ -468,25 +450,47 @@ fun getXMPath(context: Context): String {
 }
 
 fun getStartedSVC(): Boolean{
-    val result = RootUtils.runAndGetOutput("getprop init.dkmsvc")
-    return !(result.isEmpty() || result.equals("0"))
+    val result = KeepShellPublic.doCmdSync("${dkmsvcDaemonPath()} status")
+    return result != "stopped"
 }
 
 fun getSVCCMD(): String{
-    return RootUtils.runAndGetOutput("getprop init.dkmsvc.cmd")
+    return KeepShellPublic.doCmdSync("${dkmsvcDaemonPath()} cmd")
 }
 
-fun setSVCCMD(value: String){
+fun isCharging(context: Context): Boolean {
+    val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+    val status = intent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+    val plugged = intent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
+
+    val charging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+            status == BatteryManager.BATTERY_STATUS_FULL
+
+    val usbPlugged = plugged == BatteryManager.BATTERY_PLUGGED_USB ||
+            plugged == BatteryManager.BATTERY_PLUGGED_AC ||
+            plugged == BatteryManager.BATTERY_PLUGGED_WIRELESS
+
+    if (rootAvailable())
+        bypassChg = getBypassChg()
+
+    return charging || usbPlugged || bypassChg
+}
+
+fun getBypassChg(): Boolean{
+    return KeepShellPublic.doCmdSync("${dkmsvcDaemonPath()} status bypass") == "1"
+}
+
+fun setSvcCmd(value: String){
     var result = getSVCCMD()
     result = if (result.isNotEmpty())
         "$result-$value"
     else
         value
-    RootUtils.runCommand("setprop init.dkmsvc.cmd \"$result\"")
+    RootUtils.runCommand("${dkmsvcDaemonPath()} cmd $result")
 }
 
 fun startSVC(){
-    RootUtils.runCommand("dkmsvc service")
+    RootUtils.runCommand("${dkmsvcDaemonPath()} service")
 }
 
 fun setXiaomiTouch(active: Boolean, value: Int, context: Context){
@@ -1754,6 +1758,17 @@ fun getGameList(context: Context, pkg: String): String{
     return result
 }
 
+fun getPerAppList(context: Context, pkg: String): Boolean{
+    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    val list = prefs.getString("perapp_list", "")
+    return list!!.contains(pkg)
+}
+
+fun getKillApp(context: Context, pkg: String): Boolean{
+    val prefs = context.getSharedPreferences(pkg, Context.MODE_PRIVATE)
+    return prefs.getBoolean("kill_app", false)
+}
+
 fun setGameList(context: Context){
     clearEndData(context)
     val prefs = context.getSharedPreferences("game_ai", Context.MODE_PRIVATE)
@@ -1762,41 +1777,6 @@ fun setGameList(context: Context){
     if (list!!.isNotEmpty())
         RootUtils.runCommand("path=/data/data/${context.packageName}/files/game_ai_list; echo -e \"$list\" | sed 's/&#10;/\\n/g' | sed 's/#/\"/g' > \$path")
     RootUtils.runCommand("cat /data/data/${context.packageName}/files/game_ai_list > $GAME_AI_LIST")
-}
-
-/*
- * exp action : Settings.ACTION_USAGE_ACCESS_SETTINGS
- */
-fun requestPermission(activity: ComponentActivity, action: String) {
-    val intent = Intent(action)
-    activity.startActivity(intent)
-}
-
-fun requestPermission(activity: ComponentActivity, context: Context, action: String) {
-    val intent = Intent(action)
-    val uri = Uri.fromParts("package", context.packageName, null)
-    intent.data = uri
-    activity.startActivity(intent)
-}
-
-fun hasUsageStatsPermission(context: Context): Boolean {
-    val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-    val mode: Int
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        mode = appOps.unsafeCheckOpNoThrow(
-            AppOpsManager.OPSTR_GET_USAGE_STATS,
-            Process.myUid(),
-            context.packageName
-        )
-    } else {
-        @Suppress("DEPRECATION")
-        mode = appOps.checkOpNoThrow(
-            AppOpsManager.OPSTR_GET_USAGE_STATS,
-            Process.myUid(),
-            context.packageName
-        )
-    }
-    return mode == AppOpsManager.MODE_ALLOWED
 }
 
 fun getTopAppPackageName(context: Context): String? {
@@ -1816,28 +1796,19 @@ fun getTopAppPackageName(context: Context): String? {
     return null
 }
 
-fun clearNotification(context: Context) {
-    val notificationManager = context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.cancel(1)
-}
-
 var onFocusedApp = ""
+var onGameFps = "0.0"
 var FPSActive = false
+var GameActive = false
 
-fun restartDkmSVC(context: Context){
-    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
-    val hash = RootUtils.runAndGetOutput("data=$(dkmsvc hash); echo \${data% *}")
-    val pool = SingleSchedulePool()
-    if (!prefs.getString("dkmsvc_hash", "")!!.contains(hash)) {
-        prefs.edit { putString("dkmsvc_hash", hash) }
-        RootUtils.runCommand("setprop init.dkmsvc.exit 1")
-        pool.delay(2, TimeUnit.SECONDS) {
-            install_dkmsvc()
-            RootUtils.runCommand("setprop init.dkmsvc.exit 0")
-            startSVC()
-        }
-        pool.shutdown()
-    }
+fun restartDkmSVC(){
+    val result = KeepShellPublic.doCmdSync("${dkmsvcDaemonPath()} status")
+    if (result == "started")
+        RootUtils.runCommand("${dkmsvcDaemonPath()} stop")
+    try {
+        install_dkmsvc()
+    } catch (_: Throwable) { }
+    startSVC()
 }
 
 var forceReloadWlList = true
@@ -1993,4 +1964,172 @@ fun getSwapSize(value: Float, ram: Int): Int{
 fun mbToGB(value: Int): Int {
     val result = (value / 1000).toFloat()
     return result.roundToInt()
+}
+
+fun getBatteryTemperature(context: Context): Float {
+    val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+    val temp = intent?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) ?: 0
+    return temp / 10f
+}
+
+@Composable
+fun prepareColor(context: Context) {
+    val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    prefs.edit { putInt(SpfColors.COLOR_PRIMARY, MaterialTheme.colorScheme.primary.toArgb()) }
+    prefs.edit { putInt(SpfColors.COLOR_SECONDARY, MaterialTheme.colorScheme.secondaryContainer.toArgb()) }
+    prefs.edit { putInt(SpfColors.COLOR_SURFACE, MaterialTheme.colorScheme.surface.toArgb()) }
+    prefs.edit { putInt(SpfColors.COLOR_SURFACE_CONTAINER, MaterialTheme.colorScheme.surfaceContainer.toArgb()) }
+    prefs.edit { putInt(SpfColors.COLOR_SURFACE_VARIANT, MaterialTheme.colorScheme.surfaceVariant.toArgb()) }
+    prefs.edit { putInt(SpfColors.COLOR_ON_SURFACE, MaterialTheme.colorScheme.onSurface.toArgb()) }
+    prefs.edit { putInt(SpfColors.COLOR_BACKGROUND, MaterialTheme.colorScheme.background.toArgb()) }
+    prefs.edit { putInt(SpfColors.COLOR_ON_BACKGROUND, MaterialTheme.colorScheme.onBackground.toArgb()) }
+    prefs.edit { putInt(SpfColors.COLOR_OUTLAND, MaterialTheme.colorScheme.outline.toArgb()) }
+}
+
+fun dpToPx(context: Context, dp: Int): Int {
+    return (dp * context.resources.displayMetrics.density).toInt()
+}
+
+fun Float.dpToPx(context: Context): Float {
+    return this * context.resources.displayMetrics.density
+}
+
+fun dpToPx(context: Context, dpValue: Float): Int {
+    val scale = context.resources.displayMetrics.density
+    return (dpValue * scale + 0.5f).toInt()
+}
+
+fun setData(before: String, after: String, context: Context){
+    val prefs = context.getSharedPreferences(SpfConfig.GAME_AI, Context.MODE_PRIVATE)
+    setData(before, after, prefs, context)
+}
+
+fun setData(before: String, after: String, prefs: SharedPreferences, context: Context){
+    var dataSource = "${prefs.getString("game_ai_list", "")}"
+    if (after.isNotEmpty()) {
+        if (dataSource.isEmpty())
+            dataSource = after
+        else {
+            if (dataSource.contains(before))
+                dataSource = dataSource.replace(before, after)
+            else
+                dataSource = "$dataSource\n$after"
+        }
+        prefs.edit { putString("game_ai_list", dataSource) }
+    }
+    setGameList(context)
+
+    // Reload after update data
+    dataSource = "${prefs.getString("game_ai_list", "")}"
+    getGameNewList = dataSource
+}
+
+fun prefMode(context: Context, value: Int, prefs: SharedPreferences, globalSPF: SharedPreferences) {
+    prefs.edit { putInt(SpfConfig.GAME_TOOL_PERF, value) }
+    val govList = cpu_av_gov(context, 1)
+    val govLow = if (govList.contains("walt")) "walt" else "schedutil"
+    val govBal = if (govList.contains("game_walt")) "game_walt"
+    else if (govList.contains("game")) "game" else govLow
+    val govPro = if (govList.contains("performance")) "performance" else govBal
+
+    var thermalVal = -1
+    var govVal = govLow
+    var opVal = 0
+    var boostVal = 0
+    when (value) {
+        2 -> {
+            opVal = 1
+            boostVal = 3
+            thermalVal = 10
+            govVal = govPro
+        }
+        1 -> {
+            boostVal = 2
+            opVal = 2
+            thermalVal = 16
+            govVal = govBal
+        }
+    }
+
+    if (globalSPF.getBoolean(SpfConfig.PERF_MODE, false)) {
+        if (hasModule(GAME_AI) && globalSPF.getBoolean(SpfConfig.GAME_AI, false)) {
+            var data = getGameList(context, onFocusedApp)
+            if (data.isEmpty())
+                data =
+                    "{#pkg#: #$onFocusedApp#, #gm#: 0, #op#: 0, #gov#: #$govLow#, #t#: -1, #gpu#: 0}"
+            val oprofile = strToInt(parserGameList(data, "op"))
+            val governor = parserGameList(data, "gov")
+            val thermal = strToInt(parserGameList(data, "t"))
+            val getDataold = data
+            data = data.replace("#op#: $oprofile", "#op#: $opVal")
+                .replace("#gov#: #$governor#", "#gov#: #$govVal#")
+                .replace("#t#: $thermal", "#t#: $thermalVal")
+            if (getDataold != data)
+                setData(getDataold, data, context)
+            setPerfMode(opVal, boostVal, thermalVal, govVal, prefs, context)
+        } else {
+            globalSPF.edit { putInt(SpfConfig.PROFILE_MODE, opVal) }
+            setPerfMode(opVal, boostVal, thermalVal, govVal, prefs, context)
+        }
+    } else {
+        setPerfMode(opVal, boostVal, thermalVal, govVal, prefs, context)
+    }
+}
+
+fun setPerfMode(op: Int, boost: Int, thermal: Int, gov: String, prefs: SharedPreferences, context: Context) {
+    prefs.edit()
+        .putInt("thermal", thermal)
+        .putString("cpu2_gov", gov)
+        .putString("cpu1_gov", gov)
+        .apply()
+    if (hasModule(CPU_PRIME_GOV))
+        prefs.edit { putString("cpu3_gov", gov) }
+    if (hasModule("${getGPUPath(context)}/$ADRENO_BOOST"))
+        prefs.edit { putInt("gpu_adreno_boost", boost) }
+    if (hasModule(OPROFILE))
+        setKernel("$op", OPROFILE)
+    runProfileWorker(context)
+ /*   setKernel("$thermal", THERMAL_PROFILE)
+    setKernel(gov, CPU_LITTLE_GOV)
+    setKernel(gov, CPU_BIG_GOV)
+    if (hasModule(CPU_PRIME_GOV))
+        setKernel(gov, CPU_PRIME_GOV)*/
+}
+
+fun getDefCIB(defSpf: SharedPreferences){
+    if (defSpf.all.isEmpty() && hasModule(INPUT_BOOST_DURATION)) {
+        defSpf.edit { putInt("cpu_freq_idle_big", strToInt(readKernel(CPU_FREQ_IDLE_BIG))) }
+        defSpf.edit { putInt("cpu_freq_idle_little", strToInt(readKernel(CPU_FREQ_IDLE_LITTLE))) }
+        defSpf.edit { putInt("cpu_freq_idle_prime", strToInt(readKernel(CPU_FREQ_IDLE_PRIME))) }
+        defSpf.edit { putInt("cpu_freq_min_big", strToInt(readKernel(CPU_FREQ_MIN_BIG))) }
+        defSpf.edit { putInt("cpu_freq_min_little", strToInt(readKernel(CPU_FREQ_MIN_LITTLE))) }
+        defSpf.edit { putInt("cpu_freq_min_prime", strToInt(readKernel(CPU_FREQ_MIN_PRIME))) }
+        defSpf.edit { putInt("input_boost_duration", strToInt(readKernel(INPUT_BOOST_DURATION))) }
+        defSpf.edit { putInt("input_boost_freq_big", strToInt(readKernel(INPUT_BOOST_FREQ_BIG))) }
+        defSpf.edit { putInt("input_boost_freq_little", strToInt(readKernel(INPUT_BOOST_FREQ_LITTLE))) }
+        defSpf.edit { putInt("input_boost_freq_prime", strToInt(readKernel(INPUT_BOOST_FREQ_PRIME))) }
+        defSpf.edit { putInt("max_boost_freq_big", strToInt(readKernel(MAX_BOOST_FREQ_BIG))) }
+        defSpf.edit { putInt("max_boost_freq_little", strToInt(readKernel(MAX_BOOST_FREQ_LITTLE))) }
+        defSpf.edit { putInt("max_boost_freq_prime", strToInt(readKernel(MAX_BOOST_FREQ_PRIME))) }
+        defSpf.edit { putInt("wake_boost_duration", strToInt(readKernel(WAKE_BOOST_DURATION))) }
+    }
+}
+
+fun resetCIB(prefs: SharedPreferences, defSpf: SharedPreferences){
+    if (!defSpf.all.isEmpty() && hasModule(INPUT_BOOST_DURATION)) {
+        prefs.edit { putInt("cpu_freq_idle_big", defSpf.getInt("cpu_freq_idle_big", strToInt(readKernel(CPU_FREQ_IDLE_BIG)))) }
+        prefs.edit { putInt("cpu_freq_idle_little", defSpf.getInt("cpu_freq_idle_little", strToInt(readKernel(CPU_FREQ_IDLE_LITTLE)))) }
+        prefs.edit { putInt("cpu_freq_idle_prime", defSpf.getInt("cpu_freq_idle_prime", strToInt(readKernel(CPU_FREQ_IDLE_PRIME)))) }
+        prefs.edit { putInt("cpu_freq_min_big", defSpf.getInt("cpu_freq_min_big", strToInt(readKernel(CPU_FREQ_MIN_BIG)))) }
+        prefs.edit { putInt("cpu_freq_min_little", defSpf.getInt("cpu_freq_min_little", strToInt(readKernel(CPU_FREQ_MIN_LITTLE)))) }
+        prefs.edit { putInt("cpu_freq_min_prime", defSpf.getInt("cpu_freq_min_prime", strToInt(readKernel(CPU_FREQ_MIN_PRIME)))) }
+        prefs.edit { putInt("input_boost_duration", defSpf.getInt("input_boost_duration", strToInt(readKernel(INPUT_BOOST_DURATION)))) }
+        prefs.edit { putInt("input_boost_freq_big", defSpf.getInt("input_boost_freq_big", strToInt(readKernel(INPUT_BOOST_FREQ_BIG)))) }
+        prefs.edit { putInt("input_boost_freq_little", defSpf.getInt("input_boost_freq_little", strToInt(readKernel(INPUT_BOOST_FREQ_LITTLE)))) }
+        prefs.edit { putInt("input_boost_freq_prime", defSpf.getInt("input_boost_freq_prime", strToInt(readKernel(INPUT_BOOST_FREQ_PRIME)))) }
+        prefs.edit { putInt("max_boost_freq_big", defSpf.getInt("max_boost_freq_big", strToInt(readKernel(MAX_BOOST_FREQ_BIG)))) }
+        prefs.edit { putInt("max_boost_freq_little", defSpf.getInt("max_boost_freq_little", strToInt(readKernel(MAX_BOOST_FREQ_LITTLE)))) }
+        prefs.edit { putInt("max_boost_freq_prime", defSpf.getInt("max_boost_freq_prime", strToInt(readKernel(MAX_BOOST_FREQ_PRIME)))) }
+        prefs.edit { putInt("wake_boost_duration", defSpf.getInt("wake_boost_duration", strToInt(readKernel(WAKE_BOOST_DURATION)))) }
+    }
 }

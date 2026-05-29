@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -23,12 +22,14 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -111,12 +112,15 @@ import com.diphons.dkmsu.ui.util.launchApp
 import com.diphons.dkmsu.ui.util.parseAdrenoBoost
 import com.diphons.dkmsu.ui.util.readKernel
 import com.diphons.dkmsu.ui.util.reloadData
+import com.diphons.dkmsu.ui.util.resetCIB
 import com.diphons.dkmsu.ui.util.restartApp
+import com.diphons.dkmsu.ui.util.setData
 import com.diphons.dkmsu.ui.util.setGameList
 import com.diphons.dkmsu.ui.util.stringToList
 import com.diphons.dkmsu.ui.util.stringToList2
 import com.diphons.dkmsu.ui.util.thermalList
 import com.diphons.dkmsu.ui.viewmodel.AIViewModel
+import com.ramcosta.composedestinations.generated.destinations.CpuInputBoostScreenDestination
 
 /**
  * @author diphons
@@ -134,6 +138,7 @@ fun AppGameAIScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val globalConfig = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
     val prefs = context.getSharedPreferences("game_ai", Context.MODE_PRIVATE)
+    val defSpf = context.getSharedPreferences("cib", Context.MODE_PRIVATE)
 
     val packageName = appInfo.packageName
     val perapp = context.getSharedPreferences(packageName, Context.MODE_PRIVATE)
@@ -218,7 +223,7 @@ fun AppGameAIScreen(
         mutableStateOf(if (getGameDef.contains(packageName)) context.getString(R.string.reset) else context.getString(R.string.remove))
     }
     var resetVisible by rememberSaveable {
-        mutableStateOf(if (getGameNewList.contains(packageName)) true else false)
+        mutableStateOf(getGameNewList.contains(packageName))
     }
     val resetVisible2 by rememberSaveable {
         mutableStateOf(globalConfig.getString(SpfConfig.PER_APP_LIST, "")!!.contains(packageName))
@@ -240,25 +245,6 @@ fun AppGameAIScreen(
         getList = globalConfig.getString(SpfConfig.PER_APP_LIST, "")
     }
 
-    fun setData(before: String, after: String){
-        var dataSource = "${prefs.getString("game_ai_list", "")}"
-        if (after.isNotEmpty()) {
-            if (dataSource.isEmpty())
-                dataSource = after
-            else {
-                if (dataSource.contains(before))
-                    dataSource = dataSource.replace(before, after)
-                else
-                    dataSource = "$dataSource\n$after"
-            }
-            prefs.edit { putString("game_ai_list", dataSource) }
-        }
-        setGameList(context)
-
-        // Reload after update data
-        dataSource = "${prefs.getString("game_ai_list", "")}"
-        getGameNewList = dataSource
-    }
     fun removeData(data: String){
         var dataSource = "${prefs.getString("game_ai_list", "")}"
         if (data.isNotEmpty()) {
@@ -273,11 +259,17 @@ fun AppGameAIScreen(
     var refreshrete by rememberSaveable { mutableStateOf(
         perapp.getString(SpfConfig.REFRESH_RATE, "Default")
     )}
+    var kill_app by rememberSaveable {
+        mutableStateOf(perapp.getBoolean(SpfConfig.KILL_APP, false))
+    }
     var fps_monitor by rememberSaveable {
         mutableStateOf(perapp.getBoolean(SpfConfig.MONITOR_MINI, false))
     }
     var touch_sample by rememberSaveable {
         mutableStateOf(perapp.getBoolean(SpfConfig.TOUCH_SAMPLE, false))
+    }
+    var keep_app by rememberSaveable {
+        mutableStateOf(perapp.getBoolean(SpfConfig.KEEP_APP, false))
     }
     var seek_microfon by rememberSaveable {
         mutableStateOf(perapp.getFloat(SpfConfig.SC_MICROFON, 0f))
@@ -433,7 +425,7 @@ fun AppGameAIScreen(
                             data = data.replace(getdata, "#gov#: #$getValueDialog#")
                             governor = getValueDialog
                         }
-                        setData(getDataold, data)
+                        setData(getDataold, data, prefs, context)
                         updateVisible()
                     }
                     dialogEvent = null
@@ -468,7 +460,7 @@ fun AppGameAIScreen(
                                 "#gpu#: ${parseAdrenoBoost(context, getValueDialog)}"
                             )
                             adreno = getValueDialog
-                            setData(getdataold, data)
+                            setData(getdataold, data, prefs, context)
                         }
                         updateVisible()
                     }
@@ -508,7 +500,7 @@ fun AppGameAIScreen(
                             "#t#: ${if (getThermalVal.contains("-")) "#$getThermalVal#" else getThermalVal}"
                         )
                         thermal = getThermalInt(context, getValueDialog, gki_mode)
-                        setData(getDataOld, data)
+                        setData(getDataOld, data, prefs, context)
                         updateVisible()
                     }
                     dialogEvent = null
@@ -570,9 +562,11 @@ fun AppGameAIScreen(
         dialogEvent = DialogEvent(DialogType.Gpu, 0, mode, title, gpu_ref, gpu_def)
     }
     fun resetValue(){
+        perapp.edit { putBoolean(SpfConfig.GAME_TOOL, false) }
         perapp.edit { putString(SpfConfig.REFRESH_RATE, "Default") }
         perapp.edit { putBoolean(SpfConfig.MONITOR_MINI, false) }
         perapp.edit { putBoolean(SpfConfig.TOUCH_SAMPLE, false) }
+        perapp.edit { putBoolean(SpfConfig.KEEP_APP, false) }
         perapp.edit { putFloat(SpfConfig.SC_MICROFON, 0f) }
         perapp.edit { putFloat(SpfConfig.SC_EARFON, 0f) }
         perapp.edit { putBoolean(SpfConfig.SC_SWITCH_HEADFON, false) }
@@ -584,6 +578,7 @@ fun AppGameAIScreen(
         perapp.edit { putInt("gpu_min_freq", getGPUMinFreq(context)) }
         perapp.edit { putString("gpu_gov", readKernel(getGPUPath(context), GPU_GOV)) }
         perapp.edit { putInt("gpu_def_power", gpuMaxPwrLevel(context)) }
+        perapp.edit { putBoolean(SpfConfig.KILL_APP, false) }
     }
     Scaffold(
         topBar = {
@@ -605,6 +600,7 @@ fun AppGameAIScreen(
                         getList = getList!!.replace(packageName, "")
                     globalConfig.edit { putString(SpfConfig.PER_APP_LIST, getList) }
                     resetValue()
+                    resetCIB(prefs, defSpf)
                     RootUtils.runCommand("rm -fr /data/data/${context.packageName}/shared_prefs/$packageName.xml")
                     navigator.popBackStack()
                     removeMode = false
@@ -630,121 +626,142 @@ fun AppGameAIScreen(
                         .padding(start = 5.dp, end = 5.dp)
                 ) {
                     SwitchItem(
-                        title = stringResource(id = R.string.game_mode),
-                        checked = game_mode == 1,
+                        title = stringResource(id = R.string.kill_app),
+                        checked = kill_app,
                         onCheckedChange = {
-                            if (removeMode)
-                                game_mode = if (it) 1 else 0
-                            else {
-                                getdata = "#gm#: $game_mode"
-                                val getdataold = data
-                                game_mode = if (it) 1 else 0
-                                data =
-                                    data.replace(getdata, "#gm#: $game_mode")
-
-                                setData(getdataold, data)
-                                updateVisible()
-                            }
+                            kill_app = it
+                            perapp.edit { putBoolean(SpfConfig.KILL_APP, it) }
+                            updateVisible()
                         },
                     )
                 }
             }
-
-            if (getFPSCount() > 1) {
-                @Composable
-                fun RefreshRateDropdownItem(title: String, reason: Int) {
-                    DropdownMenuItem(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        text = {
-                            Text(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                text = title,
-                                textAlign = TextAlign.Center
-                            )
-                        }, onClick = {
-                            refreshrete = if (reason == 0) "Default" else "$reason"
-                            perapp.edit { putString(SpfConfig.REFRESH_RATE, "$reason") }
-                            showDropdown = false
-                            updateVisible()
-                        })
-                }
+            if (!kill_app) {
 
                 ElevatedCard {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(
-                                22.dp
-                            )
+                            .padding(start = 5.dp, end = 5.dp)
                     ) {
-                        Box(
+                        SwitchItem(
+                            title = stringResource(id = R.string.game_mode),
+                            checked = game_mode == 1,
+                            onCheckedChange = {
+                                perapp.edit { putBoolean(SpfConfig.GAME_TOOL, it) }
+                                if (removeMode)
+                                    game_mode = if (it) 1 else 0
+                                else {
+                                    getdata = "#gm#: $game_mode"
+                                    val getdataold = data
+                                    game_mode = if (it) 1 else 0
+                                    data =
+                                        data.replace(getdata, "#gm#: $game_mode")
+
+                                    setData(getdataold, data, prefs, context)
+                                    updateVisible()
+                                }
+                            },
+                        )
+                    }
+                }
+
+                if (getFPSCount() > 1) {
+                    @Composable
+                    fun RefreshRateDropdownItem(title: String, reason: Int) {
+                        DropdownMenuItem(
                             modifier = Modifier
                                 .fillMaxWidth(),
-                        ) {
-                            Text(
-                                modifier = Modifier
-                                    .align(Alignment.CenterStart)
-                                    .padding(end = 80.dp),
-                                text = stringResource(R.string.refresh_rate),
-                                fontSize = 16.sp,
-                                style = MaterialTheme.typography.titleSmall
-                            )
-
-                            ElevatedCard(
-                                colors = CardDefaults.elevatedCardColors(containerColor = run {
-                                    MaterialTheme.colorScheme.primary
-                                }),
-                                modifier = Modifier
-                                    .align(Alignment.CenterEnd)
-                            ) {
-                                Row(
+                            text = {
+                                Text(
                                     modifier = Modifier
-                                        .clickable {
-                                            showDropdown = true
-                                        }
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                    ) {
-                                        Text(
-                                            modifier = Modifier
-                                                .padding(
-                                                    top = 9.dp,
-                                                    bottom = 9.dp,
-                                                    start = 15.dp,
-                                                    end = 32.dp
-                                                ),
-                                            text = "$refreshrete${if (refreshrete!!.contains("Default")) "" else " Hz"}",
-                                            fontSize = 16.sp,
-                                            style = MaterialTheme.typography.titleSmall,
-                                            textAlign = TextAlign.Center
-                                        )
+                                        .fillMaxWidth(),
+                                    text = title,
+                                    textAlign = TextAlign.Center
+                                )
+                            }, onClick = {
+                                refreshrete = if (reason == 0) "Default" else "$reason"
+                                perapp.edit { putString(SpfConfig.REFRESH_RATE, "$reason") }
+                                showDropdown = false
+                                updateVisible()
+                            })
+                    }
 
-                                        Row(
+                    ElevatedCard {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    22.dp
+                                )
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                            ) {
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterStart)
+                                        .padding(end = 80.dp),
+                                    text = stringResource(R.string.refresh_rate),
+                                    fontSize = 16.sp,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+
+                                ElevatedCard(
+                                    colors = CardDefaults.elevatedCardColors(containerColor = run {
+                                        MaterialTheme.colorScheme.primary
+                                    }),
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .clickable {
+                                                showDropdown = true
+                                            }
+                                    ) {
+                                        Box(
                                             modifier = Modifier
-                                                .align(Alignment.CenterEnd)
-                                                .padding(end = 6.dp)
                                         ) {
-                                            Icon(
-                                                Icons.Filled.KeyboardArrowDown, "",
+                                            Text(
+                                                modifier = Modifier
+                                                    .padding(
+                                                        top = 9.dp,
+                                                        bottom = 9.dp,
+                                                        start = 15.dp,
+                                                        end = 32.dp
+                                                    ),
+                                                text = "$refreshrete${if (refreshrete!!.contains("Default")) "" else " Hz"}",
+                                                fontSize = 16.sp,
+                                                style = MaterialTheme.typography.titleSmall,
+                                                textAlign = TextAlign.Center
                                             )
-                                        }
-                                    }
-                                    if (getFPSCount() > 1) {
-                                        DropdownMenu(
-                                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                                            expanded = showDropdown, onDismissRequest = {
-                                                showDropdown = false
-                                            }) {
-                                            RefreshRateDropdownItem("Default", reason = 0)
-                                            for (i in 1..getFPSCount()) {
-                                                RefreshRateDropdownItem(
-                                                    "${getfpsbyid(i)} Hz", reason = strToInt(
-                                                        getfpsbyid(i)
-                                                    )
+
+                                            Row(
+                                                modifier = Modifier
+                                                    .align(Alignment.CenterEnd)
+                                                    .padding(end = 6.dp)
+                                            ) {
+                                                Icon(
+                                                    Icons.Filled.KeyboardArrowDown, "",
                                                 )
+                                            }
+                                        }
+                                        if (getFPSCount() > 1) {
+                                            DropdownMenu(
+                                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                                expanded = showDropdown, onDismissRequest = {
+                                                    showDropdown = false
+                                                }) {
+                                                RefreshRateDropdownItem("Default", reason = 0)
+                                                for (i in 1..getFPSCount()) {
+                                                    RefreshRateDropdownItem(
+                                                        "${getfpsbyid(i)} Hz", reason = strToInt(
+                                                            getfpsbyid(i)
+                                                        )
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -753,30 +770,7 @@ fun AppGameAIScreen(
                         }
                     }
                 }
-            }
 
-            ElevatedCard {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
-                ) {
-                    SwitchItem(
-                        title = stringResource(R.string.fps_monitor_show),
-                        checked = fps_monitor,
-                        summary = if (fps_monitor)
-                            stringResource(R.string.fps_monitor_show_disable)
-                        else
-                            stringResource(R.string.fps_monitor_show_enable)
-                    ) {
-                        perapp.edit { putBoolean(SpfConfig.MONITOR_MINI, it) }
-                        fps_monitor = it
-                        updateVisible()
-                    }
-                }
-            }
-
-            if (hasModule(TOUCH_SAMPLE) || hasModule(TOUCH_SAMPLE_GOODIX)) {
                 ElevatedCard {
                     Column(
                         modifier = Modifier
@@ -784,213 +778,69 @@ fun AppGameAIScreen(
                             .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
                     ) {
                         SwitchItem(
-                            title = stringResource(id = R.string.touch_sample),
-                            checked = touch_sample,
-                            summary = stringResource(id = R.string.touch_sample_sum)
+                            title = stringResource(R.string.fps_monitor_show),
+                            checked = fps_monitor,
+                            summary = if (fps_monitor)
+                                stringResource(R.string.fps_monitor_show_disable)
+                            else
+                                stringResource(R.string.fps_monitor_show_enable)
                         ) {
-                            perapp.edit { putBoolean(SpfConfig.TOUCH_SAMPLE, it) }
-                            touch_sample = it
+                            perapp.edit { putBoolean(SpfConfig.MONITOR_MINI, it) }
+                            fps_monitor = it
                             updateVisible()
                         }
                     }
                 }
-            }
 
-            ElevatedCard {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            dialogEvent = DialogEvent(
-                                DialogType.Cpu, 0, 1,
-                                "Profile Mode",
-                                "${context.getString(R.string.balance)} ${context.getString(R.string.performance)} ${context.getString(R.string.game)} ${context.getString(R.string.battery)}",
-                                getProfileString(context, oprofile))
+                if (hasModule(TOUCH_SAMPLE) || hasModule(TOUCH_SAMPLE_GOODIX)) {
+                    ElevatedCard {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
+                        ) {
+                            SwitchItem(
+                                title = stringResource(id = R.string.touch_sample),
+                                checked = touch_sample,
+                                summary = stringResource(id = R.string.touch_sample_sum)
+                            ) {
+                                perapp.edit { putBoolean(SpfConfig.TOUCH_SAMPLE, it) }
+                                touch_sample = it
+                                updateVisible()
+                            }
+                        }
+                    }
+                }
 
+                ElevatedCard {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
+                    ) {
+                        SwitchItem(
+                            title = stringResource(R.string.keep_app_process),
+                            checked = keep_app,
+                            summary = stringResource(R.string.keep_app_process_sum)
+                        ) {
+                            perapp.edit { putBoolean(SpfConfig.KEEP_APP, it) }
+                            keep_app = it
+                            updateVisible()
                         }
-                        .padding(vertical = 10.dp, horizontal = 22.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .align(Alignment.CenterStart),
-                        text = "Profile Mode"
-                    )
-                    Text(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .align(Alignment.CenterEnd),
-                        text = getProfileString(context, oprofile),
-                        textAlign = TextAlign.Center
-                    )
+                    }
                 }
-            }
 
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 22.dp)
-                        .padding(top = 15.dp, bottom = 10.dp),
-                    text = "CPU",
-                    fontSize = 15.sp,
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            dialogEvent = DialogEvent(
-                                DialogType.Cpu, 1, 0,
-                                "CPU Governor",
-                                cpu_av_gov(context, 1),
-                                governor)
-                        }
-                        .padding(vertical = 10.dp, horizontal = 22.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .align(Alignment.CenterStart),
-                        text = "Governor",
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .align(Alignment.CenterEnd),
-                        text = governor,
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-
-            ElevatedCard {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp, horizontal = 22.dp),
-                    text = "GPU",
-                    fontSize = 15.sp,
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            setGpu("Choose GPU Max Freq", 0)
-                        }
-                        .padding(vertical = 10.dp, horizontal = 22.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart),
-                        text = "Max Freq",
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd),
-                        text = "${gpu_max_freq / 1000000} Mhz",
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            setGpu("Choose GPU Min Freq", 1)
-                        }
-                        .padding(vertical = 10.dp, horizontal = 22.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart),
-                        text = "Min Freq",
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd),
-                        text = "${gpu_min_freq / 1000000} Mhz",
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            setGpu("Choose GPU Governor", 2)
-                        }
-                        .padding(vertical = 10.dp, horizontal = 22.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart),
-                        text = "Governor",
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd),
-                        text = "$gpu_gov",
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            setGpu("Choose GPU Default Power Level", 3)
-                        }
-                        .padding(vertical = 10.dp, horizontal = 22.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart),
-                        text = "Default Power Level",
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd),
-                        text = "$gpu_def_power",
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                if (hasAdrenoBoost) {
+                ElevatedCard {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
                                 dialogEvent = DialogEvent(
-                                    DialogType.Gpu, 0, 4,
-                                    "Choose Adreno Boost Level",
-                                    "${context.getString(R.string.off)} ${context.getString(R.string.low)} ${
-                                        context.getString(
-                                            R.string.medium
-                                        )
-                                    } ${context.getString(R.string.high)}",
-                                    parseAdrenoBoost(context, strToInt(adreno))
-                                )
+                                    DialogType.Cpu, 0, 1,
+                                    "Profile Mode",
+                                    "${context.getString(R.string.balance)} ${context.getString(R.string.performance)} ${context.getString(R.string.game)} ${context.getString(R.string.battery)}",
+                                    getProfileString(context, oprofile))
+
                             }
                             .padding(vertical = 10.dp, horizontal = 22.dp)
                     ) {
@@ -998,7 +848,48 @@ fun AppGameAIScreen(
                             modifier = Modifier
                                 .padding(vertical = 8.dp)
                                 .align(Alignment.CenterStart),
-                            text = "Adreno Boost",
+                            text = "Profile Mode"
+                        )
+                        Text(
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .align(Alignment.CenterEnd),
+                            text = getProfileString(context, oprofile),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 22.dp)
+                            .padding(top = 15.dp, bottom = 10.dp),
+                        text = "CPU",
+                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                dialogEvent = DialogEvent(
+                                    DialogType.Cpu, 1, 0,
+                                    "CPU Governor",
+                                    cpu_av_gov(context, 1),
+                                    governor)
+                            }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .align(Alignment.CenterStart),
+                            text = "Governor",
                             fontSize = 13.sp,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -1006,317 +897,337 @@ fun AppGameAIScreen(
                             modifier = Modifier
                                 .padding(vertical = 8.dp)
                                 .align(Alignment.CenterEnd),
-                            text = parseAdrenoBoost(context, strToInt(adreno)),
+                            text = governor,
                             textAlign = TextAlign.Center,
                             fontSize = 13.sp,
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
-            }
 
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp, horizontal = 22.dp),
-                    text = "Thermal",
-                    fontSize = 15.sp,
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            dialogEvent = DialogEvent(
-                                DialogType.Thermal, 0, 0,
-                                "Choose Thermal Profile",
-                                thermalList(context, gki_mode),
-                                getThermalString(context, thermal, gki_mode))
-                        }
-                        .padding(vertical = 10.dp, horizontal = 22.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart),
-                        text = "Profile",
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd),
-                        text = getThermalString(context, thermal, gki_mode),
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp, horizontal = 22.dp),
-                    text = "IO Sched",
-                    fontSize = 15.sp,
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            dialogEvent = DialogEvent(
-                                DialogType.Io, 0, 0,
-                                "Choose IO Scheduler",
-                                getListIOSched(),
-                                "${perapp.getString("io_sched", getDefIOSched())}"
+                if (hasModule(INPUT_BOOST_DURATION)) {
+                    ElevatedCard {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    navigator.navigate(CpuInputBoostScreenDestination(appInfo.packageName))
+                                }
+                                .padding(23.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column (modifier = Modifier
+                                .weight(3f)
+                            ){
+                                Text(
+                                    text = "CPU Input Boost",
+                                    fontSize = 16.sp,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = null
                             )
                         }
-                        .padding(vertical = 10.dp, horizontal = 22.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart),
-                        text = "Profile",
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd),
-                        text = "$io_sched",
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    }
                 }
-            }
 
-            ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp, horizontal = 22.dp),
-                    text = "TCP Congestion",
-                    fontSize = 15.sp,
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            dialogEvent = DialogEvent(
-                                DialogType.Io, 0, 0,
-                                "Choose TCP Congestion",
-                                readKernel(TCP_CONGS_AV),
-                                "$tcp_congs"
-                            )
-                        }
-                        .padding(vertical = 10.dp, horizontal = 22.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterStart),
-                        text = "Profile",
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd),
-                        text = "$tcp_congs",
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-
-            if (hasModule(SOUND_CONTROL)) {
                 ElevatedCard {
-                    Column(
+                    Text(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                            .padding(vertical = 10.dp, horizontal = 22.dp),
+                        text = "GPU",
+                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                setGpu("Choose GPU Max Freq", 0)
+                            }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
                     ) {
                         Text(
                             modifier = Modifier
-                                .padding(start = 16.dp, top = 5.dp),
-                            text = stringResource(id = R.string.microphone_gain)
+                                .align(Alignment.CenterStart),
+                            text = "Max Freq",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
                         )
-                        Box (
-                            modifier = Modifier.fillMaxWidth()
-                                .padding(start = 9.dp, end = 22.dp),
-                        ){
-                            Slider(
-                                modifier = Modifier
-                                    .padding(end = 30.dp),
-                                value = seek_microfon,
-                                onValueChange = {
-                                    perapp.edit { putFloat(SpfConfig.SC_MICROFON, it) }
-                                    seek_microfon = it
-                                    updateVisible()
-                                },
-                                colors = SliderDefaults.colors(
-                                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                                    inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
-                                        alpha = 0.4f
-                                    )
-                                ),
-                                thumb = {
-                                    SliderDefaults.Thumb(interactionSource = remember {
-                                        MutableInteractionSource()
-                                    },
-                                        thumbSize = DpSize(20.dp, 20.dp),
-                                        colors = SliderDefaults.colors(
-                                            thumbColor = MaterialTheme.colorScheme.primary
-                                        )
-                                    )
-                                }
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .align(Alignment.CenterEnd)
-                                    .padding(bottom = 1.dp),
-                                text = "${(seek_microfon * 100).toInt() * 20 / 100}")
-                        }
-
-                        Spacer(modifier = Modifier.height(5.dp))
                         Text(
                             modifier = Modifier
-                                .padding(start = 16.dp, top = 5.dp),
-                            text = stringResource(id = R.string.earpiece_gain)
+                                .align(Alignment.CenterEnd),
+                            text = "${gpu_max_freq / 1000000} Mhz",
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
                         )
-                        Box (
-                            modifier = Modifier.fillMaxWidth()
-                                .padding(start = 9.dp, end = 22.dp),
-                        ){
-                            Slider(
-                                modifier = Modifier
-                                    .padding(end = 30.dp),
-                                value = seek_earfon,
-                                onValueChange = {
-                                    perapp.edit { putFloat(SpfConfig.SC_EARFON, it) }
-                                    seek_earfon = it
-                                    updateVisible()
-                                },
-                                colors = SliderDefaults.colors(
-                                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                                    inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
-                                        alpha = 0.4f
-                                    )
-                                ),
-                                thumb = {
-                                    SliderDefaults.Thumb(interactionSource = remember {
-                                        MutableInteractionSource()
-                                    },
-                                        thumbSize = DpSize(20.dp, 20.dp),
-                                        colors = SliderDefaults.colors(
-                                            thumbColor = MaterialTheme.colorScheme.primary
-                                        )
-                                    )
-                                }
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .align(Alignment.CenterEnd)
-                                    .padding(bottom = 1.dp),
-                                text = "${(seek_earfon * 100).toInt() * 20 / 100}")
-                        }
-
-                        Spacer(modifier = Modifier.height(5.dp))
-                        SwitchItem(
-                            title = stringResource(id = R.string.per_channel_controls),
-                            checked = switch_headfon
-                        ) {
-                            perapp.edit { putBoolean("sc_switch_headfon", it) }
-                            switch_headfon = it
-                            if (!switch_headfon) {
-                                seek_headfon2 = seek_headfon
-                                perapp.edit {
-                                    putFloat("sc_headfon2", seek_headfon2)
-                                }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                setGpu("Choose GPU Min Freq", 1)
                             }
-                            updateVisible()
-                        }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
+                    ) {
                         Text(
                             modifier = Modifier
-                                .padding(start = 16.dp),
-                            text = if (switch_headfon) stringResource(id = R.string.headphone_gain_left) else stringResource(id = R.string.headphone_gain)
+                                .align(Alignment.CenterStart),
+                            text = "Min Freq",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
                         )
-                        Box (
-                            modifier = Modifier.fillMaxWidth()
-                                .padding(start = 9.dp, end = 22.dp),
-                        ){
-                            Slider(
-                                modifier = Modifier
-                                    .padding(end = 30.dp),
-                                value = seek_headfon,
-                                onValueChange = {
-                                    perapp.edit { putFloat(SpfConfig.SC_HEADFON, it) }
-                                    if (!switch_headfon) {
-                                        perapp.edit {
-                                            putFloat(SpfConfig.SC_HEADFON2, it)
-                                        }
-                                        seek_headfon2 = it
-                                    }
-                                    seek_headfon = it
-                                    updateVisible()
-                                },
-                                colors = SliderDefaults.colors(
-                                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                                    inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
-                                        alpha = 0.4f
-                                    )
-                                ),
-                                thumb = {
-                                    SliderDefaults.Thumb(interactionSource = remember {
-                                        MutableInteractionSource()
-                                    },
-                                        thumbSize = DpSize(20.dp, 20.dp),
-                                        colors = SliderDefaults.colors(
-                                            thumbColor = MaterialTheme.colorScheme.primary
-                                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd),
+                            text = "${gpu_min_freq / 1000000} Mhz",
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                setGpu("Choose GPU Governor", 2)
+                            }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart),
+                            text = "Governor",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd),
+                            text = "$gpu_gov",
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                setGpu("Choose GPU Default Power Level", 3)
+                            }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart),
+                            text = "Default Power Level",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd),
+                            text = "$gpu_def_power",
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    if (hasAdrenoBoost) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    dialogEvent = DialogEvent(
+                                        DialogType.Gpu, 0, 4,
+                                        "Choose Adreno Boost Level",
+                                        "${context.getString(R.string.off)} ${context.getString(R.string.low)} ${
+                                            context.getString(
+                                                R.string.medium
+                                            )
+                                        } ${context.getString(R.string.high)}",
+                                        parseAdrenoBoost(context, strToInt(adreno))
                                     )
                                 }
+                                .padding(vertical = 10.dp, horizontal = 22.dp)
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp)
+                                    .align(Alignment.CenterStart),
+                                text = "Adreno Boost",
+                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodySmall
                             )
                             Text(
                                 modifier = Modifier
-                                    .align(Alignment.CenterEnd)
-                                    .padding(bottom = 1.dp),
-                                text = "${(seek_headfon * 100).toInt() * 20 / 100}")
+                                    .padding(vertical = 8.dp)
+                                    .align(Alignment.CenterEnd),
+                                text = parseAdrenoBoost(context, strToInt(adreno)),
+                                textAlign = TextAlign.Center,
+                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
+                    }
+                }
 
-                        if (switch_headfon) {
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp, horizontal = 22.dp),
+                        text = "Thermal",
+                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                dialogEvent = DialogEvent(
+                                    DialogType.Thermal, 0, 0,
+                                    "Choose Thermal Profile",
+                                    thermalList(context, gki_mode),
+                                    getThermalString(context, thermal, gki_mode))
+                            }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart),
+                            text = "Profile",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd),
+                            text = getThermalString(context, thermal, gki_mode),
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp, horizontal = 22.dp),
+                        text = "IO Sched",
+                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                dialogEvent = DialogEvent(
+                                    DialogType.Io, 0, 0,
+                                    "Choose IO Scheduler",
+                                    getListIOSched(),
+                                    "${perapp.getString("io_sched", getDefIOSched())}"
+                                )
+                            }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart),
+                            text = "Profile",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd),
+                            text = "$io_sched",
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                ElevatedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp, horizontal = 22.dp),
+                        text = "TCP Congestion",
+                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                dialogEvent = DialogEvent(
+                                    DialogType.Io, 0, 0,
+                                    "Choose TCP Congestion",
+                                    readKernel(TCP_CONGS_AV),
+                                    "$tcp_congs"
+                                )
+                            }
+                            .padding(vertical = 10.dp, horizontal = 22.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart),
+                            text = "Profile",
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        Text(
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd),
+                            text = "$tcp_congs",
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
+                if (hasModule(SOUND_CONTROL)) {
+                    ElevatedCard {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                        ) {
                             Text(
                                 modifier = Modifier
-                                    .padding(start = 16.dp),
-                                text = stringResource(id = R.string.headphone_gain_right)
+                                    .padding(start = 16.dp, top = 5.dp),
+                                text = stringResource(id = R.string.microphone_gain)
                             )
-                            Box(
+                            Box (
                                 modifier = Modifier.fillMaxWidth()
                                     .padding(start = 9.dp, end = 22.dp),
-                            ) {
+                            ){
                                 Slider(
                                     modifier = Modifier
                                         .padding(end = 30.dp),
-                                    value = seek_headfon2,
+                                    value = seek_microfon,
                                     onValueChange = {
-                                        perapp.edit {
-                                            putFloat(SpfConfig.SC_HEADFON2, it)
-                                        }
-                                        seek_headfon2 = it
+                                        perapp.edit { putFloat(SpfConfig.SC_MICROFON, it) }
+                                        seek_microfon = it
                                         updateVisible()
                                     },
                                     colors = SliderDefaults.colors(
@@ -1326,10 +1237,9 @@ fun AppGameAIScreen(
                                         )
                                     ),
                                     thumb = {
-                                        SliderDefaults.Thumb(
-                                            interactionSource = remember {
-                                                MutableInteractionSource()
-                                            },
+                                        SliderDefaults.Thumb(interactionSource = remember {
+                                            MutableInteractionSource()
+                                        },
                                             thumbSize = DpSize(20.dp, 20.dp),
                                             colors = SliderDefaults.colors(
                                                 thumbColor = MaterialTheme.colorScheme.primary
@@ -1341,8 +1251,161 @@ fun AppGameAIScreen(
                                     modifier = Modifier
                                         .align(Alignment.CenterEnd)
                                         .padding(bottom = 1.dp),
-                                    text = "${(seek_headfon2 * 100).toInt() * 20 / 100}"
+                                    text = "${(seek_microfon * 100).toInt() * 20 / 100}")
+                            }
+
+                            Spacer(modifier = Modifier.height(5.dp))
+                            Text(
+                                modifier = Modifier
+                                    .padding(start = 16.dp, top = 5.dp),
+                                text = stringResource(id = R.string.earpiece_gain)
+                            )
+                            Box (
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(start = 9.dp, end = 22.dp),
+                            ){
+                                Slider(
+                                    modifier = Modifier
+                                        .padding(end = 30.dp),
+                                    value = seek_earfon,
+                                    onValueChange = {
+                                        perapp.edit { putFloat(SpfConfig.SC_EARFON, it) }
+                                        seek_earfon = it
+                                        updateVisible()
+                                    },
+                                    colors = SliderDefaults.colors(
+                                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                                        inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.4f
+                                        )
+                                    ),
+                                    thumb = {
+                                        SliderDefaults.Thumb(interactionSource = remember {
+                                            MutableInteractionSource()
+                                        },
+                                            thumbSize = DpSize(20.dp, 20.dp),
+                                            colors = SliderDefaults.colors(
+                                                thumbColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        )
+                                    }
                                 )
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd)
+                                        .padding(bottom = 1.dp),
+                                    text = "${(seek_earfon * 100).toInt() * 20 / 100}")
+                            }
+
+                            Spacer(modifier = Modifier.height(5.dp))
+                            SwitchItem(
+                                title = stringResource(id = R.string.per_channel_controls),
+                                checked = switch_headfon
+                            ) {
+                                perapp.edit { putBoolean("sc_switch_headfon", it) }
+                                switch_headfon = it
+                                if (!switch_headfon) {
+                                    seek_headfon2 = seek_headfon
+                                    perapp.edit {
+                                        putFloat("sc_headfon2", seek_headfon2)
+                                    }
+                                }
+                                updateVisible()
+                            }
+                            Text(
+                                modifier = Modifier
+                                    .padding(start = 16.dp),
+                                text = if (switch_headfon) stringResource(id = R.string.headphone_gain_left) else stringResource(id = R.string.headphone_gain)
+                            )
+                            Box (
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(start = 9.dp, end = 22.dp),
+                            ){
+                                Slider(
+                                    modifier = Modifier
+                                        .padding(end = 30.dp),
+                                    value = seek_headfon,
+                                    onValueChange = {
+                                        perapp.edit { putFloat(SpfConfig.SC_HEADFON, it) }
+                                        if (!switch_headfon) {
+                                            perapp.edit {
+                                                putFloat(SpfConfig.SC_HEADFON2, it)
+                                            }
+                                            seek_headfon2 = it
+                                        }
+                                        seek_headfon = it
+                                        updateVisible()
+                                    },
+                                    colors = SliderDefaults.colors(
+                                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                                        inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.4f
+                                        )
+                                    ),
+                                    thumb = {
+                                        SliderDefaults.Thumb(interactionSource = remember {
+                                            MutableInteractionSource()
+                                        },
+                                            thumbSize = DpSize(20.dp, 20.dp),
+                                            colors = SliderDefaults.colors(
+                                                thumbColor = MaterialTheme.colorScheme.primary
+                                            )
+                                        )
+                                    }
+                                )
+                                Text(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd)
+                                        .padding(bottom = 1.dp),
+                                    text = "${(seek_headfon * 100).toInt() * 20 / 100}")
+                            }
+
+                            if (switch_headfon) {
+                                Text(
+                                    modifier = Modifier
+                                        .padding(start = 16.dp),
+                                    text = stringResource(id = R.string.headphone_gain_right)
+                                )
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                        .padding(start = 9.dp, end = 22.dp),
+                                ) {
+                                    Slider(
+                                        modifier = Modifier
+                                            .padding(end = 30.dp),
+                                        value = seek_headfon2,
+                                        onValueChange = {
+                                            perapp.edit {
+                                                putFloat(SpfConfig.SC_HEADFON2, it)
+                                            }
+                                            seek_headfon2 = it
+                                            updateVisible()
+                                        },
+                                        colors = SliderDefaults.colors(
+                                            activeTrackColor = MaterialTheme.colorScheme.primary,
+                                            inactiveTickColor = MaterialTheme.colorScheme.primary.copy(
+                                                alpha = 0.4f
+                                            )
+                                        ),
+                                        thumb = {
+                                            SliderDefaults.Thumb(
+                                                interactionSource = remember {
+                                                    MutableInteractionSource()
+                                                },
+                                                thumbSize = DpSize(20.dp, 20.dp),
+                                                colors = SliderDefaults.colors(
+                                                    thumbColor = MaterialTheme.colorScheme.primary
+                                                )
+                                            )
+                                        }
+                                    )
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterEnd)
+                                            .padding(bottom = 1.dp),
+                                        text = "${(seek_headfon2 * 100).toInt() * 20 / 100}"
+                                    )
+                                }
                             }
                         }
                     }
@@ -1406,7 +1469,6 @@ private fun TopBar(
                         leadingContent = appIcon,
                     )
                 }
-
             },
             navigationIcon = {
                 IconButton(
@@ -1465,7 +1527,8 @@ private fun AppMenuBox(packageName: String, content: @Composable () -> Unit) {
 
     BoxWithConstraints(
         Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .wrapContentHeight()
             .pointerInput(Unit) {
                 detectTapGestures {
                     touchPoint = it

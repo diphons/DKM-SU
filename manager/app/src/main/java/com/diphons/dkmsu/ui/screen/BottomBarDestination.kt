@@ -22,5 +22,5 @@ enum class BottomBarDestination(
     Home(HomeScreenDestination, R.string.home, IconResource.fromImageVector(Icons.Filled.Home), IconResource.fromImageVector(Icons.Outlined.Home), false),
     SuperUser(SuperUserScreenDestination, R.string.superuser, IconResource.fromImageVector(Icons.Filled.AdminPanelSettings), IconResource.fromImageVector(Icons.Outlined.AdminPanelSettings), true),
     Module(ModuleScreenDestination, R.string.module, IconResource.fromImageVector(Icons.Filled.Layers), IconResource.fromImageVector(Icons.Outlined.Layers), true),
-    Kernel(KernelScreenDestination, R.string.home_kernel, IconResource.fromImageVector(Icons.Filled.DeveloperMode), IconResource.fromImageVector(Icons.Outlined.DeveloperMode), true)
+    Kernel(KernelScreenDestination, R.string.home_kernel, IconResource.fromImageVector(Icons.Filled.DeveloperMode), IconResource.fromImageVector(Icons.Outlined.DeveloperMode), false)
 }

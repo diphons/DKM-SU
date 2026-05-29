@@ -41,8 +41,10 @@ android {
         prefab = true
     }
 
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget("21"))
+        }
     }
 
     packaging {
@@ -104,6 +106,8 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.appcompat.resources)
+    implementation(libs.material)
+    implementation(libs.androidx.material3)
 
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
@@ -138,4 +142,5 @@ dependencies {
     implementation(libs.accompanist)
     implementation(libs.livedata)
     implementation(libs.worker)
+    implementation(libs.lottie.compose)
 }

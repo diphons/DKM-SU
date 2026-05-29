@@ -312,6 +312,10 @@
     <string name="wakelock_btn_unblock">Buka blokir</string>
     <string name="battery_status">Status Baterai</string>
     <string name="battery_status_sum">Tampilkan status baterai dalam notifikasi</string>
+    <string name="battery_status_reset_percentage">Reset saat pengisian daya</string>
+    <string name="battery_status_reset_percentage_sum">Reset statistik saat pengisian daya mencapai 100%</string>
+    <string name="battery_status_reset">Reset statistik</string>
+    <string name="battery_status_estimated">untuk terisi penuh</string>
     <string name="full_charging">Terisi penuh</string>
     <string name="turbo">Turbo</string>
     <string name="fast">Cepat</string>
@@ -345,4 +349,16 @@
     <string name="ram_recycle">Mendaur ulang ZRAM</string>
     <string name="bypass_chg">Lewati Pengisian Daya</string>
     <string name="bypass_chg_summary">Gunakan daya langsung dari pengisi daya tanpa melibatkan baterai.\n\nPastikan Anda menggunakan pengisi daya bawaan.</string>
+    <string name="bypass_chg_content">Gunakan daya langsung</string>
+    <string name="keep_app_process">Tetap jalankan</string>
+    <string name="keep_app_process_sum">Biarkan aplikasi tetap berjalan di latar belakang</string>
+    <string name="low_power_mode">Mode daya rendah</string>
+    <string name="balanced_mode">Mode seimbang</string>
+    <string name="pro_game_mode">Mode Pro Gamer</string>
+    <string name="performance_settings">Pengaturan performa</string>
+    <string name="perf_settings_heating">Pemanasan</string>
+    <string name="perf_settings_image_quality">Kualitas gambar</string>
+    <string name="perf_settings_touch_control">Kontrol sentuh</string>
+    <string name="perf_settings_smoothness">Kehalusan</string>
+    <string name="kill_app">Nonaktifkan Aplikasi</string>
 </resources>

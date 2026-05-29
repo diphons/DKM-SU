@@ -19,6 +19,7 @@ package com.diphons.dkmsu.ui.uibench;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -40,8 +41,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.diphons.dkmsu.R;
+import com.diphons.dkmsu.ui.store.SpfColors;
+import com.diphons.dkmsu.ui.store.SpfConfig;
 
 public class RenderingJitter extends Activity {
     private TextView mJitterReport;
@@ -50,6 +54,7 @@ public class RenderingJitter extends Activity {
     private TextView mTotalFrameTimeReport;
     private TextView mMostlyTotalFrameTimeReport;
     private PointGraphView mGraph;
+    private static SharedPreferences prefs;
 
     private static final Handler sMetricsHandler;
     static {
@@ -90,6 +95,7 @@ public class RenderingJitter extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.rendering_jitter);
         View content = findViewById(android.R.id.content);
+        prefs = getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE);
         content.setBackground(new AnimatedBackgroundDrawable());
         content.setKeepScreenOn(true);
         mJitterReport = findViewById(R.id.jitter_mma);
@@ -102,6 +108,11 @@ public class RenderingJitter extends Activity {
         mMostlyTotalFrameTimeReport.setText("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         mUiFrameTimeReport.setText("0123456789");
         mRenderThreadTimeReport.setText(",.!()[]{};");
+        mJitterReport.setTextColor(prefs.getInt(SpfColors.COLOR_ON_BACKGROUND, ContextCompat.getColor(this, R.color.white)));
+        mMostlyTotalFrameTimeReport.setTextColor(prefs.getInt(SpfColors.COLOR_ON_BACKGROUND, ContextCompat.getColor(this, R.color.white)));
+        mUiFrameTimeReport.setTextColor(prefs.getInt(SpfColors.COLOR_ON_BACKGROUND, ContextCompat.getColor(this, R.color.white)));
+        mRenderThreadTimeReport.setTextColor(prefs.getInt(SpfColors.COLOR_ON_BACKGROUND, ContextCompat.getColor(this, R.color.white)));
+        mTotalFrameTimeReport.setTextColor(prefs.getInt(SpfColors.COLOR_ON_BACKGROUND, ContextCompat.getColor(this, R.color.white)));
         getWindow().addOnFrameMetricsAvailableListener(mMetricsListener, sMetricsHandler);
     }
 
@@ -294,14 +305,14 @@ public class RenderingJitter extends Activity {
 
         public AnimatedBackgroundDrawable() {
             mPaint = new Paint();
-            mPaint.setColor(0xFFFFFF00);
+            mPaint.setColor(prefs.getInt(SpfColors.COLOR_PRIMARY, 0xFFFFFF00));
             mPaint.setAntiAlias(true);
         }
 
         @Override
         public void draw(Canvas canvas) {
         //    stepColor();
-            canvas.drawColor(mColor);
+            canvas.drawColor(prefs.getInt(SpfColors.COLOR_BACKGROUND, mColor));
 
             mX += (mReverseX ? -mMoveStep : mMoveStep);
             mY += (mReverseY ? -mMoveStep : mMoveStep);

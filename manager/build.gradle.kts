@@ -4,6 +4,10 @@ import com.android.build.gradle.api.AndroidBasePlugin
 import java.io.ByteArrayOutputStream
 import java.util.Date
 import java.text.SimpleDateFormat
+import org.gradle.api.tasks.Exec
+import org.gradle.api.tasks.Internal
+import javax.inject.Inject
+import org.gradle.process.ExecOperations
 
 plugins {
     alias(libs.plugins.agp.app) apply false
@@ -30,26 +34,31 @@ cmaker {
 }
 
 val androidMinSdkVersion = 26
-val androidTargetSdkVersion = 35
-val androidCompileSdkVersion = 35
-val androidCompileNdkVersion = "27.2.12479018"
+val androidTargetSdkVersion = 36
+val androidCompileSdkVersion = 36
+val androidCompileNdkVersion = "29.0.14206865"
 val androidSourceCompatibility = JavaVersion.VERSION_21
 val androidTargetCompatibility = JavaVersion.VERSION_21
 val managerVersionCode by extra(getVersionCode())
 val managerVersionName by extra(getVersionName())
 val buildDate by extra(getDate())
 
-fun getGitCommitCount(): Int {
-    val out = ByteArrayOutputStream()
-    exec {
-        commandLine("git", "rev-list", "--count", "HEAD")
-        standardOutput = out
+abstract class GitInfo @Inject constructor(
+    private val execOps: ExecOperations
+) {
+    fun getGitCommitCount(): Int {
+        val out = ByteArrayOutputStream()
+        execOps.exec {
+            commandLine("git", "rev-list", "--count", "HEAD")
+            standardOutput = out
+        }
+        return out.toString().trim().toInt()
     }
-    return out.toString().trim().toInt()
 }
 
 fun getVersionCode(): Int {
-    val commitCount = getGitCommitCount()
+	val gitInfo = objects.newInstance(GitInfo::class.java)
+    val commitCount = gitInfo.getGitCommitCount()
     val major = 1
     return major * 10000 + commitCount + 200
 }

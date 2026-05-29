@@ -312,6 +312,10 @@
     <string name="wakelock_btn_unblock">Unblock</string>
     <string name="battery_status">Состояние батареи</string>
     <string name="battery_status_sum">Показывать состояние батареи в уведомлении</string>
+    <string name="battery_status_reset_percentage">Сбросить при зарядке</string>
+    <string name="battery_status_reset_percentage_sum">Сбросить статистику при достижении 100% заряда</string>
+    <string name="battery_status_reset">Сбросить статистику</string>
+    <string name="battery_status_estimated">до полной зарядки</string>
     <string name="full_charging">Полностью заряжен</string>
     <string name="turbo">Турбо</string>
     <string name="fast">Быстрый</string>
@@ -345,4 +349,16 @@
     <string name="ram_recycle">Переработка ZRAM</string>
     <string name="bypass_chg">Обходная зарядка</string>
     <string name="bypass_chg_summary">Используйте питание напрямую от зарядного устройства, не задействуя аккумулятор.\n\nОбязательно используйте штатное зарядное устройство.</string>
+    <string name="bypass_chg_content">Используйте прямую мощность</string>
+    <string name="keep_app_process">Продолжай бежать</string>
+    <string name="keep_app_process_sum">Оставьте приложение работать в фоновом режиме</string>
+    <string name="low_power_mode">Low power mode</string>
+    <string name="balanced_mode">Balanced mode</string>
+    <string name="pro_game_mode">Pro Gamer mode</string>
+    <string name="performance_settings">Настройки производительности</string>
+    <string name="perf_settings_heating">Нагрев</string>
+    <string name="perf_settings_image_quality">Image quality</string>
+    <string name="perf_settings_touch_control">Touch control</string>
+    <string name="perf_settings_smoothness">Плавность</string>
+    <string name="kill_app">Отключите приложение</string>
 </resources>

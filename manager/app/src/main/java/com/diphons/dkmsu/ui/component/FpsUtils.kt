@@ -1,7 +1,6 @@
 package com.diphons.dkmsu.ui.component
 
-import com.diphons.dkmsu.ui.component.KeepShell
-import com.diphons.dkmsu.ui.component.KeepShellPublic
+import android.view.Choreographer
 import com.diphons.dkmsu.ui.component.RootFile.fileExists
 
 /**
@@ -14,15 +13,19 @@ class FpsUtils(private val keepShell: KeepShell = KeepShellPublic.secondaryKeepS
     private var fpsCommand2 = "service call SurfaceFlinger 1013"
     private var lastTime = -1L
     private var lastFrames = -1
+    private var getFPS = 0F
+    private var choreographerStarted = false
+    private var lastFrameTimeNs = 0L
+    private var frameCount = 0
+    private var lastUpdateTimeNs = 0L
+    private val updateIntervalNs = 1_000_000_000L // setiap 1 detik
+    private val smoothing = 0.15f
 
     val currentFps: String?
         get() {
-            // 优先使用GPU的内核级帧数数据
             if (!fpsFilePath.isNullOrEmpty()) {
                 return keepShell.doCmdSync("cat $fpsFilePath $subStrCommand")
-            }
-            // 如果系统帧率不可用使用GPU的内核级帧数数据
-            else if (fpsFilePath == null) {
+            } else if (fpsFilePath == null) {
                 when {
                     fileExists("/sys/class/drm/sde-crtc-0/measured_fps") -> {
                         fpsFilePath = "/sys/class/drm/sde-crtc-0/measured_fps"
@@ -52,14 +55,13 @@ class FpsUtils(private val keepShell: KeepShell = KeepShellPublic.secondaryKeepS
                                     fpsFilePath = ""
                                 }
                                 keepShell.tryExit()
-                            } catch (ex: Exception) {
+                            } catch (_: Exception) {
                                 fpsFilePath = ""
                             }
                         }).start()
                     }
                 }
-            }
-            else if (fpsCommand2.isNotEmpty()) {
+            } else if (fpsCommand2.isNotEmpty()) {
                 val result = keepShell.doCmdSync(fpsCommand2).trim()
                 if (result != "error" && !result.contains("Parcel")) {
                     fpsCommand2 = ""
@@ -68,19 +70,22 @@ class FpsUtils(private val keepShell: KeepShell = KeepShellPublic.secondaryKeepS
                         val index = result.indexOf("(") + 1
                         val frames = Integer.parseInt(result.substring(index, index + 8), 16)
                         val time = System.currentTimeMillis()
-                        var fps = 0F
                         if (lastTime > 0 && lastFrames > 0) {
-                            fps = (frames - lastFrames) * 1000.0f / (time - lastTime)
+                            getFPS = (frames - lastFrames) * 1000.0f / (time - lastTime)
                         }
                         lastFrames = frames
                         lastTime = time
-                        return String.format("%.1f", fps)
-                    } catch (ex: Exception) {
+                        return String.format("%.1f", getFPS)
+                    } catch (_: Exception) {
                         if (!(lastTime > 0 && lastFrames > 0)) {
                             fpsCommand2 = ""
                         }
                     }
                 }
+            } else {
+                if (!choreographerStarted)
+                    startChoreographerFps()
+                return String.format("%.1f", getFPS)
             }
             return null
         }
@@ -91,9 +96,34 @@ class FpsUtils(private val keepShell: KeepShell = KeepShellPublic.secondaryKeepS
             if (fpsStr != null) {
                 try {
                     return fpsStr.toFloat()
-                } catch (ex: java.lang.Exception) {
+                } catch (_: java.lang.Exception) {
                 }
             }
             return -0f
         }
+
+    private fun startChoreographerFps() {
+        choreographerStarted = true
+        val choreographer = Choreographer.getInstance()
+
+        fun frameCallback(frameTimeNanos: Long) {
+            if (lastFrameTimeNs == 0L) {
+                lastFrameTimeNs = frameTimeNanos
+                lastUpdateTimeNs = frameTimeNanos
+            } else {
+                frameCount++
+                val elapsedNs = frameTimeNanos - lastUpdateTimeNs
+                if (elapsedNs >= updateIntervalNs) {
+                    val fpsNow = frameCount * 1_000_000_000.0 / elapsedNs
+                    getFPS = getFPS * (1 - smoothing) + fpsNow.toFloat() * smoothing
+                    frameCount = 0
+                    lastUpdateTimeNs = frameTimeNanos
+                }
+                lastFrameTimeNs = frameTimeNanos
+            }
+            choreographer.postFrameCallback(::frameCallback)
+        }
+
+        choreographer.postFrameCallback(::frameCallback)
+    }
 }

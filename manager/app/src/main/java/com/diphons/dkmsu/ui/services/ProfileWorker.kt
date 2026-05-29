@@ -7,6 +7,12 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.diphons.dkmsu.ui.store.*
 import com.diphons.dkmsu.ui.util.Utils.ADRENO_BOOST
+import com.diphons.dkmsu.ui.util.Utils.CPU_FREQ_IDLE_BIG
+import com.diphons.dkmsu.ui.util.Utils.CPU_FREQ_IDLE_LITTLE
+import com.diphons.dkmsu.ui.util.Utils.CPU_FREQ_IDLE_PRIME
+import com.diphons.dkmsu.ui.util.Utils.CPU_FREQ_MIN_BIG
+import com.diphons.dkmsu.ui.util.Utils.CPU_FREQ_MIN_LITTLE
+import com.diphons.dkmsu.ui.util.Utils.CPU_FREQ_MIN_PRIME
 import com.diphons.dkmsu.ui.util.Utils.CPU_GOV
 import com.diphons.dkmsu.ui.util.Utils.CPU_INFO_MIN
 import com.diphons.dkmsu.ui.util.Utils.CPU_MAX_FREQ
@@ -21,6 +27,13 @@ import com.diphons.dkmsu.ui.util.Utils.GPU_MIN_CKL
 import com.diphons.dkmsu.ui.util.Utils.GPU_MIN_FREQ
 import com.diphons.dkmsu.ui.util.Utils.GPU_MIN_GPUCLK
 import com.diphons.dkmsu.ui.util.Utils.HEADPHONE_GAIN
+import com.diphons.dkmsu.ui.util.Utils.INPUT_BOOST_DURATION
+import com.diphons.dkmsu.ui.util.Utils.INPUT_BOOST_FREQ_BIG
+import com.diphons.dkmsu.ui.util.Utils.INPUT_BOOST_FREQ_LITTLE
+import com.diphons.dkmsu.ui.util.Utils.INPUT_BOOST_FREQ_PRIME
+import com.diphons.dkmsu.ui.util.Utils.MAX_BOOST_FREQ_BIG
+import com.diphons.dkmsu.ui.util.Utils.MAX_BOOST_FREQ_LITTLE
+import com.diphons.dkmsu.ui.util.Utils.MAX_BOOST_FREQ_PRIME
 import com.diphons.dkmsu.ui.util.Utils.MICROPHONE_GAIN
 import com.diphons.dkmsu.ui.util.Utils.OPROFILE
 import com.diphons.dkmsu.ui.util.Utils.SOUND_CONTROL
@@ -28,7 +41,9 @@ import com.diphons.dkmsu.ui.util.Utils.TCP_CONGS
 import com.diphons.dkmsu.ui.util.Utils.THERMAL_PROFILE
 import com.diphons.dkmsu.ui.util.Utils.TOUCH_SAMPLE
 import com.diphons.dkmsu.ui.util.Utils.TOUCH_SAMPLE_GOODIX
+import com.diphons.dkmsu.ui.util.Utils.WAKE_BOOST_DURATION
 import com.diphons.dkmsu.ui.util.Utils.strToInt
+import com.diphons.dkmsu.ui.util.getDefCIB
 import com.diphons.dkmsu.ui.util.getDefCPUGov
 import com.diphons.dkmsu.ui.util.getDefCPUMaxFreq
 import com.diphons.dkmsu.ui.util.getDefIOSched
@@ -75,7 +90,9 @@ class ProfileWorker(context : Context, params : WorkerParameters) : Worker(conte
                 Context.MODE_PRIVATE
             )
         }
+        val defSpf = applicationContext.getSharedPreferences("cib", Context.MODE_PRIVATE)
 
+        getDefCIB(defSpf)
         if (!gameAi) {
             // OProfile
             if (hasModule(OPROFILE)) {
@@ -177,11 +194,10 @@ class ProfileWorker(context : Context, params : WorkerParameters) : Worker(conte
         setKernel("${prefs.getString("tcp", tcpDef)}", TCP_CONGS)
 
         if (list!!.isNotEmpty()) {
-            val preferences: SharedPreferences
-            if (!list.contains(onFocusedApp)) {
-                preferences = globalConfig
+            val preferences: SharedPreferences = if (!list.contains(onFocusedApp)) {
+                globalConfig
             } else
-                preferences = prefs
+                prefs
 
             // Touch Improve
             if (hasModule(TOUCH_SAMPLE_GOODIX))
@@ -199,6 +215,131 @@ class ProfileWorker(context : Context, params : WorkerParameters) : Worker(conte
             if (getFPSCount() > 1) {
                 if (!preferences.getString(SpfConfig.REFRESH_RATE, "Default")!!.contains("Default") && preferences.getString(SpfConfig.REFRESH_RATE, "Default")!!.isNotEmpty())
                 setRefreshRate(strToInt(preferences.getString(SpfConfig.REFRESH_RATE, "60")))
+            }
+
+            // Cpu Input Boost
+            if (!defSpf.all.isEmpty()) {
+                val primeCpu = getMaxCluster(applicationContext) > 2
+                if (hasModule(CPU_FREQ_IDLE_LITTLE)) {
+                    val cpu_freq_idle_big = prefs.getInt(
+                        "cpu_freq_idle_big",
+                        defSpf.getInt("cpu_freq_idle_big", strToInt(readKernel(CPU_FREQ_IDLE_BIG)))
+                    )
+                    val cpu_freq_idle_little = prefs.getInt(
+                        "cpu_freq_idle_little",
+                        defSpf.getInt(
+                            "cpu_freq_idle_little",
+                            strToInt(readKernel(CPU_FREQ_IDLE_LITTLE))
+                        )
+                    )
+                    if (primeCpu) {
+                        val cpu_freq_idle_prime = prefs.getInt(
+                            "cpu_freq_idle_prime",
+                            defSpf.getInt(
+                                "cpu_freq_idle_prime",
+                                strToInt(readKernel(CPU_FREQ_IDLE_PRIME))
+                            )
+                        )
+                        setKernel("$cpu_freq_idle_prime", CPU_FREQ_IDLE_PRIME)
+                    }
+                    setKernel("$cpu_freq_idle_big", CPU_FREQ_IDLE_BIG)
+                    setKernel("$cpu_freq_idle_little", CPU_FREQ_IDLE_LITTLE)
+                }
+
+                if (hasModule(CPU_FREQ_MIN_LITTLE)) {
+                    val cpu_freq_min_big = prefs.getInt(
+                        "cpu_freq_min_big",
+                        defSpf.getInt("cpu_freq_min_big", strToInt(readKernel(CPU_FREQ_MIN_BIG)))
+                    )
+                    val cpu_freq_min_little = prefs.getInt(
+                        "cpu_freq_min_little",
+                        defSpf.getInt(
+                            "cpu_freq_min_little",
+                            strToInt(readKernel(CPU_FREQ_MIN_LITTLE))
+                        )
+                    )
+                    if (primeCpu) {
+                        val cpu_freq_min_prime = prefs.getInt(
+                            "cpu_freq_min_prime",
+                            defSpf.getInt(
+                                "cpu_freq_min_prime",
+                                strToInt(readKernel(CPU_FREQ_MIN_PRIME))
+                            )
+                        )
+                        setKernel("$cpu_freq_min_prime", CPU_FREQ_MIN_PRIME)
+                    }
+                    setKernel("$cpu_freq_min_big", CPU_FREQ_MIN_BIG)
+                    setKernel("$cpu_freq_min_little", CPU_FREQ_MIN_LITTLE)
+                }
+                val input_boost_duration = prefs.getInt("input_boost_duration", defSpf.getInt("input_boost_duration", strToInt(readKernel(INPUT_BOOST_DURATION))))
+                setKernel("$input_boost_duration", INPUT_BOOST_DURATION)
+
+                if (hasModule(INPUT_BOOST_FREQ_LITTLE)) {
+                    val input_boost_freq_big = prefs.getInt(
+                        "input_boost_freq_big",
+                        defSpf.getInt(
+                            "input_boost_freq_big",
+                            strToInt(readKernel(INPUT_BOOST_FREQ_BIG))
+                        )
+                    )
+                    val input_boost_freq_little = prefs.getInt(
+                        "input_boost_freq_little",
+                        defSpf.getInt(
+                            "input_boost_freq_little",
+                            strToInt(readKernel(INPUT_BOOST_FREQ_LITTLE))
+                        )
+                    )
+                    if (primeCpu) {
+                        val input_boost_freq_prime = prefs.getInt(
+                            "input_boost_freq_prime",
+                            defSpf.getInt(
+                                "input_boost_freq_prime",
+                                strToInt(readKernel(INPUT_BOOST_FREQ_PRIME))
+                            )
+                        )
+                        setKernel("$input_boost_freq_prime", INPUT_BOOST_FREQ_PRIME)
+                    }
+                    setKernel("$input_boost_freq_big", INPUT_BOOST_FREQ_BIG)
+                    setKernel("$input_boost_freq_little", INPUT_BOOST_FREQ_LITTLE)
+                }
+                if (hasModule(MAX_BOOST_FREQ_LITTLE)) {
+                    val max_boost_freq_big = prefs.getInt(
+                        "max_boost_freq_big",
+                        defSpf.getInt(
+                            "max_boost_freq_big",
+                            strToInt(readKernel(MAX_BOOST_FREQ_BIG))
+                        )
+                    )
+                    val max_boost_freq_little = prefs.getInt(
+                        "max_boost_freq_little",
+                        defSpf.getInt(
+                            "max_boost_freq_little",
+                            strToInt(readKernel(MAX_BOOST_FREQ_LITTLE))
+                        )
+                    )
+                    if (primeCpu) {
+                        val max_boost_freq_prime = prefs.getInt(
+                            "max_boost_freq_prime",
+                            defSpf.getInt(
+                                "max_boost_freq_prime",
+                                strToInt(readKernel(MAX_BOOST_FREQ_PRIME))
+                            )
+                        )
+                        setKernel("$max_boost_freq_prime", MAX_BOOST_FREQ_PRIME)
+                    }
+                    setKernel("$max_boost_freq_big", MAX_BOOST_FREQ_BIG)
+                    setKernel("$max_boost_freq_little", MAX_BOOST_FREQ_LITTLE)
+                }
+                if (hasModule(WAKE_BOOST_DURATION)) {
+                    val wake_boost_duration = prefs.getInt(
+                        "wake_boost_duration",
+                        defSpf.getInt(
+                            "wake_boost_duration",
+                            strToInt(readKernel(WAKE_BOOST_DURATION))
+                        )
+                    )
+                    setKernel("$wake_boost_duration", WAKE_BOOST_DURATION)
+                }
             }
         }
 

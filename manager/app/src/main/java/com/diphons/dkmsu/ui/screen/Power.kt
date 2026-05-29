@@ -1,6 +1,7 @@
 package com.diphons.dkmsu.ui.screen
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -57,12 +58,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ui.component.SwitchItem
+import com.diphons.dkmsu.ui.services.BatteryService
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.store.*
-import com.diphons.dkmsu.ui.util.RootUtils
+import com.diphons.dkmsu.ui.util.Utils
 import com.diphons.dkmsu.ui.util.Utils.CHG_CUR_MAX
 import com.diphons.dkmsu.ui.util.Utils.DYNAMIC_CHARGING
 import com.diphons.dkmsu.ui.util.getCurrentCharger
@@ -70,6 +73,7 @@ import com.diphons.dkmsu.ui.util.hasModule
 import com.diphons.dkmsu.ui.util.setChgMax
 import com.diphons.dkmsu.ui.util.setKernel
 import com.diphons.dkmsu.ui.util.Utils.*
+import com.diphons.dkmsu.ui.util.isCharging
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -122,6 +126,7 @@ fun PowerScreen(navigator: DestinationsNavigator) {
         ) {
             val context = LocalContext.current
             val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+            val battConfig = context.getSharedPreferences(SpfConfig.BATTERY_SERVICE, Context.MODE_PRIVATE)
 
             ElevatedCard {
                 var chgDropdown by remember { mutableStateOf(false) }
@@ -496,8 +501,18 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                 }
             }
 
+            val intent = Intent(context, BatteryService::class.java)
+            var batteryNotify by rememberSaveable {
+                mutableStateOf(prefs.getBoolean(SpfConfig.BATTERY_NOTIF, false))
+            }
             var batteryNotifyMode by rememberSaveable {
                 mutableStateOf(prefs.getInt(SpfConfig.BATTERY_NOTIF_MODE, 1))
+            }
+            var batteryStatsReset by rememberSaveable {
+                mutableStateOf(prefs.getBoolean(SpfConfig.BATTERY_RESET_STATUS, false))
+            }
+            var batteryMonitor by rememberSaveable {
+                mutableStateOf(battConfig.getLong(SpfConfig.SCREEN_ON_DURATION, 0L))
             }
             var showBNDropdown by remember { mutableStateOf(false) }
             @Composable
@@ -516,17 +531,25 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                         batteryNotifyMode = reason
                         prefs.edit { putInt(SpfConfig.BATTERY_NOTIF_MODE, reason) }
                         showBNDropdown = false
+
+                        if (batteryNotify) {
+                            if (batteryNotifyMode == 0) {
+                                ContextCompat.startForegroundService(context, intent)
+                            } else {
+                                context.stopService(intent)
+                                if (isCharging(context))
+                                    ContextCompat.startForegroundService(context, intent)
+                            }
+                        }
+
                     })
             }
 
             ElevatedCard {
-                var batteryNotify by rememberSaveable {
-                    mutableStateOf(prefs.getBoolean(SpfConfig.BATTERY_NOTIF, false))
-                }
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 5.dp, end = 5.dp, top = 5.dp)
+                        .padding(start = 5.dp, end = 5.dp, top = 5.dp, bottom = 5.dp)
                 ) {
                     SwitchItem(
                         title = stringResource(R.string.battery_status),
@@ -535,14 +558,23 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                     ) {
                         prefs.edit { putBoolean(SpfConfig.BATTERY_NOTIF, it) }
                         batteryNotify = it
-                        if (it)
-                            RootUtils.runCommand("setprop init.dkmsvc.cmd battery")
+                        if (it) {
+                            if (batteryNotifyMode == 0) {
+                                ContextCompat.startForegroundService(context, intent)
+                            } else {
+                                context.stopService(intent)
+                                if (isCharging(context))
+                                    ContextCompat.startForegroundService(context, intent)
+                            }
+                        } else {
+                            context.stopService(intent)
+                        }
                     }
                 }
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 21.dp, end = 21.dp, bottom = 21.dp),
+                        .padding(start = 21.dp, end = 21.dp, bottom = 16.dp),
                 ) {
                     Text(
                         modifier = Modifier
@@ -599,6 +631,62 @@ fun PowerScreen(navigator: DestinationsNavigator) {
                                 }) {
                                 BatteryNotifyDropdownItem("Always", reason = 0)
                                 BatteryNotifyDropdownItem("Plugged", reason = 1)
+                            }
+                        }
+                    }
+                }
+                if (batteryNotifyMode == 0) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
+                    ) {
+                        SwitchItem(
+                            title = stringResource(R.string.battery_status_reset_percentage),
+                            checked = batteryStatsReset,
+                            summary = stringResource(R.string.battery_status_reset_percentage_sum)
+                        ) {
+                            batteryStatsReset = it
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 23.dp, end = 23.dp, bottom = 23.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterStart)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.battery_status_reset)
+                            )
+                        }
+                        ElevatedCard(
+                            colors = CardDefaults.elevatedCardColors(containerColor = run {
+                                MaterialTheme.colorScheme.primary
+                            }),
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .clickable {
+                                    if (batteryNotify)
+                                        resetStats = true
+                                    else
+                                        battConfig.edit().clear().apply()
+                                    batteryMonitor = battConfig.getLong(SpfConfig.SCREEN_ON_DURATION, 0L)
+                                },
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(vertical = 6.dp, horizontal = 15.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.reset),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    textAlign = TextAlign.Center
+                                )
                             }
                         }
                     }

@@ -26,6 +26,8 @@ import com.diphons.dkmsu.ui.util.KsuCli
 import com.diphons.dkmsu.ui.util.Utils.*
 import com.diphons.dkmsu.ui.util.getGameAllList
 import com.diphons.dkmsu.ui.util.getGameList
+import com.diphons.dkmsu.ui.util.getKillApp
+import com.diphons.dkmsu.ui.util.getPerAppList
 import com.diphons.dkmsu.ui.util.reloadData
 import java.text.Collator
 import java.util.*
@@ -50,7 +52,8 @@ class AIViewModel : ViewModel() {
         val op: String,
         val gov: String,
         val t: String,
-        val gpu: String
+        val gpu: String,
+        val kill: Boolean
     ) : Parcelable {
         val packageName: String
             get() = packageInfo.packageName
@@ -68,6 +71,8 @@ class AIViewModel : ViewModel() {
             get () = t
         val adreno: String
             get () = gpu
+        val killApp: Boolean
+            get() = kill
     }
 
     var search by mutableStateOf("")
@@ -157,20 +162,29 @@ class AIViewModel : ViewModel() {
                     reloadData = false
                     clearEndData(ksuApp.applicationContext)
                 }
-                val gameAi = getGameAllList(ksuApp.applicationContext).contains(it.packageName)
-                var getlist = ""
+                var gameAi = getGameAllList(ksuApp.applicationContext).contains(it.packageName)
+                var getList = ""
+                var killApp = false
                 if (gameAi) {
-                    getlist = getGameList(ksuApp.applicationContext, it.packageName)
+                    getList = getGameList(ksuApp.applicationContext, it.packageName)
+                } else {
+                    gameAi = getPerAppList(ksuApp.applicationContext, it.packageName)
+                    if (gameAi) {
+                        killApp = getKillApp(ksuApp.applicationContext, it.packageName)
+                        if (!killApp)
+                            getList = "#gm#: 0, #op#: 0, #gov#: #${readFile(CPU_LITTLE_GOV)}#, #t#: -1, #gpu#: 0"
+                    }
                 }
                 AppInfo(
                     label = appInfo.loadLabel(pm).toString(),
                     packageInfo = it,
                     gameai = gameAi,
-                    game = parserGameList(getlist, "gm").contains("1"),
-                    op = parserGameList(getlist, "op"),
-                    gov = parserGameList(getlist, "gov"),
-                    t = parserGameList(getlist, "t"),
-                    gpu = parserGameList(getlist, "gpu")
+                    game = parserGameList(getList, "gm").contains("1"),
+                    op = parserGameList(getList, "op"),
+                    gov = parserGameList(getList, "gov"),
+                    t = parserGameList(getList, "t"),
+                    gpu = parserGameList(getList, "gpu"),
+                    kill = killApp
                 )
             }.filter { it.packageName != ksuApp.packageName }
             Log.i(TAG, "load cost: ${SystemClock.elapsedRealtime() - start}")

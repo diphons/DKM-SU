@@ -3,6 +3,7 @@ package com.diphons.dkmsu.ui.screen
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Context.ACTIVITY_SERVICE
+import android.content.Intent
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
@@ -34,7 +35,9 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -71,10 +74,12 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.diphons.dkmsu.Natives
@@ -85,9 +90,12 @@ import com.ramcosta.composedestinations.navigation.EmptyDestinationsNavigator
 import com.diphons.dkmsu.R
 import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.component.KeepShellPublic
+import com.diphons.dkmsu.ui.component.SwitchItem
 import com.diphons.dkmsu.ui.component.rememberCustomDialog
 import com.diphons.dkmsu.ui.component.runDialog
+import com.diphons.dkmsu.ui.popup.FPSMonitor
 import com.diphons.dkmsu.ui.popup.PowerMenu
+import com.diphons.dkmsu.ui.services.BatteryService
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.util.*
 import com.diphons.dkmsu.ui.store.*
@@ -116,6 +124,7 @@ fun KernelScreen(navigator: DestinationsNavigator) {
 
     val context = LocalContext.current
     val prefs = context.getSharedPreferences(SpfConfig.SETTINGS, Context.MODE_PRIVATE)
+    val battConfig = context.getSharedPreferences(SpfConfig.BATTERY_SERVICE, Context.MODE_PRIVATE)
     var scrollPos by remember { mutableStateOf(0f) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -128,6 +137,7 @@ fun KernelScreen(navigator: DestinationsNavigator) {
             }
         }
     }
+    prepareColor(context)
 
     activityManager = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
     val gameai = MutableLiveData<Boolean>(prefs.getBoolean(SpfConfig.GAME_AI, true))
@@ -212,7 +222,8 @@ fun KernelScreen(navigator: DestinationsNavigator) {
         if (batt_healt_info.value!! > 100)
             batt_healt_info.value = 100
     }
-    loadData()
+    if (rootAvailable())
+        loadData()
 
     //Toast.makeText(context, "${getMinFreq(context, 3)} - ${getMaxFreq(context, 3)}", Toast.LENGTH_LONG).show()
     Scaffold(
@@ -240,57 +251,107 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                 .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-
-            loadData()
-            Row (modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ){
-                ElevatedCard (
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
+            if (rootAvailable()) {
+                loadData()
+                Row (modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ){
-                    Box(
+                    ElevatedCard (
                         modifier = Modifier
-                            .fillMaxSize()
-                    ) {
-                        Row (
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .padding(bottom = 5.dp)
-                        ){
-                            Icon(
-                                Icons.Filled.KeyboardArrowDown, "",
-                            )
-                        }
-                        Column (
+                            .weight(1f)
+                            .fillMaxHeight()
+                    ){
+                        Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clickable {
-                                    navigator.navigate(PerfmodeScreenDestination)
-                                }
-                                .padding(22.dp)
-                                .padding(bottom = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ){
-                            Text(
-                                modifier = Modifier,
-                                text = stringResource(R.string.performance_mode),
-                                fontSize = 15.sp,
-                                style = MaterialTheme.typography.titleSmall
-                            )
-                            Text(
-                                modifier = Modifier,
-                                text = "${stringResource(R.string.status)} : ${perf_status.value}",
-                                fontSize = 13.sp,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            if (!gameai.value!!) {
+                        ) {
+                            Row (
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .padding(bottom = 5.dp)
+                            ){
+                                Icon(
+                                    Icons.Filled.KeyboardArrowDown, "",
+                                )
+                            }
+                            Column (
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable {
+                                        navigator.navigate(PerfmodeScreenDestination)
+                                    }
+                                    .padding(22.dp)
+                                    .padding(bottom = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ){
                                 Text(
                                     modifier = Modifier,
-                                    text = "${stringResource(R.string.power_profile)} : ${perf_profile.value}",
+                                    text = stringResource(R.string.performance_mode),
+                                    fontSize = 15.sp,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Text(
+                                    modifier = Modifier,
+                                    text = "${stringResource(R.string.status)} : ${perf_status.value}",
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                if (!gameai.value!!) {
+                                    Text(
+                                        modifier = Modifier,
+                                        text = "${stringResource(R.string.power_profile)} : ${perf_profile.value}",
+                                        fontSize = 13.sp,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    ElevatedCard (
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                    ){
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .padding(bottom = 5.dp)
+                            ) {
+                                Icon(
+                                    Icons.Filled.KeyboardArrowDown, "",
+                                )
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable {
+                                        navigator.navigate(PowerScreenDestination)
+                                    }
+                                    .padding(22.dp)
+                                    .padding(bottom = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Text(
+                                    modifier = Modifier,
+                                    text = stringResource(R.string.power_settings),
+                                    fontSize = 15.sp,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Text(
+                                    modifier = Modifier,
+                                    text = "${chg_profile.value}",
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Text(
+                                    modifier = Modifier,
+                                    text = "${stringResource(R.string.health)} : ${batt_healt_info.value}%",
                                     fontSize = 13.sp,
                                     style = MaterialTheme.typography.bodySmall
                                 )
@@ -298,60 +359,383 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                         }
                     }
                 }
-                ElevatedCard (
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                ){
+            } else {
+                val intent = Intent(context, BatteryService::class.java)
+                var batteryNotify by rememberSaveable {
+                    mutableStateOf(prefs.getBoolean(SpfConfig.BATTERY_NOTIF, false))
+                }
+                var batteryNotifyMode by rememberSaveable {
+                    mutableStateOf(prefs.getInt(SpfConfig.BATTERY_NOTIF_MODE, 1))
+                }
+                var batteryStatsReset by rememberSaveable {
+                    mutableStateOf(prefs.getBoolean(SpfConfig.BATTERY_RESET_STATUS, false))
+                }
+                var showBNDropdown by remember { mutableStateOf(false) }
+                @Composable
+                fun BatteryNotifyDropdownItem(title: String, reason: Int) {
+                    DropdownMenuItem(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        text = {
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                text = title,
+                                textAlign = TextAlign.Center
+                            )
+                        }, onClick = {
+                            batteryNotifyMode = reason
+                            prefs.edit { putInt(SpfConfig.BATTERY_NOTIF_MODE, reason) }
+                            showBNDropdown = false
+
+                            if (batteryNotify) {
+                                if (batteryNotifyMode == 0) {
+                                    ContextCompat.startForegroundService(context, intent)
+                                } else {
+                                    context.stopService(intent)
+                                    if (isCharging(context))
+                                        ContextCompat.startForegroundService(context, intent)
+                                }
+                            }
+
+                        })
+                }
+
+                ElevatedCard {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp, end = 5.dp, top = 5.dp, bottom = 5.dp)
+                    ) {
+                        SwitchItem(
+                            title = stringResource(R.string.battery_status),
+                            checked = batteryNotify,
+                            summary = stringResource(R.string.battery_status_sum)
+                        ) {
+                            prefs.edit { putBoolean(SpfConfig.BATTERY_NOTIF, it) }
+                            batteryNotify = it
+                            if (it) {
+                                if (batteryNotifyMode == 0) {
+                                    ContextCompat.startForegroundService(context, intent)
+                                } else {
+                                    context.stopService(intent)
+                                    if (isCharging(context))
+                                        ContextCompat.startForegroundService(context, intent)
+                                }
+                            } else {
+                                context.stopService(intent)
+                            }
+                        }
+                    }
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
+                            .padding(start = 21.dp, end = 21.dp, bottom = 16.dp),
                     ) {
-                        Row(
+                        Text(
                             modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .padding(bottom = 5.dp)
+                                .align(Alignment.CenterStart),
+                            text = "Battery status view mode"
+                        )
+
+                        ElevatedCard(
+                            colors = CardDefaults.elevatedCardColors(containerColor = run {
+                                MaterialTheme.colorScheme.primary
+                            }),
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
                         ) {
-                            Icon(
-                                Icons.Filled.KeyboardArrowDown, "",
-                            )
+                            Row(
+                                modifier = Modifier
+                                    .clickable {
+                                        showBNDropdown = true
+                                    }
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                ) {
+                                    Text(
+                                        modifier = Modifier
+                                            .padding(
+                                                top = 9.dp,
+                                                bottom = 9.dp,
+                                                start = 15.dp,
+                                                end = 32.dp
+                                            ),
+                                        text = if (batteryNotifyMode == 0) "Always"
+                                        else
+                                            "Plugged",
+                                        fontSize = 16.sp,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        textAlign = TextAlign.Center
+                                    )
+
+                                    Row(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterEnd)
+                                            .padding(end = 6.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.KeyboardArrowDown, "",
+                                        )
+                                    }
+                                }
+                                DropdownMenu(
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    expanded = showBNDropdown, onDismissRequest = {
+                                        showBNDropdown = false
+                                    }) {
+                                    BatteryNotifyDropdownItem("Always", reason = 0)
+                                    BatteryNotifyDropdownItem("Plugged", reason = 1)
+                                }
+                            }
                         }
+                    }
+                    if (batteryNotifyMode == 0) {
                         Column(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .clickable {
-                                    navigator.navigate(PowerScreenDestination)
-                                }
-                                .padding(22.dp)
-                                .padding(bottom = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                                .fillMaxWidth()
+                                .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
                         ) {
+                            SwitchItem(
+                                title = stringResource(R.string.battery_status_reset_percentage),
+                                checked = batteryStatsReset,
+                                summary = stringResource(R.string.battery_status_reset_percentage_sum)
+                            ) {
+                                batteryStatsReset = it
+                            }
+                        }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 23.dp, end = 23.dp, bottom = 23.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.CenterStart)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.battery_status_reset)
+                                )
+                            }
+                            ElevatedCard(
+                                colors = CardDefaults.elevatedCardColors(containerColor = run {
+                                    MaterialTheme.colorScheme.primary
+                                }),
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .clickable {
+                                        if (batteryNotify)
+                                            resetStats = true
+                                        else
+                                            battConfig.edit().clear().apply()
+                                    },
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(vertical = 6.dp, horizontal = 15.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.reset),
+                                        style = MaterialTheme.typography.titleSmall,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var fps_monitor by rememberSaveable {
+                    mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI, false))
+                }
+                var fps_monitor_mode by rememberSaveable {
+                    mutableStateOf(prefs.getInt(SpfConfig.MONITOR_MINI_MODE, 2))
+                }
+                var showFPSDropdown by remember { mutableStateOf(false) }
+                @Composable
+                fun FPSMonitorDropdownItem(title: String, reason: Int) {
+                    DropdownMenuItem(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        text = {
                             Text(
-                                modifier = Modifier,
-                                text = stringResource(R.string.power_settings),
-                                fontSize = 15.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                text = title,
+                                textAlign = TextAlign.Center
+                            )
+                        }, onClick = {
+                            fps_monitor_mode = reason
+                            prefs.edit { putInt(SpfConfig.MONITOR_MINI_MODE, reason) }
+                            showFPSDropdown = false
+                            if (prefs.getBoolean(SpfConfig.MONITOR_MINI, false)) {
+                                FPSMonitor(context).hidePopupWindow()
+                                FPSMonitor(context).showPopupWindow()
+                            }
+                        })
+                }
+
+                ElevatedCard {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp, end = 5.dp, bottom = 5.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 18.dp, end = 18.dp, top = 18.dp, bottom = 5.dp),
+                        ){
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart),
+                                text = stringResource(R.string.fps_monitor),
+                                fontSize = 16.sp,
                                 style = MaterialTheme.typography.titleSmall
                             )
-                            Text(
-                                modifier = Modifier,
-                                text = "${chg_profile.value}",
-                                fontSize = 13.sp,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                            Text(
-                                modifier = Modifier,
-                                text = "${stringResource(R.string.health)} : ${batt_healt_info.value}%",
-                                fontSize = 13.sp,
-                                style = MaterialTheme.typography.bodySmall
-                            )
+
+                            ElevatedCard(
+                                colors = CardDefaults.elevatedCardColors(containerColor = run {
+                                    MaterialTheme.colorScheme.primary
+                                }),
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .clickable {
+                                            showFPSDropdown = true
+                                        }
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                    ) {
+                                        Text(
+                                            modifier = Modifier
+                                                .padding(top = 9.dp, bottom = 9.dp, start = 15.dp, end = 32.dp),
+                                            text = if (fps_monitor_mode == 0) stringResource(R.string.fps_only)
+                                            else if (fps_monitor_mode == 1)
+                                                stringResource(R.string.fps_scene)
+                                            else
+                                                stringResource(R.string.fps_oplus),
+                                            fontSize = 16.sp,
+                                            style = MaterialTheme.typography.titleSmall,
+                                            textAlign = TextAlign.Center
+                                        )
+
+                                        Row (
+                                            modifier = Modifier
+                                                .align(Alignment.CenterEnd)
+                                                .padding(end = 6.dp)
+                                        ){
+                                            Icon(
+                                                Icons.Filled.KeyboardArrowDown, "",
+                                            )
+                                        }
+                                    }
+                                    DropdownMenu(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                        expanded = showFPSDropdown, onDismissRequest = {
+                                            showFPSDropdown = false
+                                        }) {
+                                        FPSMonitorDropdownItem(stringResource(R.string.fps_only), reason = 0)
+                                        FPSMonitorDropdownItem(stringResource(R.string.fps_scene), reason = 1)
+                                        FPSMonitorDropdownItem(stringResource(R.string.fps_oplus), reason = 2)
+                                    }
+                                }
+                            }
+                        }
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 18.dp, end = 18.dp, top = 5.dp, bottom = 5.dp),
+                            text = if (fps_monitor_mode == 0)
+                                stringResource(R.string.fps_only_info)
+                            else if (fps_monitor_mode == 1)
+                                stringResource(R.string.fps_scene_info)
+                            else
+                                stringResource(R.string.fps_oplus_info),
+                            fontSize = 14.sp,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                        SwitchItem(
+                            title = stringResource(R.string.fps_monitor_show),
+                            checked = fps_monitor,
+                            summary = if (fps_monitor)
+                                stringResource(R.string.fps_monitor_show_disable)
+                            else
+                                stringResource(R.string.fps_monitor_show_enable)
+                        ) {
+                            if (it)
+                                FPSMonitor(context).showPopupWindow()
+                            else
+                                FPSMonitor(context).hidePopupWindow()
+                            prefs.edit { putBoolean(SpfConfig.MONITOR_MINI, it) }
+                            fps_monitor = it
+                        }
+                        if (fps_monitor_mode == 2) {
+                            var fps_monitor_small by rememberSaveable {
+                                mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI_SMALL, false))
+                            }
+                            SwitchItem(
+                                title = stringResource(R.string.fps_small_view),
+                                checked = fps_monitor_small,
+                                summary = if (fps_monitor_small)
+                                    stringResource(R.string.fps_small_view_disable)
+                                else
+                                    stringResource(R.string.fps_small_view_enable)
+                            ) {
+                                prefs.edit { putBoolean(SpfConfig.MONITOR_MINI_SMALL, it) }
+                                fps_monitor_small = it
+                            }
+                            if (fps_monitor_small) {
+                                var fps_monitor_ram by rememberSaveable {
+                                    mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI_RAM, true))
+                                }
+                                var fps_monitor_bat by rememberSaveable {
+                                    mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI_BATT, true))
+                                }
+                                var fps_monitor_temp by rememberSaveable {
+                                    mutableStateOf(prefs.getBoolean(SpfConfig.MONITOR_MINI_TEMP, true))
+                                }
+                                SwitchItem(
+                                    title = stringResource(R.string.fps_battery_view),
+                                    checked = fps_monitor_bat,
+                                    summary = stringResource(R.string.fps_battery_view_sum)
+                                ) {
+                                    prefs.edit { putBoolean(SpfConfig.MONITOR_MINI_BATT, it) }
+                                    fps_monitor_bat = it
+                                }
+                                SwitchItem(
+                                    title = stringResource(R.string.fps_temp_view),
+                                    checked = fps_monitor_temp,
+                                    summary = stringResource(R.string.fps_temp_view_sum)
+                                ) {
+                                    prefs.edit { putBoolean(SpfConfig.MONITOR_MINI_TEMP, it) }
+                                    fps_monitor_temp = it
+                                }
+                                SwitchItem(
+                                    title = stringResource(R.string.fps_ram_view),
+                                    checked = fps_monitor_ram,
+                                    summary = stringResource(R.string.fps_ram_view_sum)
+                                ) {
+                                    prefs.edit { putBoolean(SpfConfig.MONITOR_MINI_RAM, it) }
+                                    fps_monitor_ram = it
+                                }
+                            }
                         }
                     }
                 }
             }
+
             ElevatedCard (
                 modifier = Modifier
                     .clickable {
-                        navigator.navigate(SwapScreenDestination)
+                        if (rootAvailable())
+                            navigator.navigate(SwapScreenDestination)
                     }
             ){
                 var totalMem by rememberSaveable { mutableIntStateOf(0) }
@@ -532,44 +916,13 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                     }
                 }
             }
-            ElevatedCard {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        navigator.navigate(DisplayScreenDestination)
-                    }
-                    .padding(23.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column (modifier = Modifier
-                        .weight(3f)
-                    ){
-                        Text(
-                            text = stringResource(R.string.display_settings),
-                            fontSize = 15.sp,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.display_settings_summary),
-                            fontSize = 13.sp,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null
-                    )
-                }
-            }
-            if (hasModule(DT2W) || hasModule(DT2W_LEGACY) || hasModule(TOUCH_SAMPLE) || hasModule(
-                    HAPTIC_LEVEL) || hasXiaomiDevice()
-            ) {
+
+            if (rootAvailable()) {
                 ElevatedCard {
                     Row(modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            navigator.navigate(TouchScreenDestination)
+                            navigator.navigate(DisplayScreenDestination)
                         }
                         .padding(23.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -578,13 +931,13 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                             .weight(3f)
                         ){
                             Text(
-                                text = stringResource(R.string.touch_mode),
+                                text = stringResource(R.string.display_settings),
                                 fontSize = 15.sp,
                                 style = MaterialTheme.typography.titleSmall
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                text = stringResource(R.string.touch_mode_sum),
+                                text = stringResource(R.string.display_settings_summary),
                                 fontSize = 13.sp,
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -595,13 +948,77 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                         )
                     }
                 }
-            }
-            if (hasModule(SOUND_CONTROL)) {
+                if (hasModule(DT2W) || hasModule(DT2W_LEGACY) || hasModule(TOUCH_SAMPLE) || hasModule(
+                        HAPTIC_LEVEL) || hasXiaomiDevice()
+                ) {
+                    ElevatedCard {
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                navigator.navigate(TouchScreenDestination)
+                            }
+                            .padding(23.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column (modifier = Modifier
+                                .weight(3f)
+                            ){
+                                Text(
+                                    text = stringResource(R.string.touch_mode),
+                                    fontSize = 15.sp,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(R.string.touch_mode_sum),
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+                if (hasModule(SOUND_CONTROL)) {
+                    ElevatedCard {
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                navigator.navigate(SoundScreenDestination)
+                            }
+                            .padding(23.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column (modifier = Modifier
+                                .weight(3f)
+                            ){
+                                Text(
+                                    text = stringResource(R.string.sound_control),
+                                    fontSize = 15.sp,
+                                    style = MaterialTheme.typography.titleSmall
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(R.string.sound_control_summary),
+                                    fontSize = 13.sp,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
                 ElevatedCard {
                     Row(modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            navigator.navigate(SoundScreenDestination)
+                            navigator.navigate(MiscScreenDestination)
                         }
                         .padding(23.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -610,13 +1027,13 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                             .weight(3f)
                         ){
                             Text(
-                                text = stringResource(R.string.sound_control),
+                                text = stringResource(R.string.misc),
                                 fontSize = 15.sp,
                                 style = MaterialTheme.typography.titleSmall
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                text = stringResource(R.string.sound_control_summary),
+                                text = stringResource(R.string.misc_sum),
                                 fontSize = 13.sp,
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -627,67 +1044,37 @@ fun KernelScreen(navigator: DestinationsNavigator) {
                         )
                     }
                 }
-            }
-            ElevatedCard {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        navigator.navigate(MiscScreenDestination)
-                    }
-                    .padding(23.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column (modifier = Modifier
-                        .weight(3f)
-                    ){
-                        Text(
-                            text = stringResource(R.string.misc),
-                            fontSize = 15.sp,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.misc_sum),
-                            fontSize = 13.sp,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null
-                    )
-                }
-            }
-            ElevatedCard {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            forceReloadWlList = true
-                            navigator.navigate(WakelocksScreenDestination)
+                ElevatedCard {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                forceReloadWlList = true
+                                navigator.navigate(WakelocksScreenDestination)
+                            }
+                            .padding(23.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column (modifier = Modifier
+                            .weight(3f)
+                        ){
+                            Text(
+                                text = "Wakelocks",
+                                fontSize = 15.sp,
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                text = stringResource(R.string.wakelock_sum),
+                                fontSize = 13.sp,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
-                        .padding(23.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column (modifier = Modifier
-                        .weight(3f)
-                    ){
-                        Text(
-                            text = "Wakelocks",
-                            fontSize = 15.sp,
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.wakelock_sum),
-                            fontSize = 13.sp,
-                            style = MaterialTheme.typography.bodyMedium
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null
                         )
                     }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = null
-                    )
                 }
             }
         }

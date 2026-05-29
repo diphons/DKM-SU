@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    android:shape="rectangle"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners
+        android:radius="6.0dip" />
+    <solid
+        android:color="@color/toolbox_perf_settings_mode_btn_selected_bg_color" />
+    <stroke
+        android:width="0.33000004dip"
+        android:color="#33ffffff" />
+</shape>

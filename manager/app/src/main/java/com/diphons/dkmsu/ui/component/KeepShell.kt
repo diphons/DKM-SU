@@ -58,7 +58,7 @@ class KeepShell(private var rootMode: Boolean = true) {
                 "else\n" +
                 "if [[ -d /cache ]]; then\n" +
                 "  echo 1 > /cache/dkm_root\n" +
-                "  if [[ -f /cache/dkm_root ]] && [[ \$(cat /cache/vtools_root) == '1' ]]; then\n" +
+                "  if [[ -f /cache/dkm_root ]] && [[ \$(cat /cache/dkm_root) == '1' ]]; then\n" +
                 "    echo 'success'\n" +
                 "    rm -rf /cache/dkm_root\n" +
                 "    return\n" +

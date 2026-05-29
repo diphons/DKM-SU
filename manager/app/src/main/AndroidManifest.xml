@@ -31,7 +31,8 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"
+        tools:ignore="ForegroundServicesPolicy" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.START_FOREGROUND_SERVICES_FROM_BACKGROUND"
         tools:ignore="ProtectedPermissions" />
@@ -63,6 +64,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
     <uses-permission android:name="android.permission.RUN_USER_INITIATED_JOBS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
 
     <application
         android:name=".KernelSUApplication"
@@ -92,6 +94,10 @@
             android:documentLaunchMode="intoExisting"
             android:exported="false"
             android:theme="@style/Theme.KernelSU.WebUI" />
+
+        <activity
+            android:name=".ui.uibench.RenderJitter"
+            android:exported="false" />
 
         <activity
             android:name=".ui.uibench.RenderingJitter"
@@ -196,6 +202,15 @@
             </intent-filter>
         </receiver>
         <receiver
+            android:name=".ui.services.SVCReceiver"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.FOREGROUND_SERVICE">
+            <intent-filter>
+                <action android:name="com.diphons.dkmsu.SVC_RESTART" />
+            </intent-filter>
+        </receiver>
+        <receiver
             android:name=".ui.services.PerAppReceiver"
             android:enabled="true"
             android:exported="true"
@@ -204,13 +219,21 @@
                 <action android:name="com.diphons.dkmsu.PER_APP" />
             </intent-filter>
         </receiver>
+        <service
+            android:name=".ui.services.BatteryService"
+            android:exported="false"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+            android:foregroundServiceType="specialUse" />
         <receiver
             android:name=".ui.services.BatteryReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.FOREGROUND_SERVICE">
             <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.diphons.dkmsu.BATTERY_INFO" />
+                <action android:name="android.intent.action.REBOOT" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
     </application>

@@ -1,5 +1,6 @@
 package com.diphons.dkmsu.ui
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
@@ -42,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
@@ -60,6 +62,7 @@ import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
 import com.diphons.dkmsu.Natives
 import com.diphons.dkmsu.ksuApp
 import com.diphons.dkmsu.ui.screen.BottomBarDestination
+import com.diphons.dkmsu.ui.services.BatteryService
 import com.diphons.dkmsu.ui.theme.KernelSUTheme
 import com.diphons.dkmsu.ui.util.LocalSnackbarHost
 import com.diphons.dkmsu.ui.util.rootAvailable
@@ -96,9 +99,15 @@ class MainActivity : ComponentActivity() {
         }
 
         //Extract Assets
-        if (isManager && rootAvailable()) {
-            prefs.edit { putBoolean(SpfConfig.GKI_MODE, getKNVersion()) }
+        if (rootAvailable()) {
+            if (isManager)
+                prefs.edit { putBoolean(SpfConfig.GKI_MODE, getKNVersion()) }
             extractXTAssets(this)
+        } else if (prefs.getBoolean(SpfConfig.BATTERY_NOTIF, false) &&
+            (prefs.getInt(SpfConfig.BATTERY_NOTIF_MODE, 1) == 0 || isCharging(this))) {
+            val serviceIntent = Intent(this, BatteryService::class.java)
+            startForegroundService(serviceIntent)
+            batteryWorker(this)
         }
         setContent {
             KernelSUTheme {

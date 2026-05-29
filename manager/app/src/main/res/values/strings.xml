@@ -335,6 +335,10 @@
     <string name="wakelock_btn_unblock">Unblock</string>
     <string name="battery_status">Battery Status</string>
     <string name="battery_status_sum">Show battery status in notification</string>
+    <string name="battery_status_reset_percentage">Reset when charging</string>
+    <string name="battery_status_reset_percentage_sum">Reset the stats when charging reaches 100%</string>
+    <string name="battery_status_reset">Reset stats</string>
+    <string name="battery_status_estimated">for a full charged</string>
     <string name="full_charging">Fully charged</string>
     <string name="turbo">Turbo</string>
     <string name="fast">Fast</string>
@@ -368,4 +372,16 @@
     <string name="ram_recycle">Recycle ZRAM</string>
     <string name="bypass_chg">Bypas Charging</string>
     <string name="bypass_chg_summary">Use power directly from the charger without involving the battery.\n\nMake sure you use the stock charger</string>
+    <string name="bypass_chg_content">Use direct power</string>
+    <string name="keep_app_process">Keep running</string>
+    <string name="keep_app_process_sum">Keep the app running in the background</string>
+    <string name="low_power_mode">Low power mode</string>
+    <string name="balanced_mode">Balanced mode</string>
+    <string name="pro_game_mode">Pro Gamer mode</string>
+    <string name="performance_settings">Performance settings</string>
+    <string name="perf_settings_heating">Heating</string>
+    <string name="perf_settings_image_quality">Image quality</string>
+    <string name="perf_settings_touch_control">Touch control</string>
+    <string name="perf_settings_smoothness">Smoothness</string>
+    <string name="kill_app">Disable App</string>
 </resources>

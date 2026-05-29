@@ -85,7 +85,7 @@ public class SpfConfig {
     public static String CURRENT_NOW_UNIT = "global_current_now_unit";
     public static int CURRENT_NOW_UNIT_DEFAULT = -1000;
     public static String BATTERY_NOTIF = "battery_notif";
-    public static String BATTERY_NOTIF_STATUS = "battery_notif_status";
+    public static String BATTERY_RESET_STATUS = "battery_reset_status";
     public static String BATTERY_NOTIF_MODE = "battery_notif_mode";
     public static String BYPASS_CHARGING = "bypass_charging";
     public static String SPOOF_DEFAULT = "spoof_default";
@@ -100,6 +100,20 @@ public class SpfConfig {
     public static String DIRTY_RATIO = "mem_dirty_ratio";
     public static String DIRTY_BACK_RATIO = "mem_dirty_background_ratio";
     public static String DIRTY_WRITE_CENTISECS = "mem_dirty_writeback_centisecs";
-    public static String DIRTY_EXPIRE_CENTISECS= "mem_dirty_expire_centisecs";
-    public static String TCP_CONG_DEF= "tcp_default";
+    public static String DIRTY_EXPIRE_CENTISECS = "mem_dirty_expire_centisecs";
+    public static String TCP_CONG_DEF = "tcp_default";
+    public static String KEEP_APP = "keep_app";
+    public static String SCREEN_ON_DURATION = "screen_on_duration";
+    public static String SCREEN_OFF_DURATION = "screen_off_duration";
+    public static String BATTERY_SERVICE = "battery_service";
+    public static String BATTERY_LOST_SCREEN_ON = "battery_lost_during_screen_on";
+    public static String BATTERY_LOST_SCREEN_OFF = "battery_lost_during_screen_off";
+    public static String DEEP_SLEEP_MILLIS = "deep_sleep_millis";
+    public static String LAST_SCREEN_STATE_CHANGE = "last_screen_state_millis";
+    public static String GAME_TOOL = "game_tool";
+    public static String GAME_TOOL_PERF = "game_tool_perf";
+    public static String GAME_TOOL_MODE = "game_tool_mode";
+    public static String GAME_TOOL_PORTRAIT = "game_tool_portrait";
+    public static String GAME_TOOL_LANDSCAPE = "game_tool_landscape";
+    public static String KILL_APP = "kill_app";
 }

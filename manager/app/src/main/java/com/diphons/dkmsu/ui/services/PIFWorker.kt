@@ -7,6 +7,7 @@ import com.diphons.dkmsu.ui.util.RootUtils
 import com.diphons.dkmsu.ui.util.Utils.AV_INTERNET
 import com.diphons.dkmsu.ui.util.Utils.CMD_MSG
 import com.diphons.dkmsu.ui.util.Utils.PIF_UPDATER
+import com.diphons.dkmsu.ui.util.dkmsvcDaemonPath
 
 class PIFWorker(context : Context, params : WorkerParameters) : Worker(context,params) {
     var countMax = 0
@@ -24,7 +25,7 @@ class PIFWorker(context : Context, params : WorkerParameters) : Worker(context,p
 
     override fun doWork(): Result {
         CMD_MSG = ""
-        RootUtils.runCommand("setprop init.dkmsvc.cmd 'pif'")
+        RootUtils.runCommand("${dkmsvcDaemonPath()} cmd pif")
         //CMD_MSG = RootUtils.runAndGetOutput("su -c $PIF_UPDATER")
 
         countMax = 0

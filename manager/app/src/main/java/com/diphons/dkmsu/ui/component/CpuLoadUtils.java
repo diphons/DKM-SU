@@ -2,12 +2,8 @@ package com.diphons.dkmsu.ui.component;
 
 import android.annotation.SuppressLint;
 import com.diphons.dkmsu.ui.component.KernelProrp;
-
 import java.util.HashMap;
 
-/**
- * CPU负载计算器
- */
 public class CpuLoadUtils {
     private static String lastCpuState = "";
     private static HashMap<Integer, Double> lastCpuStateMap;
@@ -41,7 +37,6 @@ public class CpuLoadUtils {
         return Long.parseLong(cols[4]);
     }
 
-    // 返回数据如： { -1: 50.5, 0: 80.9, 1: 75.5 ... },  -1 表示所有核心的整体利用率，0~7则为正常的cpu序号
     public HashMap<Integer, Double> getCpuLoad() {
         if (lastCpuStateMap != null && System.currentTimeMillis() - lastCpuStateTime < 500) {
             return lastCpuStateMap;

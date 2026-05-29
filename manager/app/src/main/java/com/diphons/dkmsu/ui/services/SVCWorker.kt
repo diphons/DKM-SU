@@ -9,7 +9,7 @@ import com.diphons.dkmsu.ui.util.svcInit
 import com.diphons.dkmsu.ui.util.spoofKernel
 import com.diphons.dkmsu.ui.util.Utils.*
 import com.diphons.dkmsu.ui.util.getStartedSVC
-import com.diphons.dkmsu.ui.util.setSVCCMD
+import com.diphons.dkmsu.ui.util.setSvcCmd
 import com.diphons.dkmsu.ui.util.startSVC
 
 class SVCWorker(context : Context, params : WorkerParameters) : Worker(context,params) {
@@ -28,7 +28,7 @@ class SVCWorker(context : Context, params : WorkerParameters) : Worker(context,p
                 if ("$spoof_kernel".isNotEmpty() && !"$spoof_kernel".contains(" "))
                     spoofKernel("$spoof_kernel")
                 setSuSFSLog(susfs_log)
-                setSVCCMD(svcInit)
+                setSvcCmd(svcInit)
             } else if (svcInit.contains("susfs1")) {
                 if ("$spoof_kernel".isNotEmpty() && !"$spoof_kernel".contains(" "))
                     spoofKernel("$spoof_kernel")
@@ -37,7 +37,7 @@ class SVCWorker(context : Context, params : WorkerParameters) : Worker(context,p
             } else if (svcInit.contains("susfs2")) {
                 setSuSFSLog(susfs_log)
             } else {
-                setSVCCMD(svcInit)
+                setSvcCmd(svcInit)
             }
 
             // Reset
